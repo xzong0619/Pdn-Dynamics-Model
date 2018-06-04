@@ -1,0 +1,17 @@
+/opt/shared/OpenGridScheduler/2011.11p1/default/spool/node01-25/active_jobs/246540.1/pe_hostfile
+node01-25
+Adding dependency `gcc/4.6.3` to your environment
+Adding package `python/2.7.8` to your environment
+Adding package `openmpi/1.6.3-gcc` to your environment
+Adding dependency `atlas/3.11.11-gcc46` to your environment
+Adding package `python-numpy/1.8.2-python2.7.8` to your environment
+Adding package `python-scipy/0.17.1-python2.7.8` to your environment
+
+Running on node01-25 with job id 246540
+
+/mnt/files-ccei/home/wangyf/Ceria/Pd_Growth/3d/all/61/300/1
+/mnt/files-ccei/home/wangyf/Ceria/Pd_Growth/3d/all/61/300/1/outputs
+Running parallel jobs
+Your job-array 246544.1-10:1 ("zacros_JA") has been submitted
+Jobs in /mnt/files-ccei/home/wangyf/Ceria/Pd_Growth/3d/all/61/300/1/outputs have finished
+Reading all runs in /mnt/files-ccei/home/wangyf/Ceria/Pd_Growth/3d/all/61/300/1/outputs

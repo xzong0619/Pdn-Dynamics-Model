@@ -1,0 +1,495 @@
+energetics
+
+################################################################################
+
+cluster Pd1*
+
+  sites 1
+  lattice_state
+      1 Pd1*       1
+
+  variant _
+    site_types               T 
+    graph_multiplicity       1
+    cluster_eng              0.0
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd2*
+
+  sites 2
+  neighboring 1-2
+  lattice_state
+      1 Pd2*       1
+      1 Pd2*       2
+
+  variant _
+    site_types               T T 
+    graph_multiplicity       2
+    cluster_eng              -0.9
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd3*
+
+  sites 3
+  neighboring 1-2 1-3 2-3
+  lattice_state
+      1 Pd3*       1
+      1 Pd3*       2
+      1 Pd3*       3
+
+  variant _
+    site_types               T T T 
+    graph_multiplicity       3
+    cluster_eng              -4.5
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd4*
+
+  sites 4
+  neighboring 1-2 1-3 2-3 4-2 4-3
+  lattice_state
+      1 Pd4*       1
+      1 Pd4*       2
+      1 Pd4*       3
+      1 Pd4*       4
+
+  variant _
+    site_types               T T T T 
+    graph_multiplicity       4
+    cluster_eng              -10.24
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd4_3&1*
+
+  sites 3
+  neighboring 1-2 1-3 2-3
+  lattice_state
+      1 Pd4_3&1*   1
+      1 Pd4_3&1*   2
+      1 Pd4_3&1*   3
+
+  variant _
+    site_types               T T T 
+    graph_multiplicity       3
+    cluster_eng              -8.22
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd5*
+
+  sites 5
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3
+  lattice_state
+      1 Pd5*       1
+      1 Pd5*       2
+      1 Pd5*       3
+      1 Pd5*       4
+      1 Pd5*       5
+
+  variant _
+    site_types               T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -3.41
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd5_4&1*
+
+  sites 4
+  neighboring 1-2 1-3 2-3 4-2 4-3
+  lattice_state
+      1 Pd5_4&1*   1
+      1 Pd5_4&1*   2
+      1 Pd5_4&1*   3
+      1 Pd5_4&1*   4
+
+  variant _
+    site_types               T T T T 
+    graph_multiplicity       4
+    cluster_eng              -15.96
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd6_1*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-3
+  lattice_state
+      1 Pd6_1*     1
+      1 Pd6_1*     2
+      1 Pd6_1*     3
+      1 Pd6_1*     4
+      1 Pd6_1*     5
+      1 Pd6_1*     6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -4.49
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd6_2*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-4
+  lattice_state
+      1 Pd6_2*     1
+      1 Pd6_2*     2
+      1 Pd6_2*     3
+      1 Pd6_2*     4
+      1 Pd6_2*     5
+      1 Pd6_2*     6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -4.38
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd6_3*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-4 6-2
+  lattice_state
+      1 Pd6_3*     1
+      1 Pd6_3*     2
+      1 Pd6_3*     3
+      1 Pd6_3*     4
+      1 Pd6_3*     5
+      1 Pd6_3*     6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       3
+    cluster_eng              -12.96
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd6_5&1*
+
+  sites 5
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3
+  lattice_state
+      1 Pd6_5&1*   1
+      1 Pd6_5&1*   2
+      1 Pd6_5&1*   3
+      1 Pd6_5&1*   4
+      1 Pd6_5&1*   5
+
+  variant _
+    site_types               T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.23
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd6_4&2*
+
+  sites 4
+  neighboring 1-2 1-3 2-3 4-2 4-3
+  lattice_state
+      1 Pd6_4&2*   1
+      1 Pd6_4&2*   2
+      1 Pd6_4&2*   3
+      1 Pd6_4&2*   4
+
+  variant _
+    site_types               T T T T 
+    graph_multiplicity       4
+    cluster_eng              -19.8
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_1*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-3 7-6 7-3 1-7
+  lattice_state
+      1 Pd7_1*     1
+      1 Pd7_1*     2
+      1 Pd7_1*     3
+      1 Pd7_1*     4
+      1 Pd7_1*     5
+      1 Pd7_1*     6
+      1 Pd7_1*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       6
+    cluster_eng              -36.42
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_2*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-4 7-6 7-5
+  lattice_state
+      1 Pd7_2*     1
+      1 Pd7_2*     2
+      1 Pd7_2*     3
+      1 Pd7_2*     4
+      1 Pd7_2*     5
+      1 Pd7_2*     6
+      1 Pd7_2*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -4.9
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_3*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-3 7-6 7-5
+  lattice_state
+      1 Pd7_3*     1
+      1 Pd7_3*     2
+      1 Pd7_3*     3
+      1 Pd7_3*     4
+      1 Pd7_3*     5
+      1 Pd7_3*     6
+      1 Pd7_3*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.11
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_3*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-4 7-6 7-4
+  lattice_state
+      1 Pd7_3*     1
+      1 Pd7_3*     2
+      1 Pd7_3*     3
+      1 Pd7_3*     4
+      1 Pd7_3*     5
+      1 Pd7_3*     6
+      1 Pd7_3*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.11
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_4*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-4 6-2 7-6 7-2
+  lattice_state
+      1 Pd7_4*     1
+      1 Pd7_4*     2
+      1 Pd7_4*     3
+      1 Pd7_4*     4
+      1 Pd7_4*     5
+      1 Pd7_4*     6
+      1 Pd7_4*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.12
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_4*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-3 7-4 7-2
+  lattice_state
+      1 Pd7_4*     1
+      1 Pd7_4*     2
+      1 Pd7_4*     3
+      1 Pd7_4*     4
+      1 Pd7_4*     5
+      1 Pd7_4*     6
+      1 Pd7_4*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.12
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_4*
+
+  sites 7
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-4 7-4 7-2
+  lattice_state
+      1 Pd7_4*     1
+      1 Pd7_4*     2
+      1 Pd7_4*     3
+      1 Pd7_4*     4
+      1 Pd7_4*     5
+      1 Pd7_4*     6
+      1 Pd7_4*     7
+
+  variant _
+    site_types               T T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.12
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_6_1&1*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-3
+  lattice_state
+      1 Pd7_6_1&1* 1
+      1 Pd7_6_1&1* 2
+      1 Pd7_6_1&1* 3
+      1 Pd7_6_1&1* 4
+      1 Pd7_6_1&1* 5
+      1 Pd7_6_1&1* 6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -6.26
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_6_2&1*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-5 6-4
+  lattice_state
+      1 Pd7_6_2&1* 1
+      1 Pd7_6_2&1* 2
+      1 Pd7_6_2&1* 3
+      1 Pd7_6_2&1* 4
+      1 Pd7_6_2&1* 5
+      1 Pd7_6_2&1* 6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -5.96
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_6_3&1*
+
+  sites 6
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3 6-4 6-2
+  lattice_state
+      1 Pd7_6_3&1* 1
+      1 Pd7_6_3&1* 2
+      1 Pd7_6_3&1* 3
+      1 Pd7_6_3&1* 4
+      1 Pd7_6_3&1* 5
+      1 Pd7_6_3&1* 6
+
+  variant _
+    site_types               T T T T T T 
+    graph_multiplicity       3
+    cluster_eng              -17.73
+  end_variant
+
+end_cluster
+
+################################################################################
+
+cluster Pd7_5&2*
+
+  sites 5
+  neighboring 1-2 1-3 2-3 4-2 4-3 5-4 5-3
+  lattice_state
+      1 Pd7_5&2*   1
+      1 Pd7_5&2*   2
+      1 Pd7_5&2*   3
+      1 Pd7_5&2*   4
+      1 Pd7_5&2*   5
+
+  variant _
+    site_types               T T T T T 
+    graph_multiplicity       1
+    cluster_eng              -6.65
+  end_variant
+
+end_cluster
+
+################################################################################
+
+
+
+end_energetics
