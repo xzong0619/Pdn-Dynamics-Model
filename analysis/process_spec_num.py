@@ -40,13 +40,23 @@ class read_Sim:
                 if txt_contain[0] == 'temperature': self.T = float(txt_contain[1])
                 if txt_contain[0] == 'pressure': self.P = float(txt_contain[1])
                 if txt_contain[0] == 'n_surf_species': self.n_spec = int(txt_contain[1])
-                if txt_contain[0] == 'surf_specs_names': self.surf_spec = txt_contain[1:]
+                if txt_contain[0] == 'surf_specs_names': self.surf_spec_name = txt_contain[1:]
                     
                     
 class spec_info:
     
     def __init__(self,  data,  dict):
         
+        '''
+        Fetch data from simulation input
+        '''
+        
+        Sim = read_Sim()
+        self.n_spec = Sim.n_spec
+        self.surf_spec_name = Sim.surf_spec_name
+        self.surf_spec = {}
+        for i in range(self.n_spec):
+            self.surf_spec[self.surf_spec_name[i]] = int(data[dict[self.surf_spec_name[i].lower()]])
         '''
         Fill reactions with species name and species data
         '''
@@ -55,19 +65,29 @@ class spec_info:
         self.t = float(data[dict['time']])
         self.T = float(data[dict['temperature']])
         self.E = float(data[dict['energy']])
-        self.d = {}
+        '''
+        self.spec = {}
         self.Pd1 = int(data[dict['pd1*']])
         self.Pd2 = int(data[dict['pd2*']])
         self.Pd3 = int(data[dict['pd3*']])
         self.Pd4 = int(data[dict['pd4*']])
         self.Pd5 = int(data[dict['pd5*']])
+        '''
         self.CO = int(data[dict['co']])                        
     
-class read_single_spec:
+class read_Single_Spec:
     
-    def __init__(self, filepath):
+    fname =  'specnum_output.txt'
+    
+    def __init__(self, fldr = None):
         
-        self.filepath = filepath
+        if fldr == None:
+            self.fldr = os.getcwd()
+        else:
+            self.fldr = fldr
+    
+        
+        self.filepath = os.path.join(self.fldr, self.fname)
 
         fid = open(self.filepath, 'r')
         file = fid.read()
@@ -84,23 +104,27 @@ class read_single_spec:
             spec.append(spec_info(s.split(),dict))
         
         n = len(spec)
-        self.n = n
-        
+        self.n = n       
         self.t = np.zeros(n)
-        self.Pd1 = np.zeros(n)
-        self.Pd2 = np.zeros(n)
-        self.Pd3 = np.zeros(n)
-        self.Pd4 = np.zeros(n)
-        self.Pd5 = np.zeros(n)
+        self.n_spec = spec[0].n_spec
+        self.surf_spec_name = spec[0].surf_spec_name
+        
+        self.surf_spec_dic = {}
+        
+        for i in range(self.n_spec):      
+            self.surf_spec_dic[self.surf_spec_name[i]] = np.zeros(n)
+        
         
         for i in range(n):
             self.t[i] = spec[i].t
-            self.Pd1[i] = spec[i].Pd1
-            self.Pd2[i] = spec[i].Pd2
-            self.Pd3[i] = spec[i].Pd3
-            self.Pd4[i] = spec[i].Pd4
-            self.Pd5[i] = spec[i].Pd5
-        
+            
+            for j in range(self.n_spec):
+                
+                self.surf_spec_dic.[self.surf_spec_name[i]][j] = spec[i].[self.surf_spec_name[i]][j]
+                
+            
+            
+        '''
     def num_to_cov(self, lattice_dim):
         
         sites_per_unitcell = 4
@@ -112,3 +136,4 @@ class read_single_spec:
         self.Pd4 = self.Pd4/total_sites *100 *4
         self.Pd5 = self.Pd5/total_sites *100 *5
 x = read_Sim()
+y = read_Single_Spec()
