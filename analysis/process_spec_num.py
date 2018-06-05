@@ -8,6 +8,7 @@ Created on Mon Jun  4 14:51:12 2018
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class read_Sim:
     
@@ -65,14 +66,6 @@ class spec_info:
         self.t = float(data[dict['time']])
         self.T = float(data[dict['temperature']])
         self.E = float(data[dict['energy']])
-        '''
-        self.spec = {}
-        self.Pd1 = int(data[dict['pd1*']])
-        self.Pd2 = int(data[dict['pd2*']])
-        self.Pd3 = int(data[dict['pd3*']])
-        self.Pd4 = int(data[dict['pd4*']])
-        self.Pd5 = int(data[dict['pd5*']])
-        '''
         self.CO = int(data[dict['co']])                        
     
 class read_Single_Spec:
@@ -110,30 +103,99 @@ class read_Single_Spec:
         self.surf_spec_name = spec[0].surf_spec_name
         
         self.surf_spec_dic = {}
-        
+        self.surf_spec_dic['t'] = np.zeros(n)
         for i in range(self.n_spec):      
             self.surf_spec_dic[self.surf_spec_name[i]] = np.zeros(n)
         
         
         for i in range(n):
-            self.t[i] = spec[i].t
+            
+            self.surf_spec_dic['t'][i] = spec[i].t
             
             for j in range(self.n_spec):
-                
-                self.surf_spec_dic.[self.surf_spec_name[i]][j] = spec[i].[self.surf_spec_name[i]][j]
-                
             
-            
-        '''
-    def num_to_cov(self, lattice_dim):
+                self.surf_spec_dic[self.surf_spec_name[j]][i] = spec[i].surf_spec[self.surf_spec_name[j]]
         
-        sites_per_unitcell = 4
-        total_sites = lattice_dim**2 *sites_per_unitcell
-        # in percentage coverage
-        self.Pd1 = self.Pd1/total_sites *100
-        self.Pd2 = self.Pd2/total_sites *100 *2
-        self.Pd3 = self.Pd3/total_sites *100 *3
-        self.Pd4 = self.Pd4/total_sites *100 *4
-        self.Pd5 = self.Pd5/total_sites *100 *5
+        self.surf_spec_df = pd.DataFrame.from_dict(self.surf_spec_dic)
+                
+class read_Multiple_Spec:
+
+     def __init__(self, n_files, fldr = None):
+         
+        if fldr == None:
+            self.fldr = os.getcwd()
+        else:
+            self.fldr = fldr
+        
+        self.filepath = []
+        
+        for f in range(n_files):
+             self.filepath.append(os.path.join(self.fldr, 'outputs', str(f+1)))
+        
+        single_spec =  read_Single_Spec(self.filepath[0])
+        single_spec_df = single_spec.surf_spec_df
+        single_spec_n = [single_spec.n]
+        
+        
+        
+        for f in range(n_files-1): 
+            
+            single_spec =  read_Single_Spec(self.filepath[f+1])
+            
+            single_spec_df = single_spec_df + single_spec.surf_spec_df
+            
+            single_spec_n.append(single_spec.n)
+            
+        self.n = min(single_spec_n)
+        
+        self.multi_spec_ave_df = single_spec_df[:self.n]/n_files
+        self.t = self.multi_spec_ave_df['t']
+        del self.multi_spec_ave_df['t']
+            
+#%%
+def num_to_cov(lattice_dim, surf_dent,  spec_vector):
+        
+    sites_per_unitcell = 4
+    total_sites = lattice_dim**2 *sites_per_unitcell
+    # in percentage coverage
+    surf_spec_cov = spec_vector * surf_dent/ total_sites
+    
+    return surf_spec_cov
+    
+
+#%%     
+def plot_single_traj(t_vec, spec_vec, *arg):
+
+    fig = plt.figure()
+    ax = plt.axes()
+    colors = ['green', 'red', 'purple', 'grey']
+    atm = 'Pd5'
+    i = 0
+    plt.plot(t_vec,spec_vec, color = colors[i])
+    for arg in argv:
+        i = i+1
+        plt.plot(t_vec,spec_vec, color = colors[i+1])
+
+    
+    plt.xlim(0, 0.3)
+    plt.legend(['Initial Coverage = 1%', 'Initial Coverage = 5%',  
+                'Initial Coverage = 10%',  'Initial Coverage = 25%'])
+    plt.ylabel('Percentage Coverage (%)',  fontsize=15)
+    plt.xlabel('Time (s)',  fontsize=15)
+    lat_dim = 10
+    title = atm + '_lattice' + str(lat_dim) + '*' +  str(lat_dim)
+    plt.title(title,  fontsize=15)
+    plt.savefig(atm+ '.png') 
+
+
+
+#%%
 x = read_Sim()
 y = read_Single_Spec()
+z = read_Multiple_Spec(10)
+t = z.t
+
+#%%
+pd2 = z.multi_spec_ave_df['Pd2*']
+#pd2 = num_to_cov(25, 2, pd2)
+plt.plot(t,pd2)
