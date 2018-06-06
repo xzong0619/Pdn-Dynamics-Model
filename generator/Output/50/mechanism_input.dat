@@ -1,0 +1,27 @@
+# Pd growth model including upto  7 Pd atoms
+# 54 reactions
+
+mechanism
+
+############################################################################
+# 50 Diffusion Pd1*
+reversible_step 50
+   neighboring 1-2
+   sites  2
+   initial
+      1 Pd1* 1
+      2 * 1
+   final
+      1 * 1
+      2 Pd1* 1
+   variant _
+   site_types T T
+   pre_expon 1.00000e+03
+   pe_ratio 1.00000e+00
+   activ_eng 0.140
+   prox_factor 0.000
+   end_variant
+end_reversible_step
+
+############################################################################
+end_mechanism

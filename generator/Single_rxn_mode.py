@@ -54,7 +54,7 @@ flag = [flg_on_events, flg_debug, flg_no_restart]
 rxn = ReadRxn('rxn_input.txt')
 n_rxn = len(rxn)
 Base_path = os.getcwd()
-'''
+
 Output_fldr = 'Output'
 
 Sim = SimOut(n_CO,  T,  P,  n_hours,  flag)
@@ -84,6 +84,6 @@ if single_rxn_mode:
         MakingCopy('Single_trajectory.py', iter_fldr)
         
         MakingCopy('run_single.qs', iter_fldr)
-'''
+
 Cal = RxnCal()     
 Cal.Tdependence(T)

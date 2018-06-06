@@ -929,7 +929,7 @@ class StateOut(Input):
             
                 for s in range(self.n_cluster):
                     
-                    cluster_i = self.surf_spec.index(self.cluster_list[s]+'*')
+                    cluster_i = self.surf_spec.index(self.cluster_list[s])
                     self.Seed_Single_cluster(cluster_i,  cluster_no[s],  txt)
 
             # Only one 1 input

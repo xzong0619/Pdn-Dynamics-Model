@@ -1,0 +1,14 @@
+# Pd growth model including upto  7 Pd atoms
+initial_state
+
+   seed_multiple Pd5_4&1*     1
+      site_types T T T T
+      neighboring 1-2 1-3 2-3 4-2 4-3 
+   end_seed_multiple
+
+   seed_multiple Pd2*     1
+      site_types T T
+      neighboring 1-2
+   end_seed_multiple
+
+end_initial_state

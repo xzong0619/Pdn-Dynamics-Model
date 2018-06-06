@@ -46,7 +46,7 @@ single_rxn_mode = 0 # if creat simulation for each rxn
 flag = [flg_on_events, flg_debug, flg_no_restart]
 
 # Initial state
-d1 = 'Pd1' # specify the initial surface species
+d1 = 'Pd1*' # specify the initial surface species, add species name with a *
 d2 = 40 # specify the corresponding number on the surface 
 di = 1 # number of types of initial surface species
 

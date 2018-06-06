@@ -1,0 +1,71 @@
+# Pd growth model including upto  7 Pd atoms
+# 54 reactions
+
+mechanism
+
+############################################################################
+#  2 Ostwald Rippening Pd1* + Pd2* -> Pd3* 
+reversible_step  2
+   neighboring 1-2 1-3 2-3
+   sites  3
+   initial
+      1 Pd2* 1
+      1 Pd2* 2
+      2 Pd1* 1
+   final
+      1 Pd3* 1
+      1 Pd3* 2
+      1 Pd3* 3
+   variant _
+   site_types T T T
+   pre_expon 1.00000e+13
+   pe_ratio 1.00000e+00
+   activ_eng 0.140
+   prox_factor 0.000
+   end_variant
+end_reversible_step
+
+############################################################################
+# 50 Diffusion Pd1*
+reversible_step 50
+   neighboring 1-2
+   sites  2
+   initial
+      1 Pd1* 1
+      2 * 1
+   final
+      1 * 1
+      2 Pd1* 1
+   variant _
+   site_types T T
+   pre_expon 1.00000e+03
+   pe_ratio 1.00000e+00
+   activ_eng 0.140
+   prox_factor 0.000
+   end_variant
+end_reversible_step
+
+############################################################################
+# 51 Diffusion Pd2*
+reversible_step 51
+   neighboring 1-2 1-3 2-3
+   sites  3
+   initial
+      1 Pd2* 1
+      1 Pd2* 2
+      2 * 1
+   final
+      1 * 1
+      2 Pd2* 1
+      2 Pd2* 2
+   variant _
+   site_types T T T
+   pre_expon 1.00000e+03
+   pe_ratio 1.00000e+00
+   activ_eng 0.370
+   prox_factor 0.000
+   end_variant
+end_reversible_step
+
+############################################################################
+end_mechanism

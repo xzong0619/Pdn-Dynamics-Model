@@ -6,10 +6,56 @@ Created on Mon Jun  4 14:51:12 2018
 """
 
 import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+sys.path.append(r"C:\Users\wangyf\Documents\GitHub\Pdn-Dynamics-Model-\generator")
+#from IO_Pdn import *
+
+
+#%%
+
+class restart:
+    
+    fname = 'specnum_output.txt'
+    
+    def __init__(self,  fldr = None):
+        
+        if fldr == None:
+            self.fldr = os.getcwd()
+        else:
+            self.fldr = fldr
+        
+        
+        single_spec_df =  read_Single_Spec(self.fldr).surf_spec_df
+        
+        self.end_state = single_spec_df[-1:]
+        del self.end_state['t']
+        
+        end_state_v = np.array(self.end_state)[0]
+        
+        surf_spec_names = self.end_state.columns
+        
+        n_surf  = len(surf_spec_names)
+        
+        self.d1 = [] # specify the initial surface species
+        self.d2 = [] # specify the corresponding number on the surface 
+        self.di = 0 # number of types of initial surface species
+        
+        
+        for i in range(n_surf):
+            
+            if not end_state_v[i] == 0:
+                
+                            self.d1.append(surf_spec_names[i])
+                            self.d2.append(int(end_state_v[i]))
+                            self.di = self.di +1
+         
+        
+        
+#%%
 class read_Sim:
     
     fname = 'simulation_input.dat'
@@ -117,6 +163,8 @@ class read_Single_Spec:
                 self.surf_spec_dic[self.surf_spec_name[j]][i] = spec[i].surf_spec[self.surf_spec_name[j]]
         
         self.surf_spec_df = pd.DataFrame.from_dict(self.surf_spec_dic)
+        
+        
                 
 class read_Multiple_Spec:
 
@@ -152,6 +200,7 @@ class read_Multiple_Spec:
         self.t = self.multi_spec_ave_df['t']
         del self.multi_spec_ave_df['t']
             
+'''
 #%%
 def num_to_cov(lattice_dim, surf_dent,  spec_vector):
         
@@ -188,8 +237,9 @@ def plot_single_traj(t_vec, spec_vec, *arg):
     plt.savefig(atm+ '.png') 
 
 
-
+'''
 #%%
+'''
 x = read_Sim()
 y = read_Single_Spec()
 z = read_Multiple_Spec(10)
@@ -199,3 +249,4 @@ t = z.t
 pd2 = z.multi_spec_ave_df['Pd2*']
 #pd2 = num_to_cov(25, 2, pd2)
 plt.plot(t,pd2)
+'''
