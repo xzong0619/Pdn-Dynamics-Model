@@ -20,6 +20,7 @@ Pdn Constructing wrapper
 '''
  Class definitions for:
      User input file        Class name
+     (in user_inputs)
      -----------------      ------------
      rxn_input.txt          RxnIn
      cluster_input.txt      ClusterIn
@@ -43,7 +44,8 @@ def ReadIn(filename):
     '''
     
     Base_path = os.getcwd()
-    filepath = os.path.join(Base_path, filename)
+    input_dir = 'user_inputs'
+    filepath = os.path.join(Base_path, input_dir, filename)
     fid = open(filepath, 'r')
     file = fid.read()
     lines = file.splitlines()
@@ -350,9 +352,14 @@ class SimOut(Input):
 
     def WriteIn(self, fldr = None):
         
+        self.output_dir = 'default_outputs'
+        
         if not fldr == None:
             
             self.fldr = fldr 
+        else:
+            self.fldr = os.path.join(os.getcwd, self.output_dir)
+            
             
         with open(os.path.join(self.fldr, self.fname), 'w') as txt:
             
@@ -821,9 +828,13 @@ class ClusterOut(Input):
         
     def WriteIn(self, fldr = None):
         
+        self.output_dir = 'default_outputs'
+        
         if not fldr == None:
             
             self.fldr = fldr 
+        else:
+            self.fldr = os.path.join(os.getcwd, self.output_dir)
             
         with open(os.path.join(self.fldr, self.fname), 'w') as txt:
              
@@ -935,7 +946,7 @@ class StateOut(Input):
             # Only one 1 input
             if self.n_cluster == 1:
                 
-                cluster_i = self.surf_spec.index(self.cluster_list+'*')
+                cluster_i = self.surf_spec.index(self.cluster_list)
                 
                 self.Seed_Single_cluster(cluster_i,   cluster_no,  txt)
                 
@@ -1002,13 +1013,15 @@ class StateOut(Input):
 
 class MakingCopy:
     
-    def __init__(self,  fname,  fldr):
+    def __init__(self,  fname,  output_fldr):
+        
         
         self.Base_path = os.getcwd()
+        self.input_dir = os.path.join(os.getcwd(), 'zacros_inputs')
         self.fname = fname
-        self.fldr = fldr
-        self.src = os.path.join(self.Base_path, self.fname)
-        self.dst = os.path.join(self.fldr, self.fname)
+        self.output_fldr = output_fldr
+        self.src = os.path.join(self.input_dir, self.fname)
+        self.dst = os.path.join(self.output_fldr, self.fname)
         
         copyfile(self.src, self.dst)
         

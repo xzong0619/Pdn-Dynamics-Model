@@ -55,7 +55,7 @@ rxn = ReadRxn('rxn_input.txt')
 n_rxn = len(rxn)
 Base_path = os.getcwd()
 
-Output_fldr = 'Output'
+Output_fldr = 'Output_Single'
 
 Sim = SimOut(n_CO,  T,  P,  n_hours,  flag)
 Cluster = ClusterOut(nc)
