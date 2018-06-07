@@ -42,9 +42,9 @@ output_dir = os.path.join(Base_path, 'outputs')
 State =  StateOut(nc)
 end_state = restart(input_dir)
 
-d1 = end_state.d1
-d2 = end_state.d2
-di = end_state.di
+s_name = end_state.s_name
+s_n = end_state.s_n
+s_count = end_state.s_count
 
 
-State.WriteIn(output_dir, d1,  d2,  di)
+State.WriteIn(output_dir, s_name, s_n, s_count)

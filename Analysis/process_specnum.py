@@ -8,11 +8,59 @@ Created on Mon Jun  4 14:51:12 2018
 import os
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 sys.path.append(r"C:\Users\wangyf\Documents\GitHub\Pdn-Dynamics-Model\Generator")
-#from IO_Pdn import *
+
+
+
+def final_spec_on_surf(single_spec_df):
+    
+    ''' 
+    takes in a single species dataframe
+    return a list of available species on the surface at final state
+    '''
+    
+    end_state = single_spec_df[-1:]
+    
+    
+    end_state_v = np.array(end_state)[0]
+    surf_spec_names = end_state.columns -1  #-1 to omit t column 
+    n_surf  = len(surf_spec_names)
+    s_name = [] # specify the initial surface species
+    s_n = [] # specify the corresponding number on the surface 
+    s_count = 0 # number of types of initial surface species
+    
+    for i in range(n_surf):
+        if not end_state_v[i] == 0:
+            
+            s_name.append(surf_spec_names[i])
+            s_n.append(int(end_state_v[i]))
+            s_count = s_count +1
+    
+    return s_name, s_n, s_count        
+            
+def lifetime_spec_on_surf(single_spec_df):
+
+    ''' 
+    takes in a single species dataframe
+    return a list of available species on the surface at final state
+    '''
+    
+    surf_spec_names = single_spec_df.columns
+    n_surf  = len(surf_spec_names) -1 #-1 to omit t column 
+    s_name = [] # specify the initial surface species
+    s_count = 0 # number of types of initial surface species
+    
+    for i in range(n_surf):
+        spec_i = np.array(single_spec_df[surf_spec_names[i]])
+        
+        if np.any(spec_i):
+            
+            s_name.append(surf_spec_names[i])
+            s_count = s_count +1
+    
+    return s_name, s_count        
 
 
 #%%
@@ -32,28 +80,7 @@ class restart:
                         
         single_spec_df =  read_Single_Spec(input_dir).surf_spec_df
         
-        self.end_state = single_spec_df[-1:]
-        del self.end_state['t']
-        
-        end_state_v = np.array(self.end_state)[0]
-        
-        surf_spec_names = self.end_state.columns
-        
-        n_surf  = len(surf_spec_names)
-        
-        self.d1 = [] # specify the initial surface species
-        self.d2 = [] # specify the corresponding number on the surface 
-        self.di = 0 # number of types of initial surface species
-        
-        
-        for i in range(n_surf):
-            
-            if not end_state_v[i] == 0:
-                
-                            self.d1.append(surf_spec_names[i])
-                            self.d2.append(int(end_state_v[i]))
-                            self.di = self.di +1
-         
+        self.s_name, self.s_n, self.s_count  = final_spec_on_surf(single_spec_df)
         
         
 #%%
@@ -166,7 +193,7 @@ class read_Single_Spec:
                 self.surf_spec_dic[self.surf_spec_name[j]][i] = spec[i].surf_spec[self.surf_spec_name[j]]
         
         self.surf_spec_df = pd.DataFrame.from_dict(self.surf_spec_dic)
-        
+        self.lifetime_spec  = lifetime_spec_on_surf(self.surf_spec_df)
         
                 
 class read_Multiple_Spec:
@@ -203,7 +230,8 @@ class read_Multiple_Spec:
         
         self.multi_spec_ave_df = single_spec_df[:self.n]/n_files
         self.t = self.multi_spec_ave_df['t']
-        del self.multi_spec_ave_df['t']
+        self.lifetime_spec  = lifetime_spec_on_surf(self.multi_spec_ave_df)
+        #del self.multi_spec_ave_df['t']
             
 '''
 #%%
