@@ -31,18 +31,18 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', series_labe
     '''
     
     PlotOptions()
-    plt.figure()
+    plt.figure(figsize=(10,8))
     
     for i in range (len(y_series)):
         plt.plot(x_series, y_series[i])
     
-    #plt.xticks(size=20)
-    #plt.yticks(size=20)
+    plt.xticks(size=20)
+    plt.yticks(size=20)
     plt.xlabel(xlab, size=24)
     plt.ylabel(ylab, size=24)
     
     if not series_labels == []:
-        plt.legend(series_labels, loc=4, prop={'size':20}, frameon=False)
+        plt.legend(series_labels, loc=1, prop={'size':20}, frameon=False)
     plt.tight_layout()
     
     if logscale:
@@ -53,3 +53,6 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', series_labe
     else:
         plt.savefig(fname)
         plt.close()
+        
+        
+        
