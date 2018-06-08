@@ -72,27 +72,33 @@ def PlotPie(x_series, series_labels = [], fname = '') :
     '''
     PlotOptions()
     plt.figure(figsize=(8,8))
-    mat.rcParams['font.size'] = 20
+    mat.rcParams['font.size'] = 12
     n_s = len(x_series)
     colors = colors_pool[:n_s]
     plt.axis('equal')
     
     explode = []
+    ncolors = []
+    nseries_labels = []
+    nx_series = []
+    
     for i in range(n_s): 
         
-        if x_series[i] == 0:
-            del colors[i]
-            del series_labels[i]
-            nx_series = np.delete(x_series, i)
-            
-    for i in range(len(nx_series)):     
-            if nx_series[i]/sum(nx_series) >= 0.1:
-                explode.append(0.0)
-            else:
-                explode.append(0.1)
-                
-    plt.pie(nx_series, explode = explode, labels = series_labels, colors = colors, autopct = '%1.1f%%', shadow = True, startangle = 140)
+        if not x_series[i] == 0:
+            ncolors.append(colors[i])
+            nseries_labels.append(series_labels[i])
+            nx_series.append(x_series[i])
+    val = 0        
+    for i in range(len(nx_series)):    
+
+            if nx_series[i]/sum(nx_series) < 0.1:
+                val = val + 0.15     
+            explode.append(val)
+        
     
+    #plt.pie(nx_series, explode = explode, labels = nseries_labels, colors = ncolors, autopct = '%1.1f%%', shadow = False, startangle = 140)
+    plt.pie(nx_series, explode = explode, colors = ncolors, startangle = 140, radius = 0.6, autopct = '%1.2f%%', pctdistance = 1.2)
+    plt.legend(labels = nseries_labels, loc=5, prop={'size':11}, frameon=False)
     if fname == '':
         plt.show()
     else:

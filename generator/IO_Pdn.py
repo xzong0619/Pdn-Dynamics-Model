@@ -6,6 +6,7 @@ Created on Tue Apr 10 11:42:20 2018
 """
 
 import os 
+import sys
 import numpy as np
 import random as _random
 from shutil import copyfile
@@ -42,10 +43,10 @@ def ReadIn(filename):
     '''
     Read reaction network file input by the user
     '''
-    
-    Base_path = os.getcwd()
+    HomePath = os.path.expanduser('~')
+    IO_path = os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model', 'Generator')
     input_dir = 'user_inputs'
-    filepath = os.path.join(Base_path, input_dir, filename)
+    filepath = os.path.join(IO_path, input_dir, filename)
     fid = open(filepath, 'r')
     file = fid.read()
     lines = file.splitlines()

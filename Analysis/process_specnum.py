@@ -237,8 +237,8 @@ class read_Multiple_Spec:
         self.n = min(single_spec_n)
         
         self.multi_spec_ave_df = single_spec_df[:self.n]/n_files
-        self.t = self.multi_spec_ave_df['t']
-        self.lifetime_spec  = lifetime_spec_on_surf(self.multi_spec_ave_df)
+        #self.t = self.multi_spec_ave_df['t']
+        #self.lifetime_spec  = lifetime_spec_on_surf(self.multi_spec_ave_df)
         #del self.multi_spec_ave_df['t']
             
 
@@ -254,42 +254,3 @@ def num_to_cov(lattice_dim, n_spec, surf_dent_vec, spec_vecs):
     
     return surf_spec_cov
     
-'''
-#%%     
-def plot_single_traj(t_vec, spec_vec, *arg):
-
-    fig = plt.figure()
-    ax = plt.axes()
-    colors = ['green', 'red', 'purple', 'grey']
-    atm = 'Pd5'
-    i = 0
-    plt.plot(t_vec,spec_vec, color = colors[i])
-    for arg in argv:
-        i = i+1
-        plt.plot(t_vec,spec_vec, color = colors[i+1])
-
-    
-    plt.xlim(0, 0.3)
-    plt.legend(['Initial Coverage = 1%', 'Initial Coverage = 5%',  
-                'Initial Coverage = 10%',  'Initial Coverage = 25%'])
-    plt.ylabel('Percentage Coverage (%)',  fontsize=15)
-    plt.xlabel('Time (s)',  fontsize=15)
-    lat_dim = 10
-    title = atm + '_lattice' + str(lat_dim) + '*' +  str(lat_dim)
-    plt.title(title,  fontsize=15)
-    plt.savefig(atm+ '.png') 
-
-
-'''
-#%%
-'''
-x = read_Sim()
-y = read_Single_Spec()
-z = read_Multiple_Spec(10)
-t = z.t
-
-#%%
-pd2 = z.multi_spec_ave_df['Pd2*']
-#pd2 = num_to_cov(25, 2, pd2)
-plt.plot(t,pd2)
-'''
