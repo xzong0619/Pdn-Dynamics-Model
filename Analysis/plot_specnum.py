@@ -24,12 +24,12 @@ def PlotOptions():
     mat.rcParams['lines.markersize'] = 12
             
 
-def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', series_labels = [], fname = '', logscale = False):
+def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', xlim = [], series_labels = [], fname = '', logscale = False):
     
     '''
     Plot multiple series against time
     '''
-    
+    # Add axis optios here
     PlotOptions()
     plt.figure(figsize=(10,8))
     
@@ -40,7 +40,10 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', series_labe
     plt.yticks(size=20)
     plt.xlabel(xlab, size=24)
     plt.ylabel(ylab, size=24)
-    
+	
+	if not xlim = []:
+    plt.xlim(xlim)
+	
     if not series_labels == []:
         plt.legend(series_labels, loc=1, prop={'size':20}, frameon=False)
     plt.tight_layout()
