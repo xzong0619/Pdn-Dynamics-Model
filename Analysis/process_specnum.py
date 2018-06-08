@@ -25,8 +25,8 @@ def final_spec_on_surf(single_spec_df):
     
     
     end_state_v = np.array(end_state)[0]
-    surf_spec_names = end_state.columns -1  #-1 to omit t column 
-    n_surf  = len(surf_spec_names)
+    surf_spec_names = end_state.columns 
+    n_surf  = len(surf_spec_names) -1  #-1 to omit t column 
     s_name = [] # specify the initial surface species
     s_n = [] # specify the corresponding number on the surface 
     s_count = 0 # number of types of initial surface species
@@ -35,7 +35,7 @@ def final_spec_on_surf(single_spec_df):
         if not end_state_v[i] == 0:
             
             s_name.append(surf_spec_names[i])
-            s_n.append(int(end_state_v[i]))
+            s_n.append((end_state_v[i]))
             s_count = s_count +1
     
     return s_name, s_n, s_count        
@@ -62,6 +62,14 @@ def lifetime_spec_on_surf(single_spec_df):
     
     return s_name, s_count        
 
+def final_lt_spec_on_surf(single_spec_df):
+    
+    s_name, s_count  = lifetime_spec_on_surf(single_spec_df)
+    end_state = single_spec_df[-1:]
+    end_state = end_state[s_name]
+    s_n = np.array(end_state)[0]
+    
+    return s_n
 
 #%%
 
@@ -233,18 +241,20 @@ class read_Multiple_Spec:
         self.lifetime_spec  = lifetime_spec_on_surf(self.multi_spec_ave_df)
         #del self.multi_spec_ave_df['t']
             
-'''
+
 #%%
-def num_to_cov(lattice_dim, surf_dent,  spec_vector):
+def num_to_cov(lattice_dim, n_spec, surf_dent_vec, spec_vecs):
         
     sites_per_unitcell = 4
     total_sites = lattice_dim**2 *sites_per_unitcell
     # in percentage coverage
-    surf_spec_cov = spec_vector * surf_dent/ total_sites
+    surf_spec_cov = []
+    for i in range(n_spec):
+        surf_spec_cov.append(spec_vecs[i] * surf_dent_vec[i]/ total_sites)
     
     return surf_spec_cov
     
-
+'''
 #%%     
 def plot_single_traj(t_vec, spec_vec, *arg):
 
