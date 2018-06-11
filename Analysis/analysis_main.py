@@ -54,10 +54,12 @@ spec_name, n_spec = pspec.lifetime_spec_on_surf(s_df)
 print(spec_name)
 surf_spec_vecs = []
 surf_spec_dent = []
+surf_spec_n = []
 
 for i in range(n_spec):
     surf_spec_vecs.append(np.array(s_df[spec_name[i]]))
     surf_spec_dent.append(Cluster.surf_dent[Cluster.surf_spec.index(spec_name[i])])
+    surf_spec_n.append(Cluster.surf_n[Cluster.surf_spec.index(spec_name[i])])
 
 if Count_to_Coverage == 0:
     ylabel = 'Species count'
@@ -83,7 +85,7 @@ dspec. PlotTimeSeries(time_vecs, surf_spec_vecs,
 # end state species info
 es_n = pspec.final_lt_spec_on_surf(s_df)
 
-spec_cov = np.multiply(np.array(surf_spec_dent),np.array(es_n))
+spec_cov = np.multiply(np.array(surf_spec_n),np.array(es_n))
 
 dspec.PlotPie(es_n, spec_name,  fname = os.path.join(output_dir, 'surf_spec_pie.png'))
 
