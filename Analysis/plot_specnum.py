@@ -42,9 +42,10 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', xlimit = []
     plt.figure(figsize=(10,8))
     
     for i in range (len(y_series)):
-        plt.plot(x_series, y_series[i], color = colors_pool[i], linewidth = 3.0)
+        plt.plot(x_series, y_series[i], #marker = 'o', markerfacecolor = None, 
+                 color = colors_pool[i], linewidth = 3.0)
     
-    plt.xticks(size=20)
+    #plt.xticks(size=20)
     plt.yticks(size=20)
     plt.xlabel(xlab, size=24)
     plt.ylabel(ylab, size=24)
