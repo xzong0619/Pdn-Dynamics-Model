@@ -27,7 +27,7 @@ n_runs = 10
 Count_to_Coverage = 1
 lattice_dim = 25
 xtruncate = 0
-xrange = (0,100)
+xrange = (0,10000000)
 ################## User input ##################################
 
 
@@ -87,6 +87,6 @@ es_n = pspec.final_lt_spec_on_surf(s_df)
 
 spec_cov = np.multiply(np.array(surf_spec_n),np.array(es_n))
 
-dspec.PlotPie(es_n, spec_name,  fname = os.path.join(output_dir, 'surf_spec_pie.png'))
+dspec.PlotPie(spec_cov, spec_name,  fname = os.path.join(output_dir, 'surf_spec_pie.png'))
 
 
