@@ -1,6 +1,6 @@
 # Pd growth model including upto  7 Pd atoms with  0 CO
 ############################################################################
-random_seed         23489 # Random seed from Python wrapper
+random_seed         85203 # Random seed from Python wrapper
 
 temperature         700.0
 pressure            0.00000e+00

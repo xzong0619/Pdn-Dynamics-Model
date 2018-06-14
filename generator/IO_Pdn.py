@@ -273,6 +273,7 @@ class RxnCal(Input):
         self.Arev = list(np.divide(np.array(self.Af), np.array(self.Aratio)))
         
         
+        
     def Tdependence(self, T):
         
         self.T  = T # temperature
@@ -280,7 +281,9 @@ class RxnCal(Input):
         self.Pfwd = list(np.multiply(np.array(self.Af), np.exp(- np.array(self.Ea)/self.kb/self.T)))
         #reverse propnesity
         self.Prev = list(np.multiply(np.array(self.Arev), np.exp(- np.array(self.Ea_rev)/self.kb/self.T)))
-                    
+                 
+        self.Timescale_fwd = list(1/np.array(self.Pfwd))
+        self.Timescale_rev = list(1/np.array(self.Prev))
 
 
 
