@@ -254,3 +254,112 @@ def num_to_cov(lattice_dim, n_spec, surf_dent_vec, spec_vecs):
     
     return surf_spec_cov
     
+#%%
+
+class read_Single_Procstat():
+    
+    '''
+    Handles data from procstat_output.txt
+    Read single procstat_output.txt
+    '''
+    
+    fname = 'procstat_output.txt'
+    input_dir = 'zacros_inputs'
+
+    def __init__(self, fldr):
+    
+        
+        if fldr == None:
+            self.fldr =  os.path.join(os.getcwd(), self.input_dir)
+        else:
+            self.fldr = fldr
+            
+        # not sure why this part is necessary    
+        MaxLen = np.int(2e4)
+        with open(os.path.join(self.fldr, self.fname), 'r') as txt:
+            RawTxt = txt.readlines()
+
+        if len(RawTxt) - 1 > MaxLen * 3:  # Procstat uses 3 lines per outputs
+            Spacing = np.int(np.floor((len(RawTxt) - 1)/(MaxLen*3)))
+            RawTxt2 = []
+            for i in range(0, MaxLen):
+                RawTxt2.append(RawTxt[i*Spacing*3+1])
+                RawTxt2.append(RawTxt[i*Spacing*3+2])
+                RawTxt2.append(RawTxt[i*Spacing*3+3])
+        else:
+            Spacing = 1
+            RawTxt2 = RawTxt[1:]
+
+        t = []
+        events = []
+        for i in range(0, np.int(len(RawTxt2)/3)):
+            t.append(np.float(RawTxt2[i*3].split()[3]))
+            eventsTemp = RawTxt2[i*3+2].split()[1:]
+            for j in range(0, np.int(len(eventsTemp))):
+                eventsTemp[j] = np.int(eventsTemp[j])
+            events.append(eventsTemp)
+
+        self.Spacing = Spacing
+        self.t = np.asarray(t)
+        self.events = np.asarray(events)
+        
+    def Freqs(self, time_norm = True, site_norm = 1, window = [0.0, 1.0]):
+        
+        '''
+        Plot a bar graph of elementary step frequencies versus time - output in elem_step_freqs.png in the directory with the Zacros run
+
+        '''
+        
+        start_ind = self.time_search(window[0] * self.t[-1])
+        end_ind = self.time_search(window[1] * self.t[-1])
+        self.event_freqs = ( self.events[end_ind,:] - self.events[start_ind,:] ) / float(site_norm)
+        if time_norm:
+            self.event_freqs = self.event_freqs / ( self.t[end_ind] - self.t[start_ind] )
+        
+        
+'''       
+
+class read_Multiple_Procstat():
+
+    '''
+    Handles procstat_output.txt from multiple trajactories
+    '''
+    
+    input_dir = 'zacros_inputs'
+    
+    def __init__(self, n_files, fldr):
+        
+        if fldr == None:
+            self.fldr =  os.path.join(os.getcwd(), self.input_dir)
+        else:
+            self.fldr = fldr
+        
+        self.filepath = []
+        
+        for f in range(n_files):
+             self.filepath.append(os.path.join(self.fldr, 'outputs', str(f+1)))
+        
+        single_procstat =  read_Single_Procstat(self.filepath[0])
+        
+        single_procstat_t = single_procstat.t
+        single_procstat_events = single_procstat.events
+        
+        single_spec_n = len(single_procstat_t)
+
+'''
+
+def time_search(t, sing_traj_t):
+        
+        '''
+        Given a time, look up the index of the smallest time greater than or equal to that time      
+        '''       
+        if t > sing_traj_t[-1] or t < 0:
+            raise Exception('Time is out of range.')
+        
+        ind = 0
+        while sing_traj_t[ind] < t:
+            ind += 1
+            
+        return ind
+
+    
