@@ -1,0 +1,12 @@
+squidward.che.udel.edu
+
+16 cores on each node 
+
+Useful Command:
+
+
+
+qstat, check all the running jobs
+qstat -u wangyf, check your own jobs
+qstat -g c, check the overall load of the server
+qstat -f, check how full each node is and jobs on each node
