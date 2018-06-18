@@ -266,7 +266,7 @@ class read_Single_Procstat():
     fname = 'procstat_output.txt'
     input_dir = 'zacros_inputs'
 
-    def __init__(self, fldr):
+    def __init__(self, fldr = None):
     
         
         if fldr == None:
@@ -334,7 +334,7 @@ class read_Multiple_Procstat():
     
     input_dir = 'zacros_inputs'
     
-    def __init__(self, n_files, fldr):
+    def __init__(self, n_files, fldr = None):
         
         if fldr == None:
             self.fldr =  os.path.join(os.getcwd(), self.input_dir)

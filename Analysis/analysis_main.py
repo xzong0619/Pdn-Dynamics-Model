@@ -16,6 +16,7 @@ sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model'
 sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model', 'Analysis'))
 sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model', 'Generator','user_inputs'))
 
+#%%
 import process_specnum as pspec
 import plot_specnum as dspec
 from IO_Pdn import *
@@ -89,4 +90,11 @@ spec_cov = np.multiply(np.array(surf_spec_n),np.array(es_n))
 
 dspec.PlotPie(spec_cov, spec_name,  fname = os.path.join(output_dir, 'surf_spec_pie.png'))
 
-
+#%%
+'''
+# Plot a bar graph of elementary step frequencies versus time - output in elem_step_freqs.png in the directory with the Zacros run
+'''
+# frequency object
+f = pspec.read_Multiple_Procstat(n_runs)
+freq_vecs = f.ave_procstat_freqs
+dspec.PlotFreqs(freq_vecs, fname = os.path.join(output_dir, 'elem_step_freqs.png'))

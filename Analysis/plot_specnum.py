@@ -101,11 +101,13 @@ def PlotPie(x_series, series_labels = [], fname = '') :
     
     #plt.pie(nx_series, explode = explode, labels = nseries_labels, colors = ncolors, autopct = '%1.1f%%', shadow = False, startangle = 140)
     plt.pie(nx_series, explode = explode, colors = ncolors, startangle = 140, radius = 0.6, autopct = '%1.2f%%', pctdistance = 1.2)
-    plt.legend(labels = nseries_labels, loc=5, prop={'size':11}, frameon=False)
+    plt.legend(labels = nseries_labels, 
+               bbox_to_anchor = (0.8, 0.8),loc= 'upper left',
+               prop={'size':11}, frameon=False)
     if fname == '':
         plt.show()
     else:
-        plt.savefig(fname)
+        plt.savefig(fname, bbox_inches = "tight")
         plt.close()
 
 
@@ -116,7 +118,7 @@ def PlotFreqs(event_freqs_vec, fname = ''):
 
     '''
     PlotOptions()
-    plt.figure()
+    plt.figure(figsize=(10,8))
     
     width = 0.2
     ind = 0
@@ -166,7 +168,7 @@ def PlotFreqs(event_freqs_vec, fname = ''):
     g_patch = mat.patches.Patch(color = 'green', label = 'net')
     
     plt.legend(handles = [r_patch, b_patch, g_patch ],
-               bbox_to_anchor = (1.02,1),loc= 'upper left',
+               bbox_to_anchor = (1.05, 1),loc= 'upper left',
                prop={'size':18},frameon=False)
     
     plt.xlim([xmin, xmax])        
