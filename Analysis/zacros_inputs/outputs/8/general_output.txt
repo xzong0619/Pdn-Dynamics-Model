@@ -1,0 +1,270 @@
++---------------------------------------------------+
+|  ZACROS 1.02                                      |
+|  GRAPH-THEORETICAL KMC SIMULATION CODE            |
+|                                                   |
+|  Multiscale Computational Catalysis and           |
+|  Materials Science Research Group                 |
+|                                                   |
+|  Michail Stamatakis, Ph.D.                        |
+|  Chemical Engineering Department                  |
+|  University College London                        |
++---------------------------------------------------+
+
+Simulation setup:
+~~~~~~~~~~~~~~~~~
+
+    Random sequence with seed: 5007                            
+
+    Temperature: 300.0000000000000
+
+    Pressure: 0.000000000000000
+
+    Number of gas species: 1
+
+    Gas species names: CO 
+
+    Gas species energies: 0.000000000000000 
+
+    Gas species molecular weights: 28.01000000000000 
+
+    Gas species molar fractions: 1.000000000000000 
+
+    Number of surface species: 20
+
+    Surface species names: Pd1* Pd2* Pd3* Pd4* Pd4_3&1* Pd5* Pd5_4&1* Pd6_1* Pd6_2* Pd6_3* Pd6_5&1* Pd6_4&2* Pd7_1* Pd7_2* Pd7_3* Pd7_4* Pd7_6_1&1* Pd7_6_2&1* Pd7_6_3&1* Pd7_5&2* 
+
+    Surface species dentation:  1  2  3  4  3  5  4  6  6  6  5  4  7  7  7  7  6  6  6  5
+
+    Snapshots will be saved in file history_output.txt at every 10 events
+
+    Process statistics will be reported in file procstat_output.txt at every event
+
+    Species number will be reported in file specnum_output.txt at every event
+
+    Maximum number of steps: 1000
+
+    Max simulated time: 1.7976931348623157E+308 (maximum allowed value)
+
+    Allowed walltime in seconds: 600
+
+Finished reading simulation input.
+
+Lattice setup:
+~~~~~~~~~~~~~~
+
+    Constructing a periodic lattice from unit cell data.
+
+    Unit cell area: 52.20513600000000
+
+    Lattice cell: 25 x 25
+
+    Surface area: 32628.21000000000
+
+    Number of lattice sites: 2500
+
+    Number of site types: 1
+
+    Site type names and number of sites of that type:
+      T (2500)
+
+    Maximum coordination number: 6
+
+    Lattice structure written to lattice_output.txt
+
+Finished reading lattice input.
+
+Energetics setup:
+~~~~~~~~~~~~~~~~~
+
+    Number of clusters: 23
+
+    Maximum number of sites involved in a cluster: 7
+
+    Clusters:
+
+        1. Pd1*__:        Mult = 1      ECI = 0.000000000000000         Entities:  Pd1* 
+        2. Pd2*__:        Mult = 2      ECI = -0.9000000000000000       Entities:  Pd2* 
+        3. Pd3*__:        Mult = 3      ECI = -4.500000000000000        Entities:  Pd3* 
+        4. Pd4*__:        Mult = 4      ECI = -10.24000000000000        Entities:  Pd4* 
+        5. Pd4_3&1*__:    Mult = 3      ECI = -8.220000000000001        Entities:  Pd4_3&1* 
+        6. Pd5*__:        Mult = 1      ECI = -3.410000000000000        Entities:  Pd5* 
+        7. Pd5_4&1*__:    Mult = 4      ECI = -15.96000000000000        Entities:  Pd5_4&1* 
+        8. Pd6_1*__:      Mult = 1      ECI = -4.490000000000000        Entities:  Pd6_1* 
+        9. Pd6_2*__:      Mult = 1      ECI = -4.380000000000000        Entities:  Pd6_2* 
+       10. Pd6_3*__:      Mult = 3      ECI = -12.96000000000000        Entities:  Pd6_3* 
+       11. Pd6_5&1*__:    Mult = 1      ECI = -5.230000000000000        Entities:  Pd6_5&1* 
+       12. Pd6_4&2*__:    Mult = 4      ECI = -19.80000000000000        Entities:  Pd6_4&2* 
+       13. Pd7_1*__:      Mult = 6      ECI = -36.42000000000000        Entities:  Pd7_1* 
+       14. Pd7_2*__:      Mult = 1      ECI = -4.900000000000000        Entities:  Pd7_2* 
+       15. Pd7_3*__:      Mult = 1      ECI = -5.110000000000000        Entities:  Pd7_3* 
+       16. Pd7_3*__:      Mult = 1      ECI = -5.110000000000000        Entities:  Pd7_3* 
+       17. Pd7_4*__:      Mult = 1      ECI = -5.120000000000000        Entities:  Pd7_4* 
+       18. Pd7_4*__:      Mult = 1      ECI = -5.120000000000000        Entities:  Pd7_4* 
+       19. Pd7_4*__:      Mult = 1      ECI = -5.120000000000000        Entities:  Pd7_4* 
+       20. Pd7_6_1&1*__:  Mult = 1      ECI = -6.260000000000000        Entities:  Pd7_6_1&1* 
+       21. Pd7_6_2&1*__:  Mult = 1      ECI = -5.960000000000000        Entities:  Pd7_6_2&1* 
+       22. Pd7_6_3&1*__:  Mult = 3      ECI = -17.73000000000000        Entities:  Pd7_6_3&1* 
+       23. Pd7_5&2*__:    Mult = 1      ECI = -6.650000000000000        Entities:  Pd7_5&2* 
+
+Finished reading energetics input.
+
+Mechanism setup:
+~~~~~~~~~~~~~~~~
+
+    Number of elementary steps: 108
+
+    Maximum number of sites involved in a step: 7
+
+    Reaction network:
+
+        1. 1_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd1*(T)  +  Pd1*(T)  ->  Pd2*(T,T)
+        2. 1_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd2*(T,T)  ->  Pd1*(T)  +  Pd1*(T)
+        3. 2_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd2*(T,T)  +  Pd1*(T)  ->  Pd3*(T,T,T)
+        4. 2_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd3*(T,T,T)  ->  Pd2*(T,T)  +  Pd1*(T)
+        5. 3_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd3*(T,T,T)  +  Pd1*(T)  ->  Pd4*(T,T,T,T)
+        6. 3_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd4*(T,T,T,T)  ->  Pd3*(T,T,T)  +  Pd1*(T)
+        7. 4_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd4*(T,T,T,T)  +  Pd1*(T)  ->  Pd5*(T,T,T,T,T)
+        8. 4_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd5*(T,T,T,T,T)  ->  Pd4*(T,T,T,T)  +  Pd1*(T)
+        9. 5_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd4_3&1*(T,T,T)  +  Pd1*(T)  ->  Pd5_4&1*(T,T,T,T)
+       10. 5_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd5_4&1*(T,T,T,T)  ->  Pd4_3&1*(T,T,T)  +  Pd1*(T)
+       11. 6_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd5*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd6_1*(T,T,T,T,T,T)
+       12. 6_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd6_1*(T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd1*(T)
+       13. 7_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd5*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd6_2*(T,T,T,T,T,T)
+       14. 7_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd6_2*(T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd1*(T)
+       15. 8_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd5*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd6_3*(T,T,T,T,T,T)
+       16. 8_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd6_3*(T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd1*(T)
+       17. 9_fwd__:     A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd5_4&1*(T,T,T,T)  +  Pd1*(T)  ->  Pd6_5&1*(T,T,T,T,T)
+       18. 9_rev__:     A(Tini) =  1.0000E+13                                        Reaction: Pd6_5&1*(T,T,T,T,T)  ->  Pd5_4&1*(T,T,T,T)  +  Pd1*(T)
+       19. 10_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_1*(T,T,T,T,T,T,T)
+       20. 10_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_1*(T,T,T,T,T,T,T)  ->  Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)
+       21. 11_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       22. 11_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)
+       23. 12_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       24. 12_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd6_1*(T,T,T,T,T,T)  +  Pd1*(T)
+       25. 13_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_2*(T,T,T,T,T,T,T)
+       26. 13_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_2*(T,T,T,T,T,T,T)  ->  Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)
+       27. 14_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       28. 14_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)
+       29. 15_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       30. 15_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd6_2*(T,T,T,T,T,T)  +  Pd1*(T)
+       31. 16_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_3*(T,T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       32. 16_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd6_3*(T,T,T,T,T,T)  +  Pd1*(T)
+       33. 17_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)
+       34. 17_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)
+       35. 18_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)
+       36. 18_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)
+       37. 19_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)  ->  Pd7_6_3&1*(T,T,T,T,T,T)
+       38. 19_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_3&1*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  Pd1*(T)
+       39. 20_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.14    k(Tini) =  4.4474E+10  Reaction: Pd6_4&2*(T,T,T,T)  +  Pd1*(T)  ->  Pd7_5&2*(T,T,T,T,T)
+       40. 20_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_5&2*(T,T,T,T,T)  ->  Pd6_4&2*(T,T,T,T)  +  Pd1*(T)
+       41. 21_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd2*(T,T)  +  Pd2*(T,T)  ->  Pd4*(T,T,T,T)
+       42. 21_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd4*(T,T,T,T)  ->  Pd2*(T,T)  +  Pd2*(T,T)
+       43. 22_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd3*(T,T,T)  +  Pd2*(T,T)  ->  Pd5*(T,T,T,T,T)
+       44. 22_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd5*(T,T,T,T,T)  ->  Pd3*(T,T,T)  +  Pd2*(T,T)
+       45. 23_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd4*(T,T,T,T)  +  Pd2*(T,T)  ->  Pd6_1*(T,T,T,T,T,T)
+       46. 23_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_1*(T,T,T,T,T,T)  ->  Pd4*(T,T,T,T)  +  Pd2*(T,T)
+       47. 24_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd4*(T,T,T,T)  +  Pd2*(T,T)  ->  Pd6_2*(T,T,T,T,T,T)
+       48. 24_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_2*(T,T,T,T,T,T)  ->  Pd4*(T,T,T,T)  +  Pd2*(T,T)
+       49. 25_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd4_3&1*(T,T,T)  +  Pd2*(T,T)  ->  Pd6_5&1*(T,T,T,T,T)
+       50. 25_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_5&1*(T,T,T,T,T)  ->  Pd4_3&1*(T,T,T)  +  Pd2*(T,T)
+       51. 26_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd5*(T,T,T,T,T)  +  Pd2*(T,T)  ->  Pd7_2*(T,T,T,T,T,T,T)
+       52. 26_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_2*(T,T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd2*(T,T)
+       53. 27_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd5*(T,T,T,T,T)  +  Pd2*(T,T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       54. 27_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd2*(T,T)
+       55. 28_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd5*(T,T,T,T,T)  +  Pd2*(T,T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       56. 28_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd5*(T,T,T,T,T)  +  Pd2*(T,T)
+       57. 29_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd5_4&1*(T,T,T,T)  +  Pd2*(T,T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)
+       58. 29_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  ->  Pd5_4&1*(T,T,T,T)  +  Pd2*(T,T)
+       59. 30_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.37    k(Tini) =  6.0853E+06  Reaction: Pd5_4&1*(T,T,T,T)  +  Pd2*(T,T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)
+       60. 30_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  ->  Pd5_4&1*(T,T,T,T)  +  Pd2*(T,T)
+       61. 31_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.71    k(Tini) =  1.1818E+01  Reaction: Pd3*(T,T,T)  +  Pd3*(T,T,T)  ->  Pd6_2*(T,T,T,T,T,T)
+       62. 31_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_2*(T,T,T,T,T,T)  ->  Pd3*(T,T,T)  +  Pd3*(T,T,T)
+       63. 32_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.71    k(Tini) =  1.1818E+01  Reaction: Pd4*(T,T,T,T)  +  Pd3*(T,T,T)  ->  Pd7_2*(T,T,T,T,T,T,T)
+       64. 32_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_2*(T,T,T,T,T,T,T)  ->  Pd4*(T,T,T,T)  +  Pd3*(T,T,T)
+       65. 33_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.71    k(Tini) =  1.1818E+01  Reaction: Pd4*(T,T,T,T)  +  Pd3*(T,T,T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       66. 33_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd4*(T,T,T,T)  +  Pd3*(T,T,T)
+       67. 34_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.71    k(Tini) =  1.1818E+01  Reaction: Pd4_3&1*(T,T,T)  +  Pd3*(T,T,T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)
+       68. 34_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  ->  Pd4_3&1*(T,T,T)  +  Pd3*(T,T,T)
+       69. 35_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.07    k(Tini) =  1.0588E-05  Reaction: Pd4_3&1*(T,T,T)  +  *(T)  ->  Pd4*(T,T,T,T)
+       70. 35_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd4*(T,T,T,T)  ->  Pd4_3&1*(T,T,T)  +  *(T)
+       71. 36_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.47    k(Tini) =  2.0189E-12  Reaction: Pd5_4&1*(T,T,T,T)  +  *(T)  ->  Pd5*(T,T,T,T,T)
+       72. 36_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd5*(T,T,T,T,T)  ->  Pd5_4&1*(T,T,T,T)  +  *(T)
+       73. 37_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.63    k(Tini) =  4.1422E-15  Reaction: Pd6_5&1*(T,T,T,T,T)  +  *(T)  ->  Pd6_1*(T,T,T,T,T,T)
+       74. 37_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_1*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  *(T)
+       75. 38_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.74    k(Tini) =  5.8792E-17  Reaction: Pd6_5&1*(T,T,T,T,T)  +  *(T)  ->  Pd6_2*(T,T,T,T,T,T)
+       76. 38_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_2*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  *(T)
+       77. 39_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.80    k(Tini) =  5.7725E-18  Reaction: Pd6_5&1*(T,T,T,T,T)  +  *(T)  ->  Pd6_3*(T,T,T,T,T,T)
+       78. 39_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_3*(T,T,T,T,T,T)  ->  Pd6_5&1*(T,T,T,T,T)  +  *(T)
+       79. 40_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.08    k(Tini) =  7.1915E-06  Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_1*(T,T,T,T,T,T,T)
+       80. 40_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_1*(T,T,T,T,T,T,T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)
+       81. 41_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.95    k(Tini) =  1.7437E-20  Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_2*(T,T,T,T,T,T,T)
+       82. 41_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_2*(T,T,T,T,T,T,T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)  +  *(T)
+       83. 42_fwd__:    A(Tini) =  1.0000E+13   Ea =  2.04    k(Tini) =  5.3647E-22  Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       84. 42_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)
+       85. 43_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.74    k(Tini) =  5.8792E-17  Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_3*(T,T,T,T,T,T,T)
+       86. 43_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_3*(T,T,T,T,T,T,T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)  +  *(T)
+       87. 44_fwd__:    A(Tini) =  1.0000E+13   Ea =  2.03    k(Tini) =  7.8984E-22  Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       88. 44_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)  +  *(T)
+       89. 45_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.68    k(Tini) =  5.9879E-16  Reaction: Pd7_6_3&1*(T,T,T,T,T,T)  +  *(T)  ->  Pd7_4*(T,T,T,T,T,T,T)
+       90. 45_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_4*(T,T,T,T,T,T,T)  ->  Pd7_6_3&1*(T,T,T,T,T,T)  +  *(T)
+       91. 46_fwd__:    A(Tini) =  1.0000E+13   Ea =  0.61    k(Tini) =  5.6554E+02  Reaction: Pd6_4&2*(T,T,T,T)  +  *(T)  ->  Pd6_5&1*(T,T,T,T,T)
+       92. 46_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd6_5&1*(T,T,T,T,T)  ->  Pd6_4&2*(T,T,T,T)  +  *(T)
+       93. 47_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.28    k(Tini) =  3.1403E-09  Reaction: Pd7_5&2*(T,T,T,T,T)  +  *(T)  ->  Pd7_6_1&1*(T,T,T,T,T,T)
+       94. 47_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_1&1*(T,T,T,T,T,T)  ->  Pd7_5&2*(T,T,T,T,T)  +  *(T)
+       95. 48_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.58    k(Tini) =  2.8655E-14  Reaction: Pd7_5&2*(T,T,T,T,T)  +  *(T)  ->  Pd7_6_2&1*(T,T,T,T,T,T)
+       96. 48_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_2&1*(T,T,T,T,T,T)  ->  Pd7_5&2*(T,T,T,T,T)  +  *(T)
+       97. 49_fwd__:    A(Tini) =  1.0000E+13   Ea =  1.63    k(Tini) =  4.1422E-15  Reaction: Pd7_5&2*(T,T,T,T,T)  +  *(T)  ->  Pd7_6_3&1*(T,T,T,T,T,T)
+       98. 49_rev__:    A(Tini) =  1.0000E+13                                        Reaction: Pd7_6_3&1*(T,T,T,T,T,T)  ->  Pd7_5&2*(T,T,T,T,T)  +  *(T)
+       99. 50_fwd__:    A(Tini) =  1.0000E+03   Ea =  0.14    k(Tini) =  4.4474E+00  Reaction: Pd1*(T)  +  *(T)  ->  *(T)  +  Pd1*(T)
+      100. 50_rev__:    A(Tini) =  1.0000E+03                                        Reaction: *(T)  +  Pd1*(T)  ->  Pd1*(T)  +  *(T)
+      101. 51_fwd__:    A(Tini) =  1.0000E+03   Ea =  0.37    k(Tini) =  6.0853E-04  Reaction: Pd2*(T,T)  +  *(T)  ->  *(T)  +  Pd2*(T,T)
+      102. 51_rev__:    A(Tini) =  1.0000E+03                                        Reaction: *(T)  +  Pd2*(T,T)  ->  Pd2*(T,T)  +  *(T)
+      103. 52_fwd__:    A(Tini) =  1.0000E+03   Ea =  0.71    k(Tini) =  1.1818E-09  Reaction: Pd3*(T,T,T)  +  *(T)  ->  *(T)  +  Pd3*(T,T,T)
+      104. 52_rev__:    A(Tini) =  1.0000E+03                                        Reaction: *(T)  +  Pd3*(T,T,T)  ->  Pd3*(T,T,T)  +  *(T)
+      105. 53_fwd__:    A(Tini) =  1.0000E+03   Ea =  1.35    k(Tini) =  2.0942E-20  Reaction: Pd4*(T,T,T,T)  +  *(T)  ->  *(T)  +  Pd4*(T,T,T,T)
+      106. 53_rev__:    A(Tini) =  1.0000E+03                                        Reaction: *(T)  +  Pd4*(T,T,T,T)  ->  Pd4*(T,T,T,T)  +  *(T)
+      107. 54_fwd__:    A(Tini) =  1.0000E+03   Ea =  1.42    k(Tini) =  1.3966E-21  Reaction: Pd4_3&1*(T,T,T)  +  *(T)  ->  *(T)  +  Pd4_3&1*(T,T,T)
+      108. 54_rev__:    A(Tini) =  1.0000E+03                                        Reaction: *(T)  +  Pd4_3&1*(T,T,T)  ->  Pd4_3&1*(T,T,T)  +  *(T)
+
+Finished reading mechanism input.
+
+Initial state setup:
+~~~~~~~~~~~~~~~~~~~~
+
+2 "multiple" seeding instructions for:
+
+  3 adparticles of species Pd4_3&1*
+
+  1 adparticles of species Pd1*
+  
+
+Finished reading initial state input.
+
+Threading information:
+~~~~~~~~~~~~~~~~~~~~~~
+     WITH THREADS            1
+
+Commencing simulation:
+~~~~~~~~~~~~~~~~~~~~~~
+
+Simulation stopped:
+~~~~~~~~~~~~~~~~~~~
+ Current KMC time: 18.73581
+ Events occurred:  1000
+ Event frequency:  53.37372
+
+Performance facts:
+~~~~~~~~~~~~~~~~~~
+
+Elapsed CPU time:         112.2547 seconds
+Elapsed clock time:       180.0000 seconds
+
+Clock time per KMC event: 0.1800000 seconds
+Clock time per KMC time:  9.607269 seconds/KMCTimeUnits
+
+Events per clock hour:    20000
+KMC Dt per clock hour:    374.7163 KMCTimeUnits
+
+Restart information successfully written in file restart.inf.
+
+> Normal termination <

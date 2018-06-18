@@ -1,0 +1,6 @@
+FORTRAN STOP
+     WITH THREADS            1
+
+real	3m3.294s
+user	3m3.134s
+sys	0m0.054s

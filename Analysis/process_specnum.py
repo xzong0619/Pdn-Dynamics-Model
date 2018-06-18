@@ -303,27 +303,34 @@ class read_Single_Procstat():
         self.t = np.asarray(t)
         self.events = np.asarray(events)
         
-    def Freqs(self, time_norm = True, site_norm = 1, window = [0.0, 1.0]):
+    def Freqs(self, time_norm = True, site_norm = 1, norm_win = True, time_win = False, window = [0.0, 1.0]):
         
         '''
         Plot a bar graph of elementary step frequencies versus time - output in elem_step_freqs.png in the directory with the Zacros run
 
         '''
+        if norm_win:
+            start_ind = time_search(window[0] * self.t[-1], self.t)
+            end_ind = time_search(window[1] * self.t[-1], self.t)
         
-        start_ind = self.time_search(window[0] * self.t[-1])
-        end_ind = self.time_search(window[1] * self.t[-1])
+        if time_win:
+            start_ind = time_search(window[0], self.t)
+            end_ind = time_search(window[1], self.t)
+            
+            
         self.event_freqs = ( self.events[end_ind,:] - self.events[start_ind,:] ) / float(site_norm)
         if time_norm:
             self.event_freqs = self.event_freqs / ( self.t[end_ind] - self.t[start_ind] )
         
         
-'''       
+     
 
 class read_Multiple_Procstat():
 
     '''
     Handles procstat_output.txt from multiple trajactories
     '''
+
     
     input_dir = 'zacros_inputs'
     
@@ -336,28 +343,34 @@ class read_Multiple_Procstat():
         
         self.filepath = []
         
+        
         for f in range(n_files):
              self.filepath.append(os.path.join(self.fldr, 'outputs', str(f+1)))
         
-        single_procstat =  read_Single_Procstat(self.filepath[0])
+        single_procstat = read_Single_Procstat(self.filepath[0])
+        single_procstat.Freqs()
+        multi_procstat_freqs =  single_procstat.event_freqs
         
-        single_procstat_t = single_procstat.t
-        single_procstat_events = single_procstat.events
+        for f in range(n_files-1):
+             single_procstat =  read_Single_Procstat(self.filepath[f+1])
+             single_procstat.Freqs()
+             
+             multi_procstat_freqs = multi_procstat_freqs + single_procstat.event_freqs
         
-        single_spec_n = len(single_procstat_t)
+        self.ave_procstat_freqs = multi_procstat_freqs/n_files
+        
 
-'''
 
-def time_search(t, sing_traj_t):
+def time_search(t, t_vec):
         
         '''
         Given a time, look up the index of the smallest time greater than or equal to that time      
         '''       
-        if t > sing_traj_t[-1] or t < 0:
+        if t > t_vec[-1] or t < 0:
             raise Exception('Time is out of range.')
         
         ind = 0
-        while sing_traj_t[ind] < t:
+        while t_vec[ind] < t:
             ind += 1
             
         return ind
