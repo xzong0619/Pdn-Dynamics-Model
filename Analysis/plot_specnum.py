@@ -45,7 +45,10 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', xlimit = []
         plt.plot(x_series, y_series[i], #marker = 'o', markerfacecolor = None, 
                  color = colors_pool[i], linewidth = 3.0)
     
-    #plt.xticks(size=20)
+    plt.xticks(size=20)
+    if max(x_series) < 0.01:
+        plt.ticklabel_format(style = 'sci', axis = 'x', scilimits= (0, 0))
+        mat.rc('font', size = 20 )
     plt.yticks(size=20)
     plt.xlabel(xlab, size=24)
     plt.ylabel(ylab, size=24)
@@ -58,6 +61,7 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', xlimit = []
                    bbox_to_anchor = (1.02,1),loc= 'upper left',
                    prop={'size':20}, frameon=False)
     plt.tight_layout()
+    
     
     if logscale:
         plt.yscale('log')
