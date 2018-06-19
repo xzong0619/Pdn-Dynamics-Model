@@ -23,7 +23,7 @@ from IO_Pdn import *
 
 
 #%% Buliding simulation modules
-T = 300 # Temperature (K) 
+T = 700 # Temperature (K) 
 
 P = 1 # Pressure (atm)
 n_CO = 0 # 1 if there is CO
@@ -74,7 +74,7 @@ for i in np.arange(-5,0):
     T_rev[i] = T_rev[i]/s_factor
     
 yfwd = np.log10(T_fwd)
-baseline = -12
+baseline = -13
 yrev = np.log10(T_rev)
 
 width = 0.4
@@ -113,11 +113,11 @@ for i in x:
         
 # add some text for labels, title and axes ticks
 ax.set_ylabel(r'$log_{10}$'+'(Time Scale (s))')
-ax.set_title('Elementary Events Time Scale (s)')
+ax.set_title('T = ' + str(T) + 'K')
 ax.set_xlabel('Events Index')
-
+ax.set_ylim([-13, 28])
 ax.tick_params(labelsize=fs)
 matplotlib.rcParams.update({'font.size': fs})
 
 plt.show()
-fig.savefig(fname = os.path.join(output_dir, 'time_scale_bar.png'))
+fig.savefig(fname = os.path.join(output_dir, str(T) + 'K_time_scale.png'))
