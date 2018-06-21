@@ -7,7 +7,7 @@ Created on Thu Jul 28 13:48:34 2016
 
 import sys
 import os
-sys.path.append('/home/vlachos/wangyf/Zacros-Wrapper')
+sys.path.append('/home/vlachos/wangyf/programs/ZW_git/Zacros-Wrapper')
 import zacros_wrapper as zw
 
 ################## User input ##################################
