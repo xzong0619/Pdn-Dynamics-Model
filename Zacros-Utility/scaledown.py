@@ -7,8 +7,14 @@ Created on Thu Jul 28 13:48:34 2016
 
 import os
 import sys
-sys.path.append('/home/vlachos/wangyf/Zacros-Wrapper')
+sys.path.append('/home/vlachos/wangyf/programs/ZW_git/Zacros-Wrapper')
 import zacros_wrapper as zw
+
+
+zacros_exe = '/home/vlachos/wangyf/programs/ZW_git/Zacros-Wrapper/zacros_ZW.x'
+KMC_source = os.getcwd()
+output = 'sd_outputs'
+BatchPath = os.path.join(KMC_source, output)
 
 
 '''
@@ -16,8 +22,8 @@ Scaldown
 '''
 
 # Read input files
-x = zw.kmc_traj(path = '/home/vlachos/wangyf/Alumina/Network/12')
-x.gas_prod = 'CO2'
-x.exe_file = '/home/vlachos/mpnunez/bin/zacros_ZW.x'
+x = zw.kmc_traj(path = KMC_source)
+x.gas_prod = 'CO'
+x.exe_file = zacros_exe
 x.ReadAllInput()
-final_data = zw.ReachSteadyStateAndRescale(x, '/home/vlachos/wangyf/Alumina/Network/12/outputs', n_runs = 16, n_batches = 1000, n_samples = 100, max_iterations = 10)
+final_data = zw.ReachSteadyStateAndRescale(x, BatchPath, n_runs = 2, n_batches = 1000, n_samples = 100, max_iterations = 10)
