@@ -8,6 +8,10 @@ import matplotlib as mat
 import matplotlib.pyplot as plt
 import numpy as np
 
+import plotly as py
+import plotly.graph_objs as go
+import cufflinks as cf
+
 
 # up to 24 colors stored
 colors_pool = [ 'b','yellowgreen', 'gold', 'lightcoral',
@@ -184,4 +188,42 @@ def PlotFreqs(event_freqs_vec, fname = ''):
     else:
         plt.savefig(fname, bbox_inches = "tight")
         plt.close()
+
+def PlotLiveSpec(s_df,  xlab = 'Time (s)', ylab = '', fname = ''):
+    
+    '''
+    Plot a live specific number or coverage graph vs time using Plotly
+    
+    '''
+    data = s_df
+    
+    if fname == '':
+        fname = 'spec_test.html'
+
+    t_vec = data['t']
+    traces = []
+    width = 4
+    labels = data.columns[0:-1]
+    n_s = len(labels)
+    
+    for i in range(n_s):
+        
+        traces.append(go.Scatter(x = t_vec, y = data[labels[i]],
+                                 name = labels[i],
+                                 mode = 'lines',
+                                 line = dict(color = colors_pool[i], width = width)
+                                 ))
+    layout = dict(xaxis = dict(title = xlab, linewidth = width, 
+                               tickfont = dict(size = 20),
+                               titlefont = dict(size = 20)),
+                  yaxis = dict(title = ylab, linewidth = width, 
+                               tickfont = dict(size = 20),
+                               titlefont = dict(size = 20)),
+                  legend = dict(font=dict(size = 20))
+                  )
+    
+    fig = go.Figure(data=traces, layout=layout)
+    py.offline.plot(fig, filename = fname)
+
+    
     

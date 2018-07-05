@@ -244,7 +244,12 @@ class read_Multiple_Spec:
 
 #%%
 def num_to_cov(lattice_dim, n_spec, surf_dent_vec, spec_vecs):
-        
+    
+    '''
+    Takes in species name vector and species population vector 
+    Converts the species number to species coverage
+    '''
+    
     sites_per_unitcell = 4
     total_sites = lattice_dim**2 *sites_per_unitcell
     # in percentage coverage
@@ -253,6 +258,21 @@ def num_to_cov(lattice_dim, n_spec, surf_dent_vec, spec_vecs):
         surf_spec_cov.append(spec_vecs[i] * surf_dent_vec[i]/ total_sites)
     
     return surf_spec_cov
+    
+def num_to_cov_df(lattice_dim, s_df):
+    
+    '''
+    Takes in species population dataframe
+    Converts the species number to species coverage
+    '''
+    sites_per_unitcell = 4
+    total_sites = lattice_dim**2 *sites_per_unitcell
+    # in percentage coverage
+    # take out the last column as it represents time
+    s_cov_df = s_df[s_df.columns[0:-1]]/total_sites 
+    s_cov_df['t'] = s_df['t']
+    return s_cov_df
+    
     
 #%%
 

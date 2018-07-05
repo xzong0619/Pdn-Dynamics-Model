@@ -24,7 +24,7 @@ from nc import *
 #%%
 ################## User input ##################################
 output = 'analysis_results'
-n_runs = 10
+n_runs = 5
 Count_to_Coverage = 1
 lattice_dim = 25
 xtruncate = 0
@@ -78,6 +78,23 @@ dspec. PlotTimeSeries(time_vecs, surf_spec_vecs,
                       xlab = 'Time (s)', ylab = ylabel, xlimit = xrange,
                       series_labels = spec_name, 
                       fname = os.path.join(output_dir, 'surf_spec_vs_time.png'))
+
+#%% 
+'''
+# plot the live version of species number/ coverages plot over time
+'''
+if Count_to_Coverage == 0:
+    ylabel = 'Species count'
+    s_df_live = s_df
+else:
+    ylabel = 'Coverage'
+    # Convert to surface coverages    
+    s_df_live = pspec.num_to_cov_df(lattice_dim, s_df)
+
+dspec.PlotLiveSpec(s_df_live, xlab = 'Time (s)', ylab = ylabel, 
+                   fname =  output + '/' + 'live_surf_vs_time.html')
+
+
 
 #%%
 '''
