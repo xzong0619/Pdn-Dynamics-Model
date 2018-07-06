@@ -133,13 +133,13 @@ class read_Sim:
                     
 class spec_info:
     
-    def __init__(self,  data,  dict):
+    def __init__(self,  fldr, data,  dict):
         
         '''
         Fetch data from simulation input
         '''
         
-        Sim = read_Sim()
+        Sim = read_Sim(fldr)
         self.n_spec = Sim.n_spec
         self.surf_spec_name = Sim.surf_spec_name
         self.surf_spec = {}
@@ -182,7 +182,7 @@ class read_Single_Spec:
         
         spec = []
         for s in data:
-            spec.append(spec_info(s.split(),dict))
+            spec.append(spec_info(fldr, s.split(),dict))
         
         n = len(spec)
         self.n = n       
@@ -230,7 +230,7 @@ class read_Multiple_Spec:
         
         for f in range(n_files):
              self.filepath.append(os.path.join(self.fldr, str(f+1)))
-             print(self.filepath)
+
         
         single_spec =  read_Single_Spec(self.filepath[0])
         single_spec_df = single_spec.surf_spec_df

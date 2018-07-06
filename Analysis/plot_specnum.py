@@ -189,7 +189,7 @@ def PlotFreqs(event_freqs_vec, fname = ''):
         plt.savefig(fname, bbox_inches = "tight")
         plt.close()
 
-def PlotLiveSpec(s_df,  xlab = 'Time (s)', ylab = '', fname = ''):
+def PlotLiveSpec(s_df,  xlab = 'Time (s)', ylab = '',  xlimit = [], fname = ''):
     
     '''
     Plot a live specific number or coverage graph vs time using Plotly
@@ -214,6 +214,7 @@ def PlotLiveSpec(s_df,  xlab = 'Time (s)', ylab = '', fname = ''):
                                  line = dict(color = colors_pool[i], width = width)
                                  ))
     layout = dict(xaxis = dict(title = xlab, linewidth = width, 
+                               range = xlimit,
                                tickfont = dict(size = 20),
                                titlefont = dict(size = 20)),
                   yaxis = dict(title = ylab, linewidth = width, 
