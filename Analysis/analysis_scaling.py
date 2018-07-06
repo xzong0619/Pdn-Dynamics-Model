@@ -34,7 +34,7 @@ Count_to_Coverage = 0 #convert species count to coverage
 ss_flag = 1 # analyze the data at steady state
 xtruncate = 1 # truncate the data when plotting
 
-ss_cut = 10**5# set steady range as the last ss_range seconds
+ss_cut = 10**3# set steady range as the last ss_range seconds
 xmax = 10**6 # set plotting range
 xrange = (0,xmax) 
 
@@ -88,6 +88,9 @@ all_df.to_csv(os.path.join(output_dir, 'all_surf_spec.csv'), sep = '\t')
 '''
 # plot the live version of species number/ coverages plot over entire time
 '''
+time_vecs = np.array(all_df['t'])
+if xmax >= time_vecs[-1]: xtruncate = 0
+
 if Count_to_Coverage == 0:
     ylabel = 'Species count'
     df_live = all_df
@@ -107,11 +110,12 @@ dspec.PlotLiveSpec(df_live, xlab = 'Time (s)', ylab = ylabel, xlimit = xrange,
 
 #%%
 '''
+# Steady state  analysis
+'''
+'''
 # plot the evolution of species number/coverages with time
 '''
 
-time_vecs = np.array(s_df['t'])
-if xmax <= time_vecs[-1]: xtruncate = 0
 
 # Analysis for steady state
 if ss_cut >= time_vecs[-1]: ss_flag = 0
@@ -158,7 +162,6 @@ else:
 
 dspec.PlotLiveSpec(s_df_live, xlab = 'Time (s)', ylab = ylabel, xlimit = [],
                    fname =  output + '/' + 'ss_surf_vs_time.html')
-
 
 
 #%%

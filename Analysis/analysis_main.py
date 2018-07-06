@@ -58,7 +58,7 @@ s_df.to_csv(os.path.join(output_dir, 'surf_spec.csv'), sep = '\t')
 '''
 
 time_vecs = np.array(s_df['t'])
-if xmax <= time_vecs[-1]: xtruncate = 0
+if xmax >= time_vecs[-1]: xtruncate = 0
 
 # Analysis for steady state
 if ss_cut >= time_vecs[-1]: ss_flag = 0
