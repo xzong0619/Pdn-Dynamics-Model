@@ -63,6 +63,10 @@ def lifetime_spec_on_surf(single_spec_df):
     return s_name, s_count        
 
 def final_lt_spec_on_surf(single_spec_df):
+    '''
+    takes in a single species dataframe
+    detect final lifetime species on the surface
+    '''
     
     s_name, s_count  = lifetime_spec_on_surf(single_spec_df)
     end_state = single_spec_df[-1:]
@@ -206,19 +210,27 @@ class read_Single_Spec:
                 
 class read_Multiple_Spec:
     
-    input_dir = 'zacros_inputs'     
+    input_dir = 'zacros_inputs\outputs'     
     
-    def __init__(self, n_files, fldr = None):
+    def __init__(self, fldr = None):
          
         if fldr == None:
             self.fldr =  os.path.join(os.getcwd(), self.input_dir)
         else:
             self.fldr = fldr
+         
+        # Automatically detects the number of replicates in a folder
+        n_files = 1
+        while os.path.exists(os.path.join(self.fldr, str(n_files))):
+            n_files = n_files+1
+        n_files = n_files-1    
         
+       
         self.filepath = []
         
         for f in range(n_files):
-             self.filepath.append(os.path.join(self.fldr, 'outputs', str(f+1)))
+             self.filepath.append(os.path.join(self.fldr, str(f+1)))
+             print(self.filepath)
         
         single_spec =  read_Single_Spec(self.filepath[0])
         single_spec_df = single_spec.surf_spec_df
@@ -352,20 +364,25 @@ class read_Multiple_Procstat():
     '''
 
     
-    input_dir = 'zacros_inputs'
+    input_dir = 'zacros_inputs\outputs'
     
-    def __init__(self, n_files, fldr = None):
+    def __init__(self, fldr = None):
         
         if fldr == None:
             self.fldr =  os.path.join(os.getcwd(), self.input_dir)
         else:
             self.fldr = fldr
+            
+        # Automatically detects the number of replicates in a folder
+        n_files = 1
+        while os.path.exists(os.path.join(self.fldr, str(n_files))):
+            n_files = n_files+1
+        n_files = n_files-1    
         
         self.filepath = []
         
-        
         for f in range(n_files):
-             self.filepath.append(os.path.join(self.fldr, 'outputs', str(f+1)))
+             self.filepath.append(os.path.join(self.fldr, str(f+1)))
         
         single_procstat = read_Single_Procstat(self.filepath[0])
         single_procstat.Freqs()
