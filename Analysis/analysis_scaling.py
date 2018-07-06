@@ -22,15 +22,27 @@ import plot_specnum as dspec
 from IO_Pdn import *
 from nc import *
 
-Parent_dir = os.getcwd()
-
+#%%
+################## User input ##################################
 output = 'analysis_results'
-Count_to_Coverage = 0
 lattice_dim = 25
-xtruncate = 1
-xrange = (0,10**6)
-Cluster = ClusterOut(nc)
 
+'''
+Boolean parameters
+'''
+Count_to_Coverage = 0 #convert species count to coverage
+ss_flag = 1 # analyze the data at steady state
+xtruncate = 1 # truncate the data when plotting
+
+ss_cut = 10**5# set steady range as the last ss_range seconds
+xmax = 10**6 # set plotting range
+xrange = (0,xmax) 
+
+################## User input ##################################
+
+
+Cluster = ClusterOut(nc)
+Parent_dir = os.getcwd()
 output_dir = os.path.join(Parent_dir, output)
 if not os.path.exists(output_dir): os.makedirs(output_dir)
 
@@ -95,11 +107,18 @@ dspec.PlotLiveSpec(df_live, xlab = 'Time (s)', ylab = ylabel, xlimit = xrange,
 
 #%%
 '''
-# plot the evolution of species number/coverages with time at steady state
-# s_df is the last frame
+# plot the evolution of species number/coverages with time
 '''
 
 time_vecs = np.array(s_df['t'])
+if xmax <= time_vecs[-1]: xtruncate = 0
+
+# Analysis for steady state
+if ss_cut >= time_vecs[-1]: ss_flag = 0
+if ss_flag == 1:
+    s_df = pspec.ss_search(ss_cut, s_df)
+    time_vecs = np.array(s_df['t'])
+    
 spec_name, n_spec = pspec.lifetime_spec_on_surf(s_df)
 
 print(spec_name)
@@ -158,7 +177,7 @@ dspec.PlotPie(spec_cov, spec_name,  fname = os.path.join(output_dir, 'ss_surf_sp
 # Plot a bar graph of elementary step frequencies versus time - output in elem_step_freqs.png in the directory with the Zacros run
 '''
 # frequency object
-f = pspec.read_Multiple_Procstat(itr_dir)
+f = pspec.read_Multiple_Procstat(iter_dir)
 freq_vecs = f.ave_procstat_freqs
 dspec.PlotFreqs(freq_vecs, fname = os.path.join(output_dir, 'ss_elem_step_freqs.png'))
     

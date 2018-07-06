@@ -24,10 +24,19 @@ from nc import *
 #%%
 ################## User input ##################################
 output = 'analysis_results'
-Count_to_Coverage = 1
 lattice_dim = 25
-xtruncate = 0
-xrange = (0,10**6)
+
+'''
+Boolean parameters
+'''
+Count_to_Coverage = 0 #convert species count to coverage
+ss_flag = 1 # analyze the data at steady state
+xtruncate = 0 # truncate the data when plotting
+
+ss_cut = 10**5# set steady range as the last ss_range seconds
+xmax = 10**6 # set plotting range
+xrange = (0,xmax) 
+
 ################## User input ##################################
 
 
@@ -49,6 +58,14 @@ s_df.to_csv(os.path.join(output_dir, 'surf_spec.csv'), sep = '\t')
 '''
 
 time_vecs = np.array(s_df['t'])
+if xmax <= time_vecs[-1]: xtruncate = 0
+
+# Analysis for steady state
+if ss_cut >= time_vecs[-1]: ss_flag = 0
+if ss_flag == 1:
+    s_df = pspec.ss_search(ss_cut, s_df)
+    time_vecs = np.array(s_df['t'])
+
 spec_name, n_spec = pspec.lifetime_spec_on_surf(s_df)
 
 print(spec_name)

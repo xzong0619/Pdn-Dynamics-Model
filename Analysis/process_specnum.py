@@ -412,4 +412,47 @@ def time_search(t, t_vec):
             
         return ind
 
+#%%
+def ss_search(ss_cut, s_df):
+    '''
+    Takes in the set steady range and a species dataframe
+    returns a steady state dataframe
+    '''    
+    t_vec = np.array(s_df['t'])
+    
+    t_end = t_vec[-1]
+    window = (t_end - ss_cut, t_end)
+    
+    start_ind = time_search(window[0], t_vec)
+    print(start_ind)
+    end_ind = time_search(window[1], t_vec)
+    print(end_ind)
+    
+    ss_df = s_df.iloc[start_ind:end_ind]
+    
+    return ss_df
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
