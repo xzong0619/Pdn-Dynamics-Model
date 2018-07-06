@@ -46,7 +46,7 @@ def PlotTimeSeries(x_series, y_series, xlab = 'Time (s)', ylab = '', xlimit = []
     plt.figure(figsize=(10,8))
     
     for i in range (len(y_series)):
-        plt.plot(x_series, y_series[i], marker = 'o', markerfacecolor = None, 
+        plt.plot(x_series, y_series[i], #marker = 'o', markerfacecolor = None, 
                  color = colors_pool[i], linewidth = 3.0)
     
     plt.xticks(size=20)

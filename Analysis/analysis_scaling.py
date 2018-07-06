@@ -34,7 +34,7 @@ Count_to_Coverage = 0 #convert species count to coverage
 ss_flag = 1 # analyze the data at steady state
 xtruncate = 1 # truncate the data when plotting
 
-ss_cut = 10**3# set steady range as the last ss_range seconds
+ss_cut = 10**11# set steady range as the last ss_range seconds
 xmax = 10**6 # set plotting range
 xrange = (0,xmax) 
 
@@ -66,7 +66,7 @@ for i in range(n_itr):
 #%% Combine all CSV files 
 fname = 'surf_spec.csv'
 all_df = pd.DataFrame([])
-s_df = pd.DataFrame()
+
 pre_t = 0 # previous simulation stop time
 
 for i in range(n_itr):
@@ -106,7 +106,36 @@ else:
 
 dspec.PlotLiveSpec(df_live, xlab = 'Time (s)', ylab = ylabel, xlimit = xrange,
                    fname =  output + '/' + 'surf_vs_time.html')    
+
+'''
+# plot the evolution of species number/coverages with time
+'''
+
     
+spec_name, n_spec = pspec.lifetime_spec_on_surf(all_df)
+
+print(spec_name)
+surf_spec_vecs = []
+surf_spec_dent = []
+surf_spec_n = []
+
+for i in range(n_spec):
+    surf_spec_vecs.append(np.array(all_df[spec_name[i]]))
+    surf_spec_dent.append(Cluster.surf_dent[Cluster.surf_spec.index(spec_name[i])])
+    surf_spec_n.append(Cluster.surf_n[Cluster.surf_spec.index(spec_name[i])])
+
+if Count_to_Coverage == 0:
+    ylabel = 'Species count'
+else:
+    ylabel = 'Coverage'
+    # Convert to surface coverages    
+    surf_spec_vecs = pspec.num_to_cov(lattice_dim, n_spec, surf_spec_dent, surf_spec_vecs)
+
+    
+dspec. PlotTimeSeries(time_vecs, surf_spec_vecs, 
+                      xlab = 'Time (s)', ylab = ylabel, xlimit = [],
+                      series_labels = spec_name, 
+                      fname = os.path.join(output_dir, 'surf_spec_vs_time.png'))
 
 #%%
 '''
@@ -118,6 +147,7 @@ dspec.PlotLiveSpec(df_live, xlab = 'Time (s)', ylab = ylabel, xlimit = xrange,
 
 
 # Analysis for steady state
+time_vecs = np.array(s_df['t'])
 if ss_cut >= time_vecs[-1]: ss_flag = 0
 if ss_flag == 1:
     s_df = pspec.ss_search(ss_cut, s_df)
