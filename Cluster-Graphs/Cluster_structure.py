@@ -10,6 +10,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import itertools as iter
 import numpy as np
+import re
 
 class Pdn: 
     
@@ -295,17 +296,60 @@ class Pdn:
         return poss_edge_new
 
     
+
+
+def neighbor_list_string(edge_list):
+    
     '''
     # function Generate neighboring list for zacors
     '''
-
-def neighbor_list_string(edge_list):
+    
+   
     ll = edge_list
     l = []
     for i in range(len(ll)):
         l.append('%d-%d ' %(ll[i][0],ll[i][1]))
     s = ''.join(l) 
     return s
+
+def neighbor_string_list(s):
+    '''
+    # function takes neighboring string from zacros and 
+    # converts it to neighboring edge list
+    '''
+    s = s[0]
+    ll = []
+    p = re.compile(r'\W+')
+    B  = p.split(s)
+    nb = int(len(B)/2)
+    for i in range(nb):
+        bi = 2* i 
+        ll.append((int(B[bi]), int(B[bi+1])))
+    return ll
+    
+def neighbor_weight(edge_list):
+    '''
+    # function takes neighboring edge list and 
+    # returns the weighted edge index
+    '''
+    
+    n_edge = len(edge_list)
+    G = nx.Graph(edge_list)
+    wt_i = []
+    
+    for i in range(n_edge):
+        pt_a = edge_list[i][0]
+        pt_b = edge_list[i][1]
+        
+        list_a = list(G.neighbors(pt_a))
+        list_b = list(G.neighbors(pt_b))
+        wt = len(list(set(list_a).intersection(list_b)))
+        if wt == 2: 
+            wt_i.append(i)
+    
+    return wt_i
+
+    
 
 class Parallel_growth:
     def __init__(self,n, ni_u, input_edge_list, input_wt_i_list):
@@ -361,9 +405,34 @@ def plot_graph(edge_list):
         plt.title('Pd %d' %n)
         plt.suptitle('S %d' %(ni))
         plt.savefig('Pd%d_%d_structures_%d.png' %(n,ni,ni//2+1))
-            
 
+def clean_up(edge_list):
         
+        '''
+        clean up identical structure
+        n - number of struture needed to check
+        edge_list - the full list of all strutures
+        '''
+        ni = len(edge_list) # number of isomorphy
+        i_list = [] #  index of possible graphs including isophoric graphs'''
+        for i in range(ni):
+            i_list.append(i)
+        index_pair = list(iter.combinations(i_list,2)) # combination of possible index pair
+        is_iso = [] # Array of whether each pair are isophoric, 1 = yes, None = no'''
+        for i in range(len(index_pair)):
+            
+            a = index_pair[i][0]
+            b = index_pair[i][1]
+            is_iso.append(edge_list[a] == edge_list[b])
+            
+        '''Remove identical graphs from the overall index'''
+        for i in range(len(index_pair)):
+            if is_iso[i] == 1:
+                if index_pair[i][1] in i_list:
+                    i_list.remove(index_pair[i][1])
+        return i_list          
+        
+
 
 
 
