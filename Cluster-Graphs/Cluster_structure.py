@@ -387,7 +387,7 @@ class Parallel_growth:
 
 def plot_graph(edge_list):      
     ni = len(edge_list)
-    n = len(nx.Graph(edge_list[0]))
+    n = len(nx.Graph(edge_list[-1]))
     
     for j in range(ni//2):        
             plt.figure()
