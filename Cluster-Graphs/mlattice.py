@@ -87,10 +87,26 @@ def gconfigurations(mother, son):
 
 def gclusters(cmother, son):
     ns = len(son)
-    mother = []
+    Gc = nx.Graph()
     for i in range(ns):
-        mother.append(cmother[i])
-    Gc = gmothers(mother)
+        c = son[i]
+        Gc.add_node(i, pos = cmother[c], color = filled)
+        
+    edge_d = []
+    edge = []
+    for i in range(ns):        
+        for j in np.arange(i+1,ns):
+            c  = son[i]
+            d = son[j]
+            edge.append((i,j))
+            edge_d.append(two_points_D(cmother[c],cmother[d]))    
+    ne = len(edge)
+    for i in range(ne):
+        Gc.add_edges_from([edge[i]], length = edge_d[i])
+        
+    drawing(Gc)
+    plt.title('Pd %d' %ns)
+       
     return Gc
     
 '''
@@ -132,17 +148,17 @@ for si in range(ns):
     Gsv.append(Gs)
 
 
-
+#%%
 '''
 Creat 6 clusters
 '''
 
 cmother = [(0,0), (1,0), (1/2, 3**0.5/2), (3/2, 3**0.5/2), (0, 3**0.5)]
 cconfig = [[0], [0,1], [0,3], [1,4],[0,1,2],[1,2,4], [0,1,3]]
-cedge = 
+#cedge = 
 
 
-cm = gmothers(cmother)
+#cm = gmothers(cmother)
 cns = len(cconfig)
 Gcv = []
 for si in range(cns):
