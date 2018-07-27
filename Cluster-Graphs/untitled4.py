@@ -9,15 +9,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.algorithms import isomorphism as iso
 
-G1 =  nc_v[7]
+G1 =  Gsv[7]
 print(G1.nodes(data=True))
 plt.figure()
-nx.draw(G1, with_labels=True)
-G2 = gv[2]
+drawing(G1)
+G2 = Gcv[4]
 print(G2.nodes(data=True))
 plt.figure()
-nx.draw(G2, with_labels=True)
+drawing(G2)
 
-GM = iso.GraphMatcher(Gm, G1)
+GM = iso.GraphMatcher(G1, G2, edge_match=iso.categorical_edge_match(['length'],[]))
 x= [y for y in GM.subgraph_isomorphisms_iter()]
 
