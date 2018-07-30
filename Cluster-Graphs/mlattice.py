@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import math
+from networkx.algorithms import isomorphism as iso
+from pprint import pprint
+from numpy.linalg import inv
+
 
 def two_points_D(A,B):
     '''
@@ -108,7 +112,58 @@ def gclusters(cmother, son):
     plt.title('Pd %d' %ns)
        
     return Gc
+ 
+def get_occupancy(G, i):
     
+    '''
+    Get the occupancy from the graph G for node i 
+    Occupied is 1 and unoccupied is 0
+    '''
+    if G.nodes[i]['color'] == empty: o = 0
+    if G.nodes[i]['color'] == filled: o = 1 
+    
+    return o    
+
+def get_delta(Gl,Gs):
+    
+    '''
+    takes in larger graph Gl and smaller graph Gs
+    find sub isomorphic graphs of Gs from Gl
+    calculate the delta value in pi matrix 
+    '''
+    '''
+    find subgraphs using edge distance match
+    '''
+    GM = iso.GraphMatcher(Gl, Gs, edge_match=iso.numerical_edge_match(['length'],[1.0]))
+    '''
+    list down total number of subgraphs niso
+    '''
+    x= [y for y in GM.subgraph_isomorphisms_iter()]
+    
+    niso =len(x)
+    '''
+    save subgraphs to a list
+    '''
+    subg = list()
+    for i in range(niso):    
+        subg.append(tuple(x[i].keys()))
+    
+    '''
+    save product into a list 
+    and caclulate the sum divid by total number of subgraphs
+    '''
+    subi = []
+    subs = []
+    for i in range(niso):
+        subi.append([])
+        for j in range(len(subg[i])):
+            subi[i].append(get_occupancy(Gl,subg[i][j]))   
+        subs.append(np.product(subi[i]))
+    delta = np.sum(subs)/niso
+    
+    return delta
+        
+#%%
 '''
 main
 '''
@@ -130,7 +185,14 @@ config = [[0],
           [0,1,2,3,5,9,7],
           [0,1,2,5,8,11,12],
           [0,1,2,8,9,11,12]]
-         
+'''
+Energy of clusters in eV
+'''
+
+Ec = [0, -0.45, -1.5, -2.56, -3.41, -4.49, -4.38, -4.32, -6.07, -4.9, -5.11, -5.12]
+
+
+     
 empty = 'grey'
 filled = 'r'
 
@@ -140,8 +202,8 @@ Gm = gmothers(mother)
 '''
 Creat 12 configurations
 '''
-ns = len(config)
-Gsv = []
+ns = len(config)  # number of configurations 
+Gsv = [] # list of configurations 
 for si in range(ns):
     son = config[si]
     Gs = gconfigurations(mother,son)
@@ -155,15 +217,26 @@ Creat 6 clusters
 
 cmother = [(0,0), (1,0), (1/2, 3**0.5/2), (3/2, 3**0.5/2), (0, 3**0.5)]
 cconfig = [[0], [0,1], [0,3], [1,4],[0,1,2],[1,2,4], [0,1,3]]
-#cedge = 
 
 
-#cm = gmothers(cmother)
-cns = len(cconfig)
-Gcv = []
-for si in range(cns):
-    cson = cconfig[si]
+nc = len(cconfig) # number of clusers
+Gcv = [] # list of clusters
+for si in range(nc):
+    cson = cconfig[si] 
     Gc = gclusters(cmother,cson)
     Gcv.append(Gc)       
+        
+#%%
+'''
+creat pi matrix
+size of number of configuration * numbers of clusters
+'''
+pi = np.zeros((ns,nc))
+
+for i in range(ns):
+    for j in range(nc):
+        pi[i][j] = get_delta(Gsv[i],Gcv[j])
+        
+J = np.matmul(inv(pi), np.array(Ec).T)         
         
         
