@@ -226,17 +226,17 @@ for si in range(nc):
     Gc = gclusters(cmother,cson)
     Gcv.append(Gc)       
         
-#%%
+#%% Stattistical analysis
 '''
 creat pi matrix
 size of number of configuration * numbers of clusters
 '''
 pi = np.zeros((ns,nc))
-
+Ec = np.array(Ec)
 for i in range(ns):
     for j in range(nc):
         pi[i][j] = get_delta(Gsv[i],Gcv[j])
         
-J = np.matmul(inv(pi), np.array(Ec).T)         
-        
-        
+J = np.linalg.lstsq(pi, Ec, rcond=None)[0]
+      
+MSE = np.sum(np.power((np.dot(pi,J) - Ec),2))/ns     
