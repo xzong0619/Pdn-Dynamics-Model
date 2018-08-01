@@ -162,7 +162,39 @@ def get_delta(Gl,Gs):
     delta = np.sum(subs)/niso
     
     return delta
-        
+
+
+
+def get_J(Ev, G1v, G2v):
+    '''
+    The function that gets 
+        energy of configurations, Ev
+        configuration graphs, G1v
+        cluster graphs, G2v
+    and returns the interaction energy in J vector and correlation matrix pi
+    '''
+    
+    Ev = np.array(Ev)
+    n1 = len(G1v)
+    n2 = len(G2v)
+    pi = np.zeros((n1,n2))
+    
+    for i in range(n1):
+        for j in range(n2):
+            pi[i][j] = get_delta(G1v[i],G2v[j])
+            
+    J = np.linalg.lstsq(pi, Ev)[0]
+    
+    return J, pi
+
+def LeaveOneOut(A, a):
+    '''
+    takes in a list A and returns a new list B by leaving ath element out
+    '''     
+    B = [x for i,x in enumerate(A) if i!=a]
+    
+    return B 
+    
 #%%
 '''
 main
@@ -231,12 +263,29 @@ for si in range(nc):
 creat pi matrix
 size of number of configuration * numbers of clusters
 '''
-pi = np.zeros((ns,nc))
-Ec = np.array(Ec)
+
+J, pi =  get_J(Ec,Gsv,Gcv)      
+MSE = np.sum(np.power((np.dot(pi,J) - Ec),2))/ns 
+
+
+
+#%%
+'''
+Calculate Leave One Out CV score
+'''
+Ec_predict = np.zeros(ns)
+
+
 for i in range(ns):
-    for j in range(nc):
-        pi[i][j] = get_delta(Gsv[i],Gcv[j])
-        
-J = np.linalg.lstsq(pi, Ec, rcond=None)[0]
-      
-MSE = np.sum(np.power((np.dot(pi,J) - Ec),2))/ns     
+    '''
+    i is the index to be removed from the list
+    '''
+    Ec_LOO =  LeaveOneOut(Ec,i)
+    Gsv_LOO = LeaveOneOut(Gsv,i)
+    
+    J_LOO = get_J(Ec_LOO, Gsv_LOO, Gcv)[0]
+    Ec_predict[i] = np.dot(pi[i],J_LOO)
+    
+CV = np.sum(np.power((Ec_predict - Ec),2))/ns    
+
+    
