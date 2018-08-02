@@ -49,8 +49,8 @@ def gmothers(mother):
             
     ne = len(edge)
     for i in range(ne):
-        #if edge_d[i] <= 1:
-        Gm.add_edges_from([edge[i]], length = edge_d[i])
+        if edge_d[i] <= 1:
+            Gm.add_edges_from([edge[i]], length = edge_d[i])
     drawing(Gm)
     plt.title('%d lattice points' %nm)
     
@@ -74,8 +74,8 @@ def gconfigurations(mother, son):
             edge_d.append(two_points_D(mother[i],mother[j]))
             
     ne = len(edge)
-    for i in range(ne):
-        Gs.add_edges_from([edge[i]], length = edge_d[i])
+    #for i in range(ne):
+    #    Gs.add_edges_from([edge[i]], length = edge_d[i])
     for i in range(nm):
         Gs.add_node(i, pos = mother[i], color = empty)
     for i in range(ne):
