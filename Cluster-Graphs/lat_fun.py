@@ -51,7 +51,7 @@ def LeaveOneOut(A, a):
 clusters object
 '''
 
-class clusters:
+class clusters():
     
     def __init__(self, occupancy):
         
@@ -73,10 +73,10 @@ class clusters:
         '''
         self.mother = mother
         self.nm = len(mother)
-        self.Gm = nx.Graph()
+        Gm = nx.Graph()
         
         for i in range(self.nm):
-            self.Gm.add_node(i, pos = mother[i], color = self.empty)
+            Gm.add_node(i, pos = mother[i], color = self.empty)
         
         self.edge_d = []
         self.edge = []
@@ -90,9 +90,11 @@ class clusters:
         self.ne = len(self.edge)
         for i in range(self.ne): 
             if self.edge_d[i] <= 1:
-                self.Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
-        drawing(self.Gm)
+                Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
+                
+        drawing(Gm)
         plt.title('%d lattice points' %self.nm)
+        return Gm
     
     
     def gconfigurations(self, son):
@@ -100,52 +102,103 @@ class clusters:
         '''
         takes in mother coordinate list and son's index number and occupancy vector
         returns the shaded son graph
-        '''
-        self.son = son
-        self.Gs = nx.Graph()
-        self.ns = len(son)
+        '''     
+        ns = len(son)
+        print('Creating G')
+        Gs = nx.Graph()
+        print('Adding nodes')
     
         for i in range(self.nm):
-            self.Gs.add_node(i, pos = self.mother[i], color = self.empty)
+            Gs.add_node(i, pos = self.mother[i], color = self.empty)
+
+        print('Adding edges')
         for i in range(self.ne):
             if self.edge_d[i] <= 1:
-                self.Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])    
-        for si in range(self.ns):
-            self.Gs.node[son[si]]['color'] = self.filled[1]
+                 Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])   
+        print('after')
+        print(Gs.nodes)
+        for si in range(ns):
+            Gs.node[son[si]]['color'] = self.filled
         
-        drawing(self.Gs)
-        plt.title('Pd %d' %self.ns)
+        drawing(Gs)
+        plt.title('Pd %d' %ns)
+        
+        return Gs
     
 
-    def gclusters(self, cmother):
+    def gclusters(self, cmother, cson):
     
         '''
         takes in clusters 
+        return cluster graph objective
         '''
-        self.Gc = nx.Graph()
-        for i in range(self.ns):
-            c = self.son[i]
-            self.Gc.add_node(i, pos = cmother[c], color = self.filled)
+        Gc = nx.Graph()
+        cns = len(cson)
+        
+        for i in range(cns):
+            c = cson[i]
+            Gc.add_node(i, pos = cmother[c], color = self.filled)
             
         cedge_d = []
         cedge = []
-        for i in range(self.ns):        
-            for j in np.arange(i+1,self.ns):
-                c  = self.son[i]
-                d = self.son[j]
+        for i in range(cns):        
+            for j in np.arange(i+1,cns):
+                c  = cson[i]
+                d = cson[j]
                 cedge.append((i,j))
                 cedge_d.append(two_points_D(cmother[c],cmother[d]))    
         
         cne = len(cedge)
         for i in range(cne):
-            self.Gc.add_edges_from([cedge[i]], length = cedge_d[i])
+           Gc.add_edges_from([cedge[i]], length = cedge_d[i])
             
-        drawing(self.Gc)
-        plt.title('Pd %d' %self.ns)
-      
+        drawing(Gc)
+        plt.title('Pd %d' %cns)
+        return Gc
+    
+
+    def get_mother(self, mother):
+        '''
+        takes in mother coordinates list and 
+        add mother attribute to the class
+        '''
+        
+        self.Gm  = self.gmothers(mother)
+        
+        
+    def get_configs(self, config):
+        
+        '''
+        takes in configuration index list
+        get a list of configurations as graph objects
+        '''
+        
+        self.Gsv = []
+        self.nconfig = len(config)
+        
+        for si in range(self.nconfig):
+            son_i = config[si]
+            Gs = self.gconfigurations(son_i)
+            self.Gsv.append(Gs)
+     
+        
+    def get_clusters(self, cmother, ccluster):
+        
+        '''
+        takes in cluster coordinates list and cluster index list
+        returns a list of clusters as graph objects
+        '''
+        
+        self.nc = len(ccluster) # number of clusers
+        self.Gcv = [] # list of clusters
+        for si in range(self.nc):
+            cson = ccluster[si] 
+            Gc = self.gclusters(cmother,cson)
+            self.Gcv.append(Gc)       
+        
 
 #%%        
-class calculations:
+class calculations():
     
     '''
     Perform statistical calculation for cluster expansion
