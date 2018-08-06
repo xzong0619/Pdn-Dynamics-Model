@@ -4,10 +4,12 @@ Created on Thu Aug  2 15:52:08 2018
 
 @author: wangyf
 """
-import Lattice_fun as Laf
+import lat_fun as lf
 import numpy as np
 
+#%% 
 '''
+Mother graph
 2D coorindates
 '''
 
@@ -34,36 +36,37 @@ l3 = np.array([np.sum(l1[[0,2,14]],0),
                np.sum(l1[[0,1,6]],0),
                np.sum(l1[[6,8,11]],0)])/3
 # fourth layer
-l4 = l1[0]
+l4 = np.array([l1[0]])
 
-l1d = np.concatenate((l1, np.array([np.ones(len(l1))]).T),axis =1)         
-
-
+      
 '''
 Add z coordinate
 '''
+dz = 1
+l1d = lf.add_z(l1, dz)  
+l2d = lf.add_z(l2, 2*dz)
+l3d = lf.add_z(l3, 3*dz)
+l4d = lf.add_z(l4, 4*dz)
 
-
-
-
-config = [[0],
-          [0,1],
-          [0,1,2],
-          [0,1,2,3],
-          [0,1,2,3,5],
-          [0,1,2,3,5,6],
-          [0,1,2,3,5,9],
-          [0,1,2,3,5,11],
-          [0,1,2,5,9,8,11],
-          [0,1,2,3,5,9,7],
-          [0,1,2,5,8,11,12],
-          [0,1,2,8,9,11,12]]
 
 
 empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
+'''
+only draw 1st nearest neighbors?
+'''
+NN1 = 0
+mother  = np.concatenate((l1d,l2d,l3d,l4d), axis =0)
 
-Gm = Laf.gmothers(l1, occ)
-Gm = Laf.gmothers(np.concatenate((l1,l2,l3), axis =0), occ)
+Clusters = lf.clusters(occ, NN1)
+Clusters.get_mother(mother)
+Gm = Clusters.mother
+
+#%%
+'''
+Create Configurations
+'''
+
+

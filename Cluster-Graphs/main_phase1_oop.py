@@ -13,7 +13,7 @@ main phase 1 in OOP version
 import lat_fun as lf 
 import numpy as np
 
-print('Hello world')
+
 mother = [(0,0), (1,0), (1/2, 3**0.5/2), (3/2, 3**0.5/2), (0, 3**0.5),
           (1/2, -3**0.5/2), (3/2, -3**0.5/2), (0, -3**0.5),
           (-1,0), (-1/2, -3**0.5/2), (-3/2, -3**0.5/2),
@@ -43,7 +43,12 @@ empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
-Clusters = lf.clusters(occ)
+'''
+only draw 1st nearest neighbors?
+'''
+NN1 = 0
+
+Clusters = lf.clusters(occ, NN1)
 Clusters.get_mother(mother)
 Gm = Clusters.mother
   
@@ -52,5 +57,51 @@ Creat 12 configurations
 '''
 Clusters.get_configs(config)
 Gsv = Clusters.Gsv
+
+#%%
+'''
+Creat 7 clusters
+'''
+
+cmother = [(0,0), (1,0), (1/2, 3**0.5/2), (3/2, 3**0.5/2), (0, 3**0.5)]
+ccluster = [[0], [0,1], [0,3], [1,4],[0,1,2],[1,2,4], [0,1,3]]
+
+Clusters.get_clusters(cmother, ccluster)
+Gcv = Clusters.Gcv
+
+#%% Stattistical analysis
+'''
+creat pi matrix
+size of number of configuration * numbers of clusters
+'''
+ns = len(config)  # number of configurations 
+
+Cal = lf.calculations(occ)
+J, pi =  Cal.get_J(Ec, Gsv ,Gcv)      
+MSE = np.sum(np.power((np.dot(pi,J) - Ec),2))/ns 
+
+
+
+#%%
+'''
+Calculate Leave One Out CV score
+'''
+Ec_predict = np.zeros(ns)
+
+
+for i in range(ns):
+    '''
+    i is the index to be removed from the list
+    '''
+    Ec_LOO =  lf.LeaveOneOut(Ec,i)
+    Gsv_LOO = lf.LeaveOneOut(Gsv,i)
+    
+    J_LOO = Cal.get_J(Ec_LOO, Gsv_LOO, Gcv)[0]
+    Ec_predict[i] = np.dot(pi[i],J_LOO)
+    
+CV = np.sum(np.power((Ec_predict - Ec),2))/ns    
+
+
+
 
 

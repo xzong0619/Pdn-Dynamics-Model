@@ -13,7 +13,7 @@ import networkx as nx
 import numpy as np
 import math
 from networkx.algorithms import isomorphism as iso
-from numpy.linalg import inv
+
 
 #%%
 '''
@@ -21,10 +21,15 @@ Basic functions
 '''
 
 def two_points_D(A,B):
+    
     '''
     Calculates the distance between two points A and B
     '''
-    d = math.sqrt((A[0]-B[0])**2+(A[1]-B[1])**2)
+    n = len(A)
+    s = 0
+    for i in range(n):
+        s = s+ (A[i]-B[i])**2
+    d = math.sqrt(s)
     return d
 
 
@@ -45,6 +50,14 @@ def LeaveOneOut(A, a):
     B = [x for i,x in enumerate(A) if i!=a]
     
     return B 
+
+def add_z(v, z):
+    '''
+    takes in a np array and add z coordinates to it
+    '''
+    vd = np.concatenate((v, np.array([z*np.ones(len(v))]).T), axis =1) 
+
+    return vd
     
 #%%
 '''
@@ -53,7 +66,7 @@ clusters object
 
 class clusters():
     
-    def __init__(self, occupancy):
+    def __init__(self, occupancy, NN1):
         
         '''
         takes in the occupancy color vector 
@@ -64,6 +77,7 @@ class clusters():
         self.occupancy = occupancy
         self.empty = self.occupancy[0]
         self.filled = self.occupancy[1]
+        self.NN1 = NN1
         
     def gmothers(self, mother):
     
@@ -76,7 +90,7 @@ class clusters():
         Gm = nx.Graph()
         
         for i in range(self.nm):
-            Gm.add_node(i, pos = mother[i], color = self.empty)
+            Gm.add_node(i, pos = mother[i][:2], color = self.empty)
         
         self.edge_d = []
         self.edge = []
@@ -89,7 +103,10 @@ class clusters():
                 
         self.ne = len(self.edge)
         for i in range(self.ne): 
-            if self.edge_d[i] <= 1:
+            if self.NN1: # only draw 1st Nearest Neighbors 
+                if self.edge_d[i] <= 1: 
+                    Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
+            else:
                 Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
                 
         drawing(Gm)
@@ -104,19 +121,18 @@ class clusters():
         returns the shaded son graph
         '''     
         ns = len(son)
-        print('Creating G')
         Gs = nx.Graph()
-        print('Adding nodes')
-    
-        for i in range(self.nm):
-            Gs.add_node(i, pos = self.mother[i], color = self.empty)
 
-        print('Adding edges')
-        for i in range(self.ne):
-            if self.edge_d[i] <= 1:
-                 Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])   
-        print('after')
-        print(Gs.nodes)
+        for i in range(self.nm):
+            Gs.add_node(i, pos = self.mother[i][:2], color = self.empty)
+
+        for i in range(self.ne): 
+            if self.NN1: # only draw 1st Nearest Neighbors 
+                if self.edge_d[i] <= 1:
+                    Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])
+            else:
+                Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])
+
         for si in range(ns):
             Gs.node[son[si]]['color'] = self.filled
         
@@ -137,7 +153,7 @@ class clusters():
         
         for i in range(cns):
             c = cson[i]
-            Gc.add_node(i, pos = cmother[c], color = self.filled)
+            Gc.add_node(i, pos = cmother[c][:2], color = self.filled)
             
         cedge_d = []
         cedge = []
