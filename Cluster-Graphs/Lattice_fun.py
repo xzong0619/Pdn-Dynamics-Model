@@ -13,10 +13,15 @@ from numpy.linalg import inv
 
 
 def two_points_D(A,B):
+    
     '''
     Calculates the distance between two points A and B
     '''
-    d = math.sqrt((A[0]-B[0])**2+(A[1]-B[1])**2)
+    n = len(A)
+    s = 0
+    for i in range(n):
+        s = s+ (A[i]-B[i])**2
+    d = math.sqrt(s)
     return d
 
 
@@ -42,6 +47,7 @@ def gmothers(mother, occupancy):
     Gm = nx.Graph()
     
     for i in range(nm):
+        # take only the first two coordinates x and y
         Gm.add_node(i, pos = mother[i], color = occupancy[0])
     
     edge_d = []

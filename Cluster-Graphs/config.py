@@ -7,6 +7,10 @@ Created on Thu Aug  2 15:52:08 2018
 import Lattice_fun as Laf
 import numpy as np
 
+'''
+2D coorindates
+'''
+
 # first layer
 l1 = np.array([(0,0), (1,0), (1/2, 3**0.5/2), (3/2, 3**0.5/2), (0, 3**0.5), (1, 3**0.5), 
                (1/2, -3**0.5/2), (3/2, -3**0.5/2), (0, -3**0.5), (1, -3**0.5), 
@@ -30,7 +34,15 @@ l3 = np.array([np.sum(l1[[0,2,14]],0),
                np.sum(l1[[0,1,6]],0),
                np.sum(l1[[6,8,11]],0)])/3
 # fourth layer
-l4 = l1[0]          
+l4 = l1[0]
+
+l1d = np.concatenate((l1, np.array([np.ones(len(l1))]).T),axis =1)         
+
+
+'''
+Add z coordinate
+'''
+
 
 
 
