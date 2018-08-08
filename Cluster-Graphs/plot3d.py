@@ -20,42 +20,29 @@ for i in range(len(mother)):
     if mother[i,2] == 2: color.append('b')
     if mother[i,2] == 3: color.append('g')
     if mother[i,2] == 4: color.append('y')
+x = mother[:,0]
+y = mother[:,1]
+z = mother[:,2]
+
+for i in range(len(mother)): #plot each point + it's index as text above
+    ax.text(x[i],y[i],z[i],  '%s' % (str(i)), size=10, color='k') 
+    ax.scatter(x[i],y[i],z[i],c=color[i], marker='o', s=10) 
     
-    
-ax.scatter(mother[:,0], mother[:,1], mother[:,2],c= color, marker='o', s=500)
+ 
+rd = 90
+
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')
-ax.view_init(azim=60)
+ax.view_init(azim=rd)
 
-for i, txt in enumerate(n):
-    ax.annotate(txt, (z[i], y[i]))
-    
 plt.show()
 
-#%%
-trace1 = go.Scatter3d(
-    x=mother[:,0],
-    y=mother[:,1],
-    z=mother[:,2],
-    mode='markers',
-    marker=dict(
-        size=20,
-        line=dict(
-            color=color,
-            width=0.5
-        ),
-        opacity=0.8
-    )
-)
-        
-layout = go.Layout(
-    margin=dict(
-        l=0,
-        r=0,
-        b=0,
-        t=0
-    )
-)        
-fig = go.Figure(data=[trace1], layout=layout)
-py.iplot(fig, filename='simple-3d-scatter')
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(x, y, z, c=color, marker='o', s= 500)
+ax.view_init(azim=rd)
+
+
+
+    
