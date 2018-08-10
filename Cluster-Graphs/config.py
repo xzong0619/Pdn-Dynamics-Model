@@ -72,7 +72,7 @@ Gm = Clusters.Gm
 '''
 Create Configurations
 '''
-
+'''
 config = [[0],                      #Pd1
           [0,1],                    #Pd2
           [0,1,2],                  #Pd3
@@ -129,7 +129,7 @@ Gsv = Clusters.Gsv
           
           
           
-
+'''
 
 
 
