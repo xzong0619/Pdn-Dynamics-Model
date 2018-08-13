@@ -47,7 +47,7 @@ occ = [empty, filled]
 only draw 1st nearest neighbors?
 '''
 NN1 = 1
-
+ 
 Clusters = lf.clusters(occ, NN1)
 Clusters.get_mother(mother)
 Gm = Clusters.mother

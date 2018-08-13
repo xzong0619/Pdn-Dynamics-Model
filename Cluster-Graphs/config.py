@@ -129,6 +129,18 @@ Gsv = Clusters.Gsv
           
 '''
 
+#%%
+'''
+Create clusters
+'''
 
+sub = lf.subgraphs(mother)
+c1 = sub.get_s(2)
 
+Clusters.get_clusters(mother, c1)
+Gcv = Clusters.Gcv
+
+'''
+add additional attributes to the node
+'''
 

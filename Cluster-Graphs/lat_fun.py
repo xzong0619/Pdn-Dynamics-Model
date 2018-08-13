@@ -359,7 +359,7 @@ class subgraphs():
         for i in range(ncombo):
             pt1 = mother[combo[i][0]]
             pt2 = mother[combo[i][1]]
-            distances.append(lf.two_points_D(pt1, pt2))
+            distances.append(two_points_D(pt1, pt2))
             
         distances = tuple(sorted(distances))
         
