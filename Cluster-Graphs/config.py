@@ -127,8 +127,6 @@ config = [[0],                      #Pd1
 Clusters.get_configs(config)
 Gsv = Clusters.Gsv
           
-          
-          
 '''
 
 
