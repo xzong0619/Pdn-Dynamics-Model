@@ -7,7 +7,7 @@ Created on Fri Aug 10 11:08:25 2018
 
 from config import mother
 import numpy as np
-import lat_fun as lf
+import lattice_functions as lf
 from itertools import combinations
 
 def layer_tuple(mother, ci):

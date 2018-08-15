@@ -10,7 +10,7 @@ main phase 1 in OOP version
 '''
 
 
-import lat_fun as lf 
+import lattice_functions as lf 
 import numpy as np
 
 

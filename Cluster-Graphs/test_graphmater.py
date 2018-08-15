@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from networkx.algorithms import isomorphism as iso
 from pprint import pprint
 import numpy as np
-
+import lattice_functions as lf
 def get_occupancy(G, i):
     
     '''
@@ -24,10 +24,10 @@ def get_occupancy(G, i):
 
 G1 =  Gsv[7]
 plt.figure()
-drawing(G1)
+lf.drawing(G1)
 G2 = Gcv[4]
 plt.figure()
-drawing(G2)
+lf.drawing(G2)
 
 GM = iso.GraphMatcher(G1, G2, edge_match=iso.numerical_edge_match(['length'],[1.0]))
 x= [y for y in GM.subgraph_isomorphisms_iter()]
@@ -46,3 +46,14 @@ for i in range(niso):
         subi[i].append(get_occupancy(G1,subg[i][j]))   
     subs.append(np.product(subi[i]))
 delta = np.sum(subs)/niso
+
+
+
+
+
+
+
+
+
+
+

@@ -4,7 +4,7 @@ Created on Thu Aug  2 15:52:08 2018
 
 @author: wangyf
 """
-import lat_fun as lf
+import lattice_functions as lf
 import numpy as np
 
 #%%
@@ -135,9 +135,9 @@ Create clusters
 '''
 
 sub = lf.subgraphs(mother)
-c1 = sub.get_s(2)
+c3 = sub.get_s(3)
 
-Clusters.get_clusters(mother, c1)
+Clusters.get_clusters(mother, c3)
 Gcv = Clusters.Gcv
 
 '''
