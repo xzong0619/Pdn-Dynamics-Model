@@ -56,3 +56,4 @@ Temporary Items
 *.pyc
 generator/__pycache__/Cluster_structure.cpython-36.pyc
 generator/__pycache__/IO_Pdn.cpython-36.pyc
+*.pyc

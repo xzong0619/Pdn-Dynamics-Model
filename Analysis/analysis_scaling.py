@@ -8,6 +8,7 @@ Created on Fri Jul  6 10:46:23 2018
 import sys
 import os
 import numpy as np
+import pandas as pd 
 
 # working on all platforms, using cross-platform home path
 
