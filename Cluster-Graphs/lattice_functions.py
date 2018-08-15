@@ -90,24 +90,28 @@ class clusters():
         Gm = nx.Graph()
         
         for i in range(self.nm):
-            Gm.add_node(i, pos = mother[i][:2], color = self.empty)
+            Gm.add_node(i, pos = mother[i][:2], z = str(int(mother[i][2])), color = self.empty)
         
-        self.edge_d = []
+        
         self.edge = []
+        self.edge_d = []
+        self.edge_z = []
         
         # Add all egdes and calculate the edge distance
         for i in range(self.nm):
             for j in np.arange(i+1,self.nm):
                 self.edge.append((i,j))
                 self.edge_d.append(two_points_D(mother[i],mother[j]))
+                self.edge_z.append(str(int(mother[i][2]))+str((mother[j][2])))
+                
                 
         self.ne = len(self.edge)
         for i in range(self.ne): 
             if self.NN1: # only draw 1st Nearest Neighbors 
                 if self.edge_d[i] <= 1: 
-                    Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
+                    Gm.add_edges_from([self.edge[i]], z = self.edge_z[i], length = self.edge_d[i])
             else:
-                Gm.add_edges_from([self.edge[i]], length = self.edge_d[i])
+                Gm.add_edges_from([self.edge[i]],  z = self.edge_z[i], length = self.edge_d[i])
                 
         drawing(Gm)
         plt.title('%d lattice points' %self.nm)
@@ -124,14 +128,14 @@ class clusters():
         Gs = nx.Graph()
 
         for i in range(self.nm):
-            Gs.add_node(i, pos = self.mother[i][:2], color = self.empty)
+            Gs.add_node(i, pos = self.mother[i][:2], z = str(int(self.mother[i][2])), color = self.empty)
 
         for i in range(self.ne): 
             if self.NN1: # only draw 1st Nearest Neighbors 
                 if self.edge_d[i] <= 1:
-                    Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])
+                    Gs.add_edges_from([self.edge[i]], z = self.edge_z[i], length = self.edge_d[i])
             else:
-                Gs.add_edges_from([self.edge[i]], length = self.edge_d[i])
+                Gs.add_edges_from([self.edge[i]], z = self.edge_z[i], length = self.edge_d[i])
 
         for si in range(ns):
             Gs.node[son[si]]['color'] = self.filled
@@ -153,20 +157,23 @@ class clusters():
         
         for i in range(cns):
             c = cson[i]
-            Gc.add_node(i, pos = cmother[c][:2], color = self.filled)
+            Gc.add_node(i, pos = cmother[c][:2], z = str(int(cmother[c][2])), color = self.filled)
             
-        cedge_d = []
         cedge = []
+        cedge_d = []
+        cedge_z = []
+        
         for i in range(cns):        
             for j in np.arange(i+1,cns):
                 c  = cson[i]
                 d = cson[j]
                 cedge.append((i,j))
-                cedge_d.append(two_points_D(cmother[c],cmother[d]))    
+                cedge_d.append(two_points_D(cmother[c],cmother[d])) 
+                cedge_z.append(str(int(cmother[c][2]))+str(int(cmother[d][2])))
         
         cne = len(cedge)
         for i in range(cne):
-           Gc.add_edges_from([cedge[i]], length = cedge_d[i])
+           Gc.add_edges_from([cedge[i]], z = cedge_z, length = cedge_d[i])
             
         drawing(Gc)
         plt.title('Pd %d' %cns)

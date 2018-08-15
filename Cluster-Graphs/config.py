@@ -72,7 +72,7 @@ Gm = Clusters.Gm
 '''
 Create Configurations
 '''
-'''
+
 config = [[0],                      #Pd1
           [0,1],                    #Pd2
           [0,1,2],                  #Pd3
@@ -124,10 +124,10 @@ config = [[0],                      #Pd1
           [0,1,2,6,11,10,14,20,21,23,24,7,22,12,18,4, 30,31,32,35, 16]]
           
 
-Clusters.get_configs(config)
-Gsv = Clusters.Gsv
+#Clusters.get_configs(config)
+#Gsv = Clusters.Gsv
           
-'''
+
 
 #%%
 '''
@@ -135,10 +135,10 @@ Create clusters
 '''
 
 sub = lf.subgraphs(mother)
-c3 = sub.get_s(3)
+c2 = sub.get_s(2)
 
-Clusters.get_clusters(mother, c3)
-Gcv = Clusters.Gcv
+#Clusters.get_clusters(mother, c2)
+#Gcv = Clusters.Gcv
 
 '''
 add additional attributes to the node

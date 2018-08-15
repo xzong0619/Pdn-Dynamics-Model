@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from networkx.algorithms import isomorphism as iso
 from pprint import pprint
 import numpy as np
-import lattice_functions as lf
+
 def get_occupancy(G, i):
     
     '''
