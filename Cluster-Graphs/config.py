@@ -6,6 +6,8 @@ Created on Thu Aug  2 15:52:08 2018
 """
 import lattice_functions as lf
 import numpy as np
+import pandas as pd
+import pickle
 
 #%%
 '''
@@ -61,12 +63,13 @@ occ = [empty, filled]
 '''
 only draw 1st nearest neighbors?
 '''
-NN1 = 1
+NN1 = 0
 mother = np.concatenate((l1d, l2d, l3d, l4d), axis=0)
 
 Clusters = lf.clusters(occ, NN1)
 Clusters.get_mother(mother)
 Gm = Clusters.Gm
+
 
 #%%
 '''
@@ -124,23 +127,102 @@ config = [[0],                      #Pd1
           [0,1,2,6,11,10,14,20,21,23,24,7,22,12,18,4, 30,31,32,35, 16]]
           
 
-#Clusters.get_configs(config)
-#Gsv = Clusters.Gsv
-          
+Clusters.get_configs(config)
+Gsv = Clusters.Gsv
+
+'''
+Use pandas and copy clipboard in Excel to import data
+Ec =list(pd.read_clipboard(header = None)['0'])
+'''
+
+Ec = [0.0,
+ -0.45,
+ -1.5,
+ -2.56,
+ -2.74,
+ -3.41,
+ -3.99,
+ -4.49,
+ -4.38,
+ -4.32,
+ -5.23,
+ -4.95,
+ -6.07,
+ -4.9,
+ -5.11,
+ -5.12,
+ -6.26,
+ -5.96,
+ -5.91,
+ -6.65,
+ -7.77,
+ -7.51,
+ -9.31,
+ -9.19,
+ -9.05,
+ -10.98,
+ -9.97,
+ -9.95,
+ -11.88,
+ -11.64,
+ -11.48,
+ -11.2,
+ -13.33,
+ -13.01,
+ -14.41,
+ -14.15,
+ -15.79,
+ -15.62,
+ -15.16,
+ -16.9,
+ -18.14,
+ -18.9,
+ -18.82,
+ -20.24,
+ -21.9,
+ -22.7,
+ -23.49,
+ -23.36,
+ -23.08]
 
 
 #%%
 '''
 Create clusters
 '''
-
 sub = lf.subgraphs(mother)
+c1 = sub.get_s(1)
 c2 = sub.get_s(2)
+c3 = sub.get_s(3)
+cclusters = c1+c2
 
-#Clusters.get_clusters(mother, c2)
-#Gcv = Clusters.Gcv
 
+Clusters.get_clusters(mother, cclusters)
+Gcv = Clusters.Gcv
+
+
+#%% Stattistical analysis
 '''
-add additional attributes to the node
+creat pi matrix
+size of number of configuration * numbers of clusters
 '''
+
+ns = len(config)  # number of configurations 
+
+Cal = lf.calculations(occ)
+#
+J, pi =  Cal.get_J(Ec, Gsv ,Gcv)      
+
+pickle.dump([J, pi], open('dump.p','wb'))
+
+
+#x = pickle.load(open("dump.p", "rb"))
+
+
+
+
+
+
+
+
 

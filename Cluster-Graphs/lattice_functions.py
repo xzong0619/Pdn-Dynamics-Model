@@ -102,7 +102,7 @@ class clusters():
             for j in np.arange(i+1,self.nm):
                 self.edge.append((i,j))
                 self.edge_d.append(two_points_D(mother[i],mother[j]))
-                self.edge_z.append(str(int(mother[i][2]))+str((mother[j][2])))
+                self.edge_z.append(str(int(mother[i][2]))+str(int(mother[j][2])))
                 
                 
         self.ne = len(self.edge)
@@ -173,7 +173,7 @@ class clusters():
         
         cne = len(cedge)
         for i in range(cne):
-           Gc.add_edges_from([cedge[i]], z = cedge_z, length = cedge_d[i])
+           Gc.add_edges_from([cedge[i]], z = cedge_z[i], length = cedge_d[i])
             
         drawing(Gc)
         plt.title('Pd %d' %cns)
@@ -252,7 +252,7 @@ class calculations():
         
         return o    
 
-    def get_delta(self, Gl,Gs):
+    def get_delta(self, Gl, Gs):
         
         '''
         takes in larger graph Gl and smaller graph Gs
@@ -260,14 +260,30 @@ class calculations():
         calculate the delta value in pi matrix 
         '''
         '''
-        find subgraphs using edge distance match
+        if there are more than 2 nodes in a cluster
         '''
-        GM = iso.GraphMatcher(Gl, Gs, edge_match=iso.numerical_edge_match(['length'],[1.0]))
-        '''
-        list down total number of subgraphs niso
-        '''
-        x= [y for y in GM.subgraph_isomorphisms_iter()]
-        
+        if len(Gs) > 1:            
+            '''
+            find subgraphs using edge distance match
+            '''
+            GMl = iso.GraphMatcher(Gl, Gs, edge_match=iso.numerical_edge_match(['length'],[1.0]))
+            '''
+            find subgraphs using node layer match
+            '''
+            GMz= iso.GraphMatcher(Gl, Gs, edge_match= iso.categorical_edge_match(['z'],[1.0])  )
+            '''
+            list down total number of subgraphs niso GMz||GMl
+            '''
+            x = [y for y in GMz.subgraph_isomorphisms_iter() if y in GMl.subgraph_isomorphisms_iter()]
+            
+        else:
+            '''
+            find subgraphs using node layer match
+            '''
+            GMn = iso.GraphMatcher(Gl, Gs, node_match= iso.categorical_edge_match(['z'],[1]) )
+            x = [y for y in GMn.subgraph_isomorphisms_iter()]
+            
+            
         niso =len(x)
         '''
         save subgraphs to a list
@@ -289,6 +305,9 @@ class calculations():
             subs.append(np.product(subi[i]))
         delta = np.sum(subs)/niso
         
+        
+        
+        
         return delta
     
     
@@ -302,18 +321,37 @@ class calculations():
         and returns the interaction energy in J vector and correlation matrix pi
         '''
         
-        Ev = np.array(Ev)
+        self.Ev = np.array(Ev)
         n1 = len(G1v)
         n2 = len(G2v)
         pi = np.zeros((n1,n2))
+        progress = 0
         
         for i in range(n1):
             for j in range(n2):
                 pi[i][j] = self.get_delta(G1v[i],G2v[j])
                 
-        J = np.linalg.lstsq(pi, Ev)[0]
+                progress = progress + 1
+                per = progress/n1/n2 *100
+                print('%.2f %% done!' %per)
+                
+                
+                
+        J = np.linalg.lstsq(pi, self.Ev)[0]
+        
+        self.J = J
+        self.pi = pi
         
         return J, pi
+    
+    def get_MSE(self):
+        
+        ns = len(self.Ev)    
+        MSE = np.sum(np.power((np.dot(self.pi,self.J) - self.Ev),2))/ns
+        
+        MSE =self.MSE
+        
+        return MSE
 
 #%%
 class subgraphs():
@@ -409,6 +447,15 @@ class subgraphs():
             
         index_list.sort() # sort the list and take out those indices
         
-        s_list = np.array(combo)[index_list]
+        s_np = np.array(combo)[index_list]
+        
+        '''
+        convert 2D np array to list
+        '''
+        
+        s_list = []
+        for i in range(s_np.shape[0]):
+            s_list.append(list(s_np[i]))
+            
             
         return s_list
