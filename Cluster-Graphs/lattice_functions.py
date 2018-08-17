@@ -349,7 +349,7 @@ class calculations():
         ns = len(self.Ev)    
         MSE = np.sum(np.power((np.dot(self.pi,self.J) - self.Ev),2))/ns
         
-        MSE =self.MSE
+        self.MSE = MSE
         
         return MSE
 
