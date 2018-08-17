@@ -17,7 +17,17 @@ empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
-
+def unique_combo(combo, indicies_list):
+    
+    Gcv = []
+    nclusters = len(indicies_list)
+    
+    for i in range(nclusters):
+        
+        for j in range():
+    Gcv.append(combo[])
+    
+    
 def layer_tuple(mother, ci):
     
     n = len(ci)
@@ -179,11 +189,6 @@ creat pi matrix
 size of number of configuration * numbers of clusters
 '''
 
-[Gm, Gsv, Gcv1, Gcv2, Gcv3] = pickle.load(open("clusters.p", "rb"))
-
-Gcv = Gcv2
-Cal = lf.calculations(occ)
-J1, pi1 =  Cal.get_J(Ec, Gsv ,Gcv)    
  
 
 J2, pi2 = get_J(Ec, Gsv ,indices_list, c2 ) 
