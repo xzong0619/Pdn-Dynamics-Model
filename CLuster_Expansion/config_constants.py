@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug  2 15:52:08 2018
+Created on Fri Aug 17 13:36:33 2018
 
 @author: wangyf
 """
-import lattice_functions as lf
+
 import numpy as np
-import pandas as pd
-import pickle
+import lattice_functions as lf
 
 #%%
 '''
@@ -45,7 +44,6 @@ l3 = np.array([np.sum(l1[[0, 2, 14]], 0),
 # fourth layer
 l4 = np.array([l1[0]])
 
-
 '''
 Add z coordinate
 '''
@@ -55,25 +53,10 @@ l2d = lf.add_z(l2, 2 * dz)
 l3d = lf.add_z(l3, 3 * dz)
 l4d = lf.add_z(l4, 4 * dz)
 
-
-empty = 'grey'
-filled = 'r'
-occ = [empty, filled]
-
-'''
-only draw 1st nearest neighbors?
-'''
-NN1 = 0
 mother = np.concatenate((l1d, l2d, l3d, l4d), axis=0)
 
-Clusters = lf.clusters(occ, NN1)
-Clusters.get_mother(mother)
-Gm = Clusters.Gm
-
-
-#%%
 '''
-Create Configurations
+Configuragtiions
 '''
 
 config = [[0],                      #Pd1
@@ -125,11 +108,11 @@ config = [[0],                      #Pd1
           [0,1,2,6,11,10,14,20,21,23,24,7,22,12,18,4, 30,31,32,35, 33],#21
           [0,1,2,6,11,10,14,20,21,23,24,7,22,12,18,4, 30,31,32,35, 25],
           [0,1,2,6,11,10,14,20,21,23,24,7,22,12,18,4, 30,31,32,35, 16]]
-          
 
-Clusters.get_configs(config)
-Gsv = Clusters.Gsv
 
+'''
+Configuration Energy
+'''
 '''
 Use pandas and copy clipboard in Excel to import data
 Ec =list(pd.read_clipboard(header = None)['0'])
@@ -184,45 +167,3 @@ Ec = [0.0,
  -23.49,
  -23.36,
  -23.08]
-
-
-#%%
-'''
-Create clusters
-'''
-sub = lf.subgraphs(mother)
-c1 = sub.get_s(1)
-c2 = sub.get_s(2)
-c3 = sub.get_s(3)
-cclusters = c1+c2
-
-
-Clusters.get_clusters(mother, cclusters)
-Gcv = Clusters.Gcv
-
-
-#%% Stattistical analysis
-'''
-creat pi matrix
-size of number of configuration * numbers of clusters
-'''
-
-ns = len(config)  # number of configurations 
-
-Cal = lf.calculations(occ)
-#
-J, pi =  Cal.get_J(Ec, Gsv ,Gcv)      
-
-pickle.dump([J, pi], open('dump.p','wb'))
-
-
-#x = pickle.load(open("dump.p", "rb"))
-
-
-
-
-
-
-
-
-
