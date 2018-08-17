@@ -66,7 +66,7 @@ clusters object
 
 class clusters():
     
-    def __init__(self, occupancy, NN1):
+    def __init__(self, occupancy, NN1, draw):
         
         '''
         takes in the occupancy color vector 
@@ -78,6 +78,7 @@ class clusters():
         self.empty = self.occupancy[0]
         self.filled = self.occupancy[1]
         self.NN1 = NN1
+        self.draw = draw
         
     def gmothers(self, mother):
     
@@ -85,6 +86,7 @@ class clusters():
         takes in mother cooridate list 
         returns connected lattice graph
         '''
+        draw_mother = self.draw[0]
         self.mother = mother
         self.nm = len(mother)
         Gm = nx.Graph()
@@ -112,9 +114,11 @@ class clusters():
                     Gm.add_edges_from([self.edge[i]], z = self.edge_z[i], length = self.edge_d[i])
             else:
                 Gm.add_edges_from([self.edge[i]],  z = self.edge_z[i], length = self.edge_d[i])
-                
-        drawing(Gm)
-        plt.title('%d lattice points' %self.nm)
+        
+        if draw_mother:
+            drawing(Gm)
+            plt.title('%d lattice points' %self.nm)
+            
         return Gm
     
     
@@ -123,7 +127,8 @@ class clusters():
         '''
         takes in mother coordinate list and son's index number and occupancy vector
         returns the shaded son graph
-        '''     
+        '''   
+        draw_config = self.draw[1]
         ns = len(son)
         Gs = nx.Graph()
 
@@ -140,8 +145,9 @@ class clusters():
         for si in range(ns):
             Gs.node[son[si]]['color'] = self.filled
         
-        drawing(Gs)
-        plt.title('Pd %d' %ns)
+        if draw_config:
+            drawing(Gs)
+            plt.title('Pd %d' %ns)
         
         return Gs
     
@@ -152,6 +158,7 @@ class clusters():
         takes in clusters 
         return cluster graph objective
         '''
+        draw_clusters = self.draw[2]
         Gc = nx.Graph()
         cns = len(cson)
         
@@ -174,9 +181,11 @@ class clusters():
         cne = len(cedge)
         for i in range(cne):
            Gc.add_edges_from([cedge[i]], z = cedge_z[i], length = cedge_d[i])
+           
+        if draw_clusters:            
+            drawing(Gc)
+            plt.title('Pd %d' %cns)
             
-        drawing(Gc)
-        plt.title('Pd %d' %cns)
         return Gc
     
 
@@ -214,10 +223,12 @@ class clusters():
         
         self.nc = len(ccluster) # number of clusers
         self.Gcv = [] # list of clusters
+        
         for si in range(self.nc):
             cson = ccluster[si] 
             Gc = self.gclusters(cmother,cson)
-            self.Gcv.append(Gc)       
+            self.Gcv.append(Gc)   
+           
         
 
 #%%        

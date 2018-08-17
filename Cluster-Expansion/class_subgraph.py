@@ -6,7 +6,7 @@ Created on Sun Aug 12 16:29:25 2018
 """
 from itertools import combinations
 import numpy as np
-import lat_fun as lf
+import lattice_functions as lf
 
 
 
