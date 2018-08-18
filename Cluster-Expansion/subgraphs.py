@@ -17,17 +17,20 @@ empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
-def unique_combo(combo, indicies_list):
+def unique_combo(combo, indices_list):
     
     Gcv = []
-    nclusters = len(indicies_list)
+    nclusters = len(indices_list)
     
     for i in range(nclusters):
-        
-        for j in range():
-    Gcv.append(combo[])
+        Gcv.append([])
+        niso = len(indices_list[i])
+        for j in range(niso):
+            Gcv[i].append(combo[indices_list[i][j]])
     
-    
+    return Gcv
+
+
 def layer_tuple(mother, ci):
     
     n = len(ci)
@@ -86,7 +89,7 @@ def get_occupancy(G, i):
     return o    
     
 
-def get_delta(Gl, G_indices, combo):
+def get_delta(Gl, Gs):
     
     '''
     takes in larger graph Gl and smaller graph Gs
@@ -96,7 +99,7 @@ def get_delta(Gl, G_indices, combo):
     '''
     if there are more than 2 nodes in a cluster
     '''
-    niso =len(G_indices)
+    niso =len(Gs)
     
     '''
     save product into a list 
@@ -106,15 +109,14 @@ def get_delta(Gl, G_indices, combo):
     subs = []
     for i in range(niso):
         subi.append([])
-        ci = combo[G_indices[i]]
-        for j in range(len(ci)):
-            subi[i].append(get_occupancy(Gl,ci[j]))   
+        for j in range(len(Gs[i])):
+            subi[i].append(get_occupancy(Gl,Gs[i][j]))   
         subs.append(np.product(subi[i]))
     delta = np.sum(subs)/niso
     
     return delta
             
-def get_J(Ev, G1v, G2v, combo):
+def get_J(Ev, G1v, G2v):
     '''
     The function that gets 
         energy of configurations, Ev
@@ -131,7 +133,7 @@ def get_J(Ev, G1v, G2v, combo):
     
     for i in range(n1):
         for j in range(n2):
-            pi[i][j] = get_delta(G1v[i],G2v[j], combo)
+            pi[i][j] = get_delta(G1v[i],G2v[j])
             
             progress = progress + 1
             per = progress/n1/n2 *100
@@ -155,6 +157,15 @@ c1 = list(combinations(index,1))
 c2 = list(combinations(index,2))
 
 c3 = list(combinations(index,3))
+
+'''
+add c1 
+'''
+sub = lf.subgraphs(mother)
+d1 = sub.get_s(1)
+
+
+
 
 '''
 use c2 as an example
@@ -188,11 +199,11 @@ d2_d = np_to_list(d2_d)
 creat pi matrix
 size of number of configuration * numbers of clusters
 '''
-
+gcv2 = unique_combo(c2, indices_list)
  
 
-J2, pi2 = get_J(Ec, Gsv ,indices_list, c2 ) 
-
+J2, pi2 = get_J(Ec, Gsv ,gcv2 ) 
+pi1 = np.load('pi2.npy')
 '''
 Now lets try c3
 '''

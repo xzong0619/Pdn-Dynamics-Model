@@ -30,6 +30,7 @@ def two_points_D(A,B):
     for i in range(n):
         s = s+ (A[i]-B[i])**2
     d = math.sqrt(s)
+    d = float(format(d, ' .3f')) # round off to three decimal digits
     return d
 
 
