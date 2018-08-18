@@ -19,16 +19,16 @@ occ = [empty, filled]
 
 def unique_combo(combo, indices_list):
     
-    Gcv = []
+    Gv_list = []
     nclusters = len(indices_list)
     
     for i in range(nclusters):
-        Gcv.append([])
+        Gv_list.append([])
         niso = len(indices_list[i])
         for j in range(niso):
-            Gcv[i].append(combo[indices_list[i][j]])
+            Gv_list[i].append(combo[indices_list[i][j]])
     
-    return Gcv
+    return Gv_list
 
 
 def layer_tuple(mother, ci):
@@ -162,7 +162,7 @@ c3 = list(combinations(index,3))
 add c1 
 '''
 sub = lf.subgraphs(mother)
-d1 = sub.get_s(1)
+gcv1 = sub.get_s2(1)
 
 
 
@@ -202,7 +202,7 @@ size of number of configuration * numbers of clusters
 gcv2 = unique_combo(c2, indices_list)
  
 
-J2, pi2 = get_J(Ec, Gsv ,gcv2 ) 
+J2, pi2 = get_J(Ec, Gsv ,gcv1+gcv2 ) 
 pi1 = np.load('pi2.npy')
 '''
 Now lets try c3
@@ -213,7 +213,7 @@ for i in range(len(c3)):
     
     ci = c3[i]
     
-    distances = distance_tuple(mother, ci)
+    distances = distance_tuple(mother, ci)   
     layers = layer_tuple(mother, ci)
  
     d3.append((distances, layers))

@@ -264,7 +264,7 @@ class calculations():
         
         return o    
 
-    def get_delta(self, Gl, Gs):
+    def get_delta_G(self, Gl, Gs):
         
         '''
         takes in larger graph Gl and smaller graph Gs
@@ -318,11 +318,34 @@ class calculations():
         delta = np.sum(subs)/niso
         
         
-        
-        
         return delta
     
+    def get_delta_l(self, Gl, Gs):
     
+        '''
+        takes in larger graph Gl and smaller graph Gs
+        find sub isomorphic graphs of Gs from Gl
+        calculate the delta value in pi matrix 
+        '''
+        '''
+        if there are more than 2 nodes in a cluster
+        '''
+        niso =len(Gs)
+        
+        '''
+        save product into a list 
+        and caclulate the sum divid by total number of subgraphs
+        '''
+        subi = []
+        subs = []
+        for i in range(niso):
+            subi.append([])
+            for j in range(len(Gs[i])):
+                subi[i].append(self.get_occupancy(Gl,Gs[i][j]))   
+            subs.append(np.product(subi[i]))
+        delta = np.sum(subs)/niso
+    
+        return delta
     
     def get_J(self, Ev, G1v, G2v):
         '''
@@ -341,7 +364,7 @@ class calculations():
         
         for i in range(n1):
             for j in range(n2):
-                pi[i][j] = self.get_delta(G1v[i],G2v[j])
+                pi[i][j] = self.get_delta_l(G1v[i],G2v[j])
                 
                 progress = progress + 1
                 per = progress/n1/n2 *100
@@ -422,6 +445,21 @@ class subgraphs():
         
         return distances
     
+    @staticmethod
+    def unique_combo(combo, indices_list):
+    
+        Gv_list = []
+        nclusters = len(indices_list)
+        
+        for i in range(nclusters):
+            Gv_list.append([])
+            niso = len(indices_list[i])
+            for j in range(niso):
+                Gv_list[i].append(combo[indices_list[i][j]])
+        
+        return Gv_list
+
+
     def get_s(self, n_atoms):
         
         '''
@@ -435,7 +473,7 @@ class subgraphs():
         
         
         '''
-        generate the information list
+        generate the inform2tion list
         store the sorted distance of nodes in tuple 1
         + the layer each node is in in tuple 2
         '''
@@ -471,3 +509,48 @@ class subgraphs():
             
             
         return s_list
+    
+    def get_s2(self, n_atoms):
+        
+        '''
+        Input number of nodes in a subgraph
+        Generate combinations among the nodes
+        '''
+        self.n_atoms = n_atoms
+        
+        combo = list(combinations(self.index, self.n_atoms))
+        ncombo  = len(combo)
+        
+        
+        '''
+        generate the information list
+        store the sorted distance of nodes in tuple 1
+        + the layer each node is in in tuple 2
+        '''
+        
+        info = [] 
+        
+        for i in range(ncombo):
+            ci  = combo[i]
+            
+            distances = self.distance_tuple(self.mother, ci)
+            layers = self.layer_tuple(self.mother, ci)
+            
+            info.append((distances, layers))
+        
+        info_set = list(set(info))
+        
+        index_list =[]
+        indices_list = []
+        
+        for i in info_set:
+            index_list.append(info.index(i))
+        
+        index_list.sort() # sort the list and take out those indices
+            
+        for i in index_list:
+            indices_list.append([a for a, x in enumerate(info) if x == info[i]])
+            
+        Gcv_list = self.unique_combo(combo, indices_list)    
+           
+        return Gcv_list

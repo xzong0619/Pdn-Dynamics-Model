@@ -16,16 +16,19 @@ occ = [empty, filled]
 
 [Gm, Gsv, Gcv1, Gcv2, Gcv3] = pickle.load(open("clusters.p", "rb"))
 
+
 #%% Stattistical analysis
 '''
 creat pi matrix
 size of number of configuration * numbers of clusters
 '''
-Gcv = Gcv3
+
+
+Gcv = Gcv1+Gcv2+Gcv3
 Cal = lf.calculations(occ)
 J, pi =  Cal.get_J(Ec, Gsv ,Gcv)      
 
 #%%
 
 np.save('pi3', pi, allow_pickle = True)
-np.load('pi3.npy')
+#pi = np.load('pi3.npy')

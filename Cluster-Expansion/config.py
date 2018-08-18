@@ -43,19 +43,12 @@ Gsv = Clusters.Gsv
 Create clusters
 '''
 sub = lf.subgraphs(mother)
-c1 = sub.get_s(1)
-c2 = sub.get_s(2)
-c3 = sub.get_s(3)
+Gcv1 = sub.get_s2(1)
+Gcv2 = sub.get_s2(2)
+Gcv3 = sub.get_s2(3)
 
 
-Clusters.get_clusters(mother, c1)
-Gcv1 = Clusters.Gcv
 
-Clusters.get_clusters(mother, c2)
-Gcv2 = Clusters.Gcv
-
-Clusters.get_clusters(mother, c3)
-Gcv3 = Clusters.Gcv
 
 pickle.dump([Gm, Gsv, Gcv1, Gcv2, Gcv3], open('clusters.p','wb'))
 
