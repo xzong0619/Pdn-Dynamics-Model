@@ -71,8 +71,6 @@ font = {'family' : 'normal',
         'size'   : 15}
 
 matplotlib.rc('font', **font)
-
-
 plt.show()
 
 

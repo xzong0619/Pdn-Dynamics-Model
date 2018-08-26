@@ -48,7 +48,5 @@ Gcv2 = sub.get_s2(2)
 Gcv3 = sub.get_s2(3)
 
 
-
-
 pickle.dump([Gm, Gsv, Gcv1, Gcv2, Gcv3], open('clusters.p','wb'))
 
