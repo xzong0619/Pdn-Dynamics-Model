@@ -4,7 +4,7 @@ Created on Thu Aug  2 15:52:08 2018
 
 @author: wangyf
 """
-from structure_constants import mother, config, Ec
+from structure_constants import mother, dz, config, Ec
 import lattice_functions as lf
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ draw = [1, 0, 0]
 
 
 Clusters = lf.clusters(occ, NN1, draw)
-Clusters.get_mother(mother)
+Clusters.get_mother(mother, dz)
 Gm = Clusters.Gm
 
 
@@ -42,7 +42,7 @@ Gsv = Clusters.Gsv
 '''
 Create clusters
 '''
-sub = lf.subgraphs(mother)
+sub = lf.subgraphs(mother, dz)
 Gcv1 = sub.get_s2(1)
 Gcv2 = sub.get_s2(2)
 Gcv3 = sub.get_s2(3)

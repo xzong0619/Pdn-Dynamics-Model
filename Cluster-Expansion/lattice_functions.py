@@ -81,7 +81,7 @@ class clusters():
         self.NN1 = NN1
         self.draw = draw
         
-    def gmothers(self, mother):
+    def gmothers(self, mother, dz):
     
         '''
         takes in mother cooridate list 
@@ -90,10 +90,11 @@ class clusters():
         draw_mother = self.draw[0]
         self.mother = mother
         self.nm = len(mother)
+        self.dz = dz
         Gm = nx.Graph()
         
         for i in range(self.nm):
-            Gm.add_node(i, pos = mother[i][:2], z = str(int(mother[i][2])), color = self.empty)
+            Gm.add_node(i, pos = mother[i][:2], z = str(int(mother[i][2]/self.dz)), color = self.empty)
         
         
         self.edge = []
@@ -105,7 +106,7 @@ class clusters():
             for j in np.arange(i+1,self.nm):
                 self.edge.append((i,j))
                 self.edge_d.append(two_points_D(mother[i],mother[j]))
-                self.edge_z.append(str(int(mother[i][2]))+str(int(mother[j][2])))
+                self.edge_z.append(str(int(mother[i][2]/self.dz))+str(int(mother[j][2]/self.dz)))
                 
                 
         self.ne = len(self.edge)
@@ -134,7 +135,7 @@ class clusters():
         Gs = nx.Graph()
 
         for i in range(self.nm):
-            Gs.add_node(i, pos = self.mother[i][:2], z = str(int(self.mother[i][2])), color = self.empty)
+            Gs.add_node(i, pos = self.mother[i][:2], z = str(int(self.mother[i][2]/self.dz)), color = self.empty)
 
         for i in range(self.ne): 
             if self.NN1: # only draw 1st Nearest Neighbors 
@@ -165,7 +166,7 @@ class clusters():
         
         for i in range(cns):
             c = cson[i]
-            Gc.add_node(i, pos = cmother[c][:2], z = str(int(cmother[c][2])), color = self.filled)
+            Gc.add_node(i, pos = cmother[c][:2], z = str(int(cmother[c][2]/self.dz)), color = self.filled)
             
         cedge = []
         cedge_d = []
@@ -177,7 +178,7 @@ class clusters():
                 d = cson[j]
                 cedge.append((i,j))
                 cedge_d.append(two_points_D(cmother[c],cmother[d])) 
-                cedge_z.append(str(int(cmother[c][2]))+str(int(cmother[d][2])))
+                cedge_z.append(str(int(cmother[c][2]/self.dz))+str(int(cmother[d][2]/self.dz)))
         
         cne = len(cedge)
         for i in range(cne):
@@ -190,13 +191,13 @@ class clusters():
         return Gc
     
 
-    def get_mother(self, mother):
+    def get_mother(self, mother, dz):
         '''
         takes in mother coordinates list and 
         add mother attribute to the class
         '''
         
-        self.Gm  = self.gmothers(mother)
+        self.Gm  = self.gmothers(mother, dz)
         
         
     def get_configs(self, config):
@@ -394,13 +395,14 @@ class subgraphs():
     generate subgraph list with the nodes numbers under the mother graph
     '''
     
-    def __init__(self, mother):
+    def __init__(self, mother, dz):
         
        self.index= np.arange(len(mother)) # generate the index of nodes
        self.mother = mother
+       self.dz = dz
        
     @staticmethod
-    def layer_tuple(mother, ci):
+    def layer_tuple(mother, dz, ci):
         
         '''
         takes in a combo of index and returns tuple of layers they are in 
@@ -414,7 +416,7 @@ class subgraphs():
         layers = []
         
         for i in range(n):
-            layers.append(mother[index[i]][2])
+            layers.append(int(mother[index[i]][2]/dz))
             
         layers= tuple(layers)
             
@@ -484,7 +486,7 @@ class subgraphs():
             ci  = combo[i]
             
             distances = self.distance_tuple(self.mother, ci)
-            layers = self.layer_tuple(self.mother, ci)
+            layers = self.layer_tuple(self.mother, self.dz, ci)
             
             info.append((distances, layers))
         
@@ -534,11 +536,12 @@ class subgraphs():
             ci  = combo[i]
             
             distances = self.distance_tuple(self.mother, ci)
-            layers = self.layer_tuple(self.mother, ci)
+            layers = self.layer_tuple(self.mother, self.dz, ci)
             
             info.append((distances, layers))
         
         info_set = list(set(info))
+        #print(info_set)
         
         index_list =[]
         indices_list = []

@@ -45,9 +45,9 @@ l3 = np.array([np.sum(l1[[0, 2, 14]], 0),
 l4 = np.array([l1[0]])
 
 '''
-Add z coordinate
+Add z coordinate to make Pd atoms in tetrahedron
 '''
-dz = 1
+dz = 6**0.5/3 
 l1d = lf.add_z(l1, dz)
 l2d = lf.add_z(l2, 2 * dz)
 l3d = lf.add_z(l3, 3 * dz)
