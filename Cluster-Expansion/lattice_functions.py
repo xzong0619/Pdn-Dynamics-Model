@@ -557,3 +557,302 @@ class subgraphs():
         Gcv_list = self.unique_combo(combo, indices_list)    
            
         return Gcv_list
+
+#%%
+class coordination():
+
+    '''
+    calculate the coordination number (CN1, CN2) 
+    and the general coordination number (GCN)
+    '''
+    
+    def __init__(self,occupancy):
+        
+        '''
+        takes in the occupancy color vector 
+        occupancy[0] is the empty color
+        occupancy[1] is the filled color
+        '''
+        
+        self.occupancy = occupancy
+        self.empty = self.occupancy[0]
+        self.filled = self.occupancy[1]
+    
+    def num_1NN(self, G, i):
+    
+        '''
+        G is a networkx graph
+        i is the index of node in G
+        
+        returns number of nearest neighbors of node i 
+        and a list of neighbor index number
+        '''
+        n_1NN = 0   
+        list_1NN = []
+        if G.nodes[i]['color'] == self.filled:  # check if the node is occupied 
+            for j in list(G.neighbors(i)): #iterate through 1st NN
+                if G.nodes[j]['color'] == self.filled: #check if the node is occupied
+                    n_1NN = n_1NN + 1
+                    list_1NN.append(j)
+        else:
+            print('No atoms detected at this position') 
+        return n_1NN, list_1NN
+    
+    def num_2NN(self, G,i):
+        
+        '''
+        G is a networkx graph
+        i is the index of node in G where CO adsorbs
+        
+        returns a list of numbers of 2nd nearest neighbors of node i for each 1NN
+        and a 2D list of 2NN index numbers
+        '''
+        n_2NN = []
+        list_2NN = []
+        if G.nodes[i]['color'] == self.filled: # check if the node is occupied 
+            for j in G.neighbors(i):      # iterate through 1st NN
+                if G.nodes[j]['color'] == self.filled: # check if the node is occupied 
+                    n_2NN.append(self.num_1NN(G,j)[0]) # Add number of 2NN for 1NNs
+                    list_2NN.append(self.num_1NN(G,j)[1]) # Add neighbor index number
+        else:
+            print('No atoms detected at this position')            
+        return n_2NN, list_2NN
+    
+    def cal_CN1(self, G,COsites):
+        
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns 1st CN number
+        '''
+        
+        CN1 = []
+        sitetype = len(COsites)
+        for i in range(sitetype):
+            CN1.append(self.num_1NN(G, COsites[i])[0])
+            
+        '''
+        take arithmaric mean for CN1 for bridge and hollow sites
+        '''
+        
+        CN1 = np.mean(np.array(CN1))   
+        
+        return CN1
+    
+    
+    def cal_CN2(self, G,COsites):
+           
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns 2nd CN number
+        '''
+        
+        
+        list_CN2 = []
+        CN2 = []
+        
+        sitetype = len(COsites)
+        
+        for i in range(sitetype):
+            list_CN2.append(self.num_2NN(G, COsites[i])[0])
+            
+        '''
+        sum up 2NN numbers for each 1NN
+        '''
+        
+        for i in range(sitetype):
+            if len(list_CN2[i]) == 0: CN2.append(0)
+            else: CN2.append(np.sum(np.array(list_CN2[i])))
+        
+        '''
+        take arithmaric mean for CN2 for bridge and hollow sites
+        '''
+        
+        CN2 = np.mean(np.array(CN2)) 
+        
+        return CN2
+    
+    def cal_GCN(self, G, COsites):
+        
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns general coordination number
+        '''
+        
+        GCN = []
+        
+        sitetype = len(COsites)
+        list_1NN = []
+        '''
+        find all avaiable 1NN index 
+        '''
+        for i in range(sitetype):
+            list_1NN = list_1NN + self.num_1NN(G, COsites[i])[1]
+        
+        '''
+        Use set to avoid double counting
+        '''    
+        list_1NN = list(set(list_1NN))
+        '''
+        Get CN for these 1NN nodes
+        '''
+        for i in list_1NN:
+            GCN.append(self.num_1NN(G,i)[0])
+    
+        '''
+        Set weight based on Pd(111)
+        '''
+        
+        if len(COsites) == 1: weight = 12
+        if len(COsites) == 2: weight = 18
+        if len(COsites) == 3: weight = 22
+        
+        GCN = np.sum(np.array(GCN))/weight
+    
+        return GCN
+    
+    
+    def num_Ce1NN(self, G, i):
+        
+        '''
+        G is a networkx graph
+        i is the index of node in G
+        
+        returns the flag of whether the atom is next to a Ce atom
+        '''
+        
+        nCe = 0 
+        if G.nodes[i]['color'] == self.filled: # check if the node is occupied
+            if G.nodes[i]['z'] == '1':  # check if the node is in base layer
+                nCe = 1 # 1 means the atom is in contact with 3 Ce atoms underneath
+        return nCe
+            
+    def num_Ce2NN(self, G, i):
+        
+        '''
+        G is a networkx graph
+        i is the index of node in G
+        
+        returns the number of 2nd nearest Ce neighbors of node i 
+        and a list of atom adjacent to Ce base layer
+        '''
+    
+        n_2NN = 0   
+        list_2NN = []
+        if G.nodes[i]['color'] == self.filled: # check if the node is occupied
+            for j in list(G.neighbors(i)): # iterate through 1st NN
+                n_2NN = n_2NN + self.num_Ce1NN(G,j)  # check if the node is next to Ce
+                if self.num_Ce1NN(G,j): list_2NN.append(j) # Append the index to a list
+        else:
+            print('No atoms detected at this position') 
+        return n_2NN, list_2NN
+    
+    def cal_CeCN1(self, G, COsites):
+        
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns coordination number of Ce
+        '''
+        
+        CN1 = []
+        sitetype = len(COsites)
+        
+        for i in range(sitetype):
+            CN1.append(self.num_Ce1NN(G, COsites[i]))
+        
+        '''
+        take arithmaric mean for CN2 for bridge and hollow sites
+        '''
+        
+        CN1 = np.mean(np.array(CN1)) * 3 # each Pd atom is coordinate by 3 Ce
+        
+        return CN1
+        
+    def cal_CeCN2(self, G, COsites):
+        
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns 2nd coordination number of Ce
+        '''
+        
+        CN2 = []
+        sitetype = len(COsites)
+        
+        for i in range(sitetype):
+            CN2.append(self.num_Ce2NN(G, COsites[i])[0])
+        
+        '''
+        take arithmaric mean for CN2 for bridge and hollow sites
+        '''
+        
+        CN2 = np.mean(np.array(CN2)) *3 
+           
+        return CN2
+    
+    def cal_CeGCN(self, G, COsites):
+    
+        '''
+        G is a networkx graph
+        COsites are the index of adsorption site
+        
+        returns general coordination number of Ce
+        '''
+        
+        GCN = []
+        
+        sitetype = len(COsites)
+        list_1NN = []
+        
+        '''
+        find all avaiable 1NN next to Ce index 
+        '''
+        
+        for i in range(sitetype):
+            list_1NN = list_1NN + self.num_Ce2NN(G, COsites[i])[1]
+            
+        list_1NN = list(set(list_1NN))
+        
+        '''
+        Check if Ce is around for 1NN nodes
+        '''
+        
+        for i in list_1NN:
+            GCN.append(self.num_Ce1NN(G,i))
+        
+        
+        if len(COsites) == 1: weight = 3
+        if len(COsites) == 2: weight = 5
+        if len(COsites) == 3: weight = 6
+        
+        GCN = np.sum(np.array(GCN))/weight * 3
+    
+        return GCN
+    
+    def get_CNs(self, G, COsites):
+        
+        '''
+        Take in configuration G
+        CO adsorption configuration index list 
+        and CO sites index list
+        '''
+        self.CN1 = self.cal_CN1(G,COsites)
+        self.CN2 = self.cal_CN2(G,COsites)
+        self.GCN = self.cal_GCN(G,COsites)
+
+        self.CeCN1 = self.cal_CeCN1(G,COsites)
+        self.CeCN2 = self.cal_CeCN2(G,COsites)
+        self.CeGCN = self.cal_CeGCN(G,COsites)
+        
+        
+        
+        
+        
