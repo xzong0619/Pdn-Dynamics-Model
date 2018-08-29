@@ -101,7 +101,75 @@ def cal_GCN(G, COsites):
 
     return GCN
 
+#def cal_CeCN(G, COsites):
+def num_Ce1NN(G, i):
+    nCe = 0 
+    if G.nodes[i]['color'] == filled: 
+        if G.nodes[i]['z'] == '1':
+            nCe = 1
+    return nCe
+        
+def num_Ce2NN(G, i):
 
+    n_2NN = 0   
+    list_2NN = []
+    if G.nodes[i]['color'] == filled: 
+        for j in list(G.neighbors(i)):
+            n_2NN = n_2NN + num_Ce1NN(G,j)
+            if num_Ce1NN(G,j): list_2NN.append(j)
+    else:
+        print('No atoms detected at this position') 
+    return n_2NN, list_2NN
+
+def cal_CeCN1(G, COsites):
+    
+    CN1 = []
+    sitetype = len(COsites)
+    
+    for i in range(sitetype):
+        CN1.append(num_Ce1NN(G, COsites[i]))
+        
+    CN1 = np.mean(np.array(CN1)) * 3 
+    
+    return CN1
+    
+def cal_CeCN2(G, COsites):
+    
+    CN2 = []
+    sitetype = len(COsites)
+    
+    for i in range(sitetype):
+        CN2.append(num_Ce2NN(G, COsites[i])[0])
+    
+    CN2 = np.mean(np.array(CN2)) *3 
+
+    
+    return CN2
+
+def cal_CeGCN(G, COsites):
+
+    GCN = []
+    
+    sitetype = len(COsites)
+    list_1NN = []
+    
+    for i in range(sitetype):
+        list_1NN = list_1NN + num_Ce2NN(G, COsites[i])[1]
+        
+    list_1NN = list(set(list_1NN))
+    
+    for i in list_1NN:
+        GCN.append(num_Ce1NN(G,i))
+    print(GCN)
+    
+    if len(COsites) == 1: weight = 3
+    if len(COsites) == 2: weight = 5
+    if len(COsites) == 3: weight = 6
+    
+    GCN = np.sum(np.array(GCN))/weight * 3
+
+    return GCN
+            
 
 empty = 'grey'
 filled = 'r'
