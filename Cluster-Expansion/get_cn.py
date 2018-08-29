@@ -46,9 +46,12 @@ nCeCN1 = []
 nCeCN2 = []
 nCeGCN = []
 
+nZ  = []
 for i in range(nCOs):
     
     cn.get_CNs(Gsv[COindex[i]],COsites[i])
+    cn.get_z(Gsv[COindex[i]],COsites[i])
+    
     nCN1.append(cn.CN1)
     nCN2.append(cn.CN2)
     nGCN.append(cn.GCN)
@@ -57,5 +60,5 @@ for i in range(nCOs):
     nCeCN2.append(cn.CeCN2)
     nCeGCN.append(cn.CeGCN)
     
-    
+    nZ.append(cn.z)
     

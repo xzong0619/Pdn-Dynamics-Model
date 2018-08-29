@@ -843,6 +843,7 @@ class coordination():
         Take in configuration G
         CO adsorption configuration index list 
         and CO sites index list
+        add properties to the self object
         '''
         self.CN1 = self.cal_CN1(G,COsites)
         self.CN2 = self.cal_CN2(G,COsites)
@@ -851,8 +852,30 @@ class coordination():
         self.CeCN1 = self.cal_CeCN1(G,COsites)
         self.CeCN2 = self.cal_CeCN2(G,COsites)
         self.CeGCN = self.cal_CeGCN(G,COsites)
+   
+    def get_z(self, G, COsites):
         
+        '''
+        Take in configuration G
+        CO adsorption configuration index list 
+        and CO sites index list
+        add average layer number to the self object
+        '''
+        list_z = []
+        sitetype = len(COsites)
         
-        
-        
-        
+        for i in range(sitetype):
+            list_z.append(int(G.nodes[COsites[i]]['z']))
+            
+            
+        self.z = np.mean(np.array(list_z))    
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
