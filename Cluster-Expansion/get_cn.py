@@ -8,6 +8,7 @@ Created on Wed Aug 29 15:56:13 2018
 from structure_constants import *
 import lattice_functions as lf
 import pickle
+import pandas as pd
 
 empty = 'grey'
 filled = 'r'
@@ -42,4 +43,11 @@ for i in range(nCOs):
     nCeGCN.append(cn.CeGCN)
     
     nZ.append(cn.z)
-    
+
+df = pd.DataFrame({"CN1": nCN1,
+                   "CN2": nCN2,
+                   "GCN": nGCN,
+                   "CeCN1": nCeCN1,
+                   "CeCN2": nCeCN2,
+                   "CeGCN": nCeGCN,
+                   "z": nZ})
