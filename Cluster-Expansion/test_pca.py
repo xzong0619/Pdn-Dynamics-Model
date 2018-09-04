@@ -44,6 +44,10 @@ y = np.array([-2.4,
                 -2])
 
 #%% Plot the trend 
+
+nPC = X.shape[1]
+
+
 feature_dict = {0: '1st Coordination Number',
                 1: '2nd Coordination Number',
                 2: 'General Coordination Number',
@@ -54,7 +58,6 @@ feature_dict = {0: '1st Coordination Number',
                 7: 'Bader Charge',
                 8: 'Number of Pd atoms'}
 
-nPC = X.shape[1]
 
 with plt.style.context('seaborn-whitegrid'):
     
@@ -121,7 +124,7 @@ space = 0.3
 
 descriptors = ['CN1', 'CN2', 'GCN', 'CeCN1', 'CeCN2', 'CeGCN', 'Z', 'q', 'nPd']
 cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey']
-fig = plt.figure(figsize=(8,6))
+fig = plt.figure(figsize=(10,6))
 
 
 ax = fig.add_subplot(111)
@@ -141,7 +144,7 @@ for i, pci in enumerate(eig_vecs_p[:pc]):
     
 
         
-linex = np.arange(np.arange(0, pc).min() -0.5  , np.arange(0, pc).max()+2)
+linex = np.arange(np.arange(0, pc).min() -0.5  , np.arange(0, pc).max()+ 2)
 
 ax.set_xticks(indeces)
 ax.set_xticklabels(list(np.arange(0,pc)+1))
