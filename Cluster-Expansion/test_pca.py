@@ -121,7 +121,7 @@ space = 0.3
 
 descriptors = ['CN1', 'CN2', 'GCN', 'CeCN1', 'CeCN2', 'CeGCN', 'Z', 'q', 'nPd']
 cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey']
-fig = plt.figure(figsize=(10,8))
+fig = plt.figure(figsize=(8,6))
 
 
 ax = fig.add_subplot(111)
