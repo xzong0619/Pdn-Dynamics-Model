@@ -14,7 +14,7 @@ from sklearn import linear_model
 from sklearn.model_selection import cross_val_predict 
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures 
-
+from sklearn.pipeline import Pipeline
 
 import pandas as pd
 import numpy as np
@@ -73,7 +73,7 @@ with plt.style.context('seaborn-whitegrid'):
 
 #%% PCA use sklearn
 pca = PCA()    
-Xreg = pca.fit_transform(X_std) 
+Xpc = pca.fit_transform(X_std) 
 
 eig_vals_p = pca.explained_variance_
 eig_vecs_p = pca.components_  # eigenvector
@@ -83,13 +83,107 @@ var_exp_p = pca.explained_variance_ratio_
 '''
 Need to be completed
 '''
+# select the number of PCs
 
+pc = 7
+
+plt.figure()
+
+ind = 0
+yvals = []
+ylabels = []
+bar_vals = []
+space = 0.2
+   
+
+
+descriptors = ['CN1', 'CN2', 'GCN', 'CeCN1', 'CeCN2', 'CeGCN', 'Z']
+cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue']
+fig = plt.figure()
+ax = fig.add_subplot(111)
+n = len(descriptors)
+width = (1 - space) / (len(descriptors))
+indeces = np.arange(0, pc) + 0.5  
+
+# Create a set of bars at each position
+for i, pci in enumerate(eig_vecs_p[:pc]):
+    
+    vals = pci/np.sum(np.absolute(pci))
+    
+    pos = width*np.arange(n) + i 
+    ax.bar(pos, vals, width=width, label=str(i+1), color = cm) 
+    
+ax.legend(descriptors, bbox_to_anchor = (1.05, 1),loc= 'upper left', prop={'size':10},frameon=False)  
+leg = ax.get_legend()
+    
+for c in range(n):
+    leg.legendHandles[c].set_color(cm[c])
+        
+linex = np.arange(np.arange(0, pc).min() -1  , np.arange(0, pc).max()+2)
+
+ax.set_xticks(indeces)
+ax.set_xticklabels(list(np.arange(0,pc)+1))
+ax.set_ylabel("Normalized Descriptoor Loading")
+ax.set_xlabel("Principal Component #")    
+
+plt.plot(linex, linex*0, c = 'k', lw = 0.8)
+plt.show()
+
+
+ 
 #%% Regression
+# Create linear regression object
+pc = 4
+Xreg = Xpc[:,:pc]
+def fit_linear_regression(X, y, degree):
+    return Pipeline([("polynomial_features", PolynomialFeatures(degree=degree,
+                                                                include_bias=False)),
+                     ("linear_regression", linear_model.LinearRegression())]
+                    ).fit(X, y) 
+        
+degree = 2
+regr = linear_model.LinearRegression()
 
+# Fit
+regr.fit(Xreg, y)
 
+# Calibration
+y_c = regr.predict(Xreg)
 
+# Cross-validation
+y_cv = cross_val_predict(regr, Xreg, y, cv=10)
 
+# Calculate scores for calibration and cross-validation
+score_c = r2_score(y, y_c)
+score_cv = r2_score(y, y_cv)
 
+# Calculate mean square error for calibration and cross validation
+mse_c = mean_squared_error(y, y_c)
+mse_cv = mean_squared_error(y, y_cv)
 
+estimator  = fit_linear_regression(Xreg, y, degree)
+regr_poly = estimator.named_steps['linear_regression']
+coefs = regr_poly.coef_
+poly = estimator.named_steps['polynomial_features']
+terms = poly.get_feature_names(['x1','x2','x3','x4','x5','x6','x7'])
 
+y_poly = estimator.predict(Xreg)
+score_poly = r2_score(y_poly, y_c)
+mse_poly = mean_squared_error(y_poly, y_c)
 
+fig, ax = plt.subplots()
+ax.scatter(y, y_poly, facecolor = 'r', s  = 60, edgecolors=(0, 0, 0))
+ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=2)
+ax.set_xlabel('Measured')
+ax.set_ylabel('Predicted')
+plt.show()
+
+xi = np.arange(len(coefs))
+fig, ax = plt.subplots()
+plt.bar(xi, coefs)
+linex = np.arange(xi.min()-1, xi.max()+2)
+plt.plot(linex, linex*0, c = 'k')
+plt.xticks(xi, terms, rotation=45 )
+plt.ylabel("Regression Coefficient Value (eV)")
+plt.xlabel("Regression Coefficient")  
+plt.show()
