@@ -5,7 +5,6 @@ Created on Fri Aug 31 12:00:34 2018
 @author: wangyf
 """
 
-from get_cn import df
 from structure_constants import ECO
 from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA 
@@ -18,10 +17,31 @@ from sklearn.pipeline import Pipeline
 
 import pandas as pd
 import numpy as np
+import matplotlib as mat
 
+mat.rc('font', size=12)
 
-X = df.iloc[:,:].values
-y = np.array(ECO)
+X = np.load('Xmatrix.npy')
+y = np.array([-2.4,
+                -2.98,
+                -3.06,
+                -2.58,
+                -3.03,
+                -2.28,
+                -2.2,
+                -2.36,
+                -2.03,
+                -2.31,
+                -2.29,
+                -2.43,
+                -2.38,
+                -2.31,
+                -2.25,
+                -2.29,
+                -2.33,
+                -2.33,
+                -2.08,
+                -2])
 
 #%% Plot the trend 
 feature_dict = {0: '1st Coordination Number',
@@ -30,11 +50,15 @@ feature_dict = {0: '1st Coordination Number',
                 3: '1st Ce Coordination Number',
                 4: '2nd Ce Coordination Number',
                 5: 'General Coordination Number',
-                6: 'Distance from the support'}
+                6: 'Distance from the support',
+                7: 'Bader Charge',
+                8: 'Number of Pd atoms'}
+
+nPC = X.shape[1]
 
 with plt.style.context('seaborn-whitegrid'):
     
-    for cnt in range(7):
+    for cnt in range(nPC):
         plt.figure(figsize=(6, 4))
         plt.scatter(X[:,cnt],y)
         plt.xlabel(feature_dict[cnt])
@@ -60,14 +84,14 @@ cum_var_exp = np.cumsum(var_exp)
 with plt.style.context('seaborn-whitegrid'):
     plt.figure(figsize=(6, 4))
 
-    plt.bar(range(7), var_exp, alpha=0.5, align='center',
+    plt.bar(range(nPC), var_exp, alpha=0.5, align='center',
             label='individual explained variance')
-    plt.step(range(7), cum_var_exp, where='mid',
+    plt.step(range(nPC), cum_var_exp, where='mid',
              label='cumulative explained variance')
     plt.ylabel('Explained variance ratio')
     plt.xlabel('Principal components')
-    plt.xticks(np.arange(7), 
-                ['PC %i'%(w+1) for w in range(7)])
+    plt.xticks(np.arange(nPC), 
+                ['PC %i'%(w+1) for w in range(nPC)])
     plt.legend(loc='best')
     plt.tight_layout()
 
@@ -85,21 +109,21 @@ Need to be completed
 '''
 # select the number of PCs
 
-pc = 7
-
-plt.figure()
+pc = 4
 
 ind = 0
 yvals = []
 ylabels = []
 bar_vals = []
-space = 0.2
+space = 0.3
    
 
 
-descriptors = ['CN1', 'CN2', 'GCN', 'CeCN1', 'CeCN2', 'CeGCN', 'Z']
-cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue']
-fig = plt.figure()
+descriptors = ['CN1', 'CN2', 'GCN', 'CeCN1', 'CeCN2', 'CeGCN', 'Z', 'q', 'nPd']
+cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey']
+fig = plt.figure(figsize=(10,8))
+
+
 ax = fig.add_subplot(111)
 n = len(descriptors)
 width = (1 - space) / (len(descriptors))
@@ -113,19 +137,22 @@ for i, pci in enumerate(eig_vecs_p[:pc]):
     pos = width*np.arange(n) + i 
     ax.bar(pos, vals, width=width, label=str(i+1), color = cm) 
     
-ax.legend(descriptors, bbox_to_anchor = (1.05, 1),loc= 'upper left', prop={'size':10},frameon=False)  
-leg = ax.get_legend()
+
     
-for c in range(n):
-    leg.legendHandles[c].set_color(cm[c])
+
         
-linex = np.arange(np.arange(0, pc).min() -1  , np.arange(0, pc).max()+2)
+linex = np.arange(np.arange(0, pc).min() -0.5  , np.arange(0, pc).max()+2)
 
 ax.set_xticks(indeces)
 ax.set_xticklabels(list(np.arange(0,pc)+1))
 ax.set_ylabel("Normalized Descriptoor Loading")
 ax.set_xlabel("Principal Component #")    
-
+'''
+ax.legend(descriptors, bbox_to_anchor = (1.05, 1),loc= 'upper left', prop={'size':10},frameon=False)  
+leg = ax.get_legend()
+for c in range(n):
+    leg.legendHandles[c].set_color(cm[c])
+'''
 plt.plot(linex, linex*0, c = 'k', lw = 0.8)
 plt.show()
 

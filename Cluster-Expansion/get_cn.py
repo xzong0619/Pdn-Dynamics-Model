@@ -9,6 +9,7 @@ from structure_constants import *
 import lattice_functions as lf
 import pickle
 import pandas as pd
+import numpy as np
 
 empty = 'grey'
 filled = 'r'
@@ -51,3 +52,10 @@ df = pd.DataFrame({"CN1": nCN1,
                    "CeCN2": nCeCN2,
                    "CeGCN": nCeGCN,
                    "z": nZ})
+'''
+Use clipboard methd
+'''
+
+#df = pd.read_clipboard()
+X = df.iloc[:,:].values
+np.save('Xmatrix', X, allow_pickle = True)
