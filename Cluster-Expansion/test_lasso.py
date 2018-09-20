@@ -51,8 +51,9 @@ MSE_train = sum((y_train - lasso_cv.predict(X_train))**2)/len(y_train)
 MSE_path = np.mean(lasso_cv.mse_path_, axis = 1)
 
 #%%
-J_index = np.nonzero(coefs)[0] -1
-J_nonzero = coefs[np.nonzero(coefs)]
+J_index = np.nonzero(coefs)[0] -1 #for the matrix before we add column 1
+J_nonzero = coefs[np.nonzero(coefs)[0]] 
+pi_nonzero = X[:, np.nonzero(coefs)[0]]
 n_nonzero = []
 
 Gcv_nonzero = []
