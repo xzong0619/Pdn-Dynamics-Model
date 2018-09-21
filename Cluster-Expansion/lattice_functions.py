@@ -348,16 +348,14 @@ class calculations():
     
         return delta
     
-    def get_J(self, Ev, G1v, G2v):
+    def get_pi_matrix(self, G1v, G2v):
         '''
         The function that gets 
-            energy of configurations, Ev
+            
             configuration graphs, G1v
             cluster graphs, G2v
-        and returns the interaction energy in J vector and correlation matrix pi
+        and returns the interaction correlation matrix pi
         '''
-        
-        self.Ev = np.array(Ev)
         n1 = len(G1v)
         n2 = len(G2v)
         pi = np.zeros((n1,n2))
@@ -370,18 +368,26 @@ class calculations():
                 progress = progress + 1
                 per = progress/n1/n2 *100
                 print('%.2f %% done!' %per)
-                
-                
-                
-        J = np.linalg.lstsq(pi, self.Ev)[0]
-        
-        self.J = J
+                        
         self.pi = pi
         
-        return J, pi
+        return pi
+    
+    def get_J(self, Ev):
+        '''
+        The function input energy of configurations, Ev
+        Returns cluster energy J from linear regression
+        '''
+        self.Ev = np.array(Ev)
+        J = np.linalg.lstsq(self.pi, self.Ev)[0]
+        self.J = J
+        
+        return J
     
     def get_MSE(self):
-        
+        '''
+        Returns MSE of prediction and real cluster energy
+        '''
         ns = len(self.Ev)    
         MSE = np.sum(np.power((np.dot(self.pi,self.J) - self.Ev),2))/ns
         

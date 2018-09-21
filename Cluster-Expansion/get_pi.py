@@ -26,7 +26,7 @@ size of number of configuration * numbers of clusters
 
 Gcv = Gcv1+Gcv2+Gcv3
 Cal = lf.calculations(occ)
-J, pi =  Cal.get_J(Ec, Gsv ,Gcv)      
+pi =  Cal.get_pi_matrix(Gsv ,Gcv)      
 
 #%%
 
