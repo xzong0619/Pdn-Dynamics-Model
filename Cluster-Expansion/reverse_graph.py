@@ -34,10 +34,11 @@ class reverse():
         ncluster = np.multiply(pi_vector,self.niso)[0]
         self.ncluster = ncluster.astype(int)
         
-        
+        '''
         ncom_list, com_list = self.get_all_com(self.Gcv, self.ncluster)
         n_possible,combo_list = self.possible_config(ncom_list, com_list)
         self.gsuper = self.get_unique_graphs(combo_list)
+        '''
     
     @staticmethod
     def get_com(L,n):

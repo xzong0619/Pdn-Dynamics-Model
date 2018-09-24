@@ -39,6 +39,11 @@ newpoints = k.infill(1, method = 'ei')
 '''
 Generate reverse graph
 '''
+empty = 'grey'
+filled = 'r'
 occ = [empty, filled]
 Gcv = tlasso.Gcv_nonzero
+
+
+#%%
 re_graph = rg.reverse(occ,Gcv)
