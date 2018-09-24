@@ -64,7 +64,8 @@ for i in range(coef_path.shape[1]):
     
 #%%
 '''
-plot alphas vs MSE along the path
+'''
+#plot alphas vs MSE along the path
 '''
 
 plt.figure(figsize=(40,40))
@@ -88,7 +89,7 @@ plt.savefig('a_vs_cv.png')
 
 
 '''
-plot alphas vs nonzero coefficents
+#plot alphas vs nonzero coefficents
 '''
 
 plt.figure(figsize=(20,20))
@@ -109,7 +110,7 @@ plt.show()
 plt.savefig('a_vs_n.png')
 
 '''
-plot parity plot
+#plot parity plot
 '''
 y_predict_all = lasso_cv.predict(X)
 
@@ -141,5 +142,5 @@ plt.show()
 plt.savefig('parity.png')
 
 
- 
+''' 
     

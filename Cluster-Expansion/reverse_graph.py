@@ -31,8 +31,8 @@ class reverse():
     def get_supergraph(self, pi_vector):
         
         # num is number of clusters in the supergraph
-        ncluster = np.multiply(pi_vector,self.niso)[0]
-        self.ncluster = ncluster.astype(int)
+        self.ncluster = np.multiply(pi_vector,self.niso)
+        #self.ncluster = self.ncluster.astype(int)
         
         '''
         ncom_list, com_list = self.get_all_com(self.Gcv, self.ncluster)
@@ -59,6 +59,7 @@ class reverse():
             if not ng==0:
                 
                 ncom,com =  self.get_com(Gcv[gi], ng)
+                print('one config done')
                 ncom_list.append(ncom)
                 com_list.append(com)
                 
@@ -118,7 +119,8 @@ class reverse():
         Cal = lf.calculations(self.occ)
         #pi_vector is the pi vector for this Gsv
         pi_vector = Cal.get_pi_matrix(Gsv, self.Gcv)
-        
-        self.get_supergraph(pi_vector)
+        ncluster = np.multiply(pi_vector,self.niso)
+        return ncluster
+        #self.get_supergraph(pi_vector)
         
         

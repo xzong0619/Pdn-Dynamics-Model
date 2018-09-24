@@ -18,7 +18,7 @@ from pyKriging.krige import kriging
 import test_lasso as tlasso
 import reverse_graph as rg
 import lattice_functions as lf
-
+from config import Gsv
 
 
 
@@ -32,7 +32,7 @@ Do kriging
 '''
 k = kriging(X, y)
 k.train(optimizer='ga')
-newpoints = k.infill(1, method = 'ei')
+newpoints = k.infill(3, method = 'ei')
 
 
 #%% 
@@ -44,9 +44,14 @@ filled = 'r'
 occ = [empty, filled]
 Gcv = tlasso.Gcv_nonzero
 
+rgf = rg.reverse(occ,Gcv)
+rgf.get_supergraph(newpoints)
 
+ncluster = rgf.ncluster
+
+ncluster_int = np.round(ncluster).astype(int)
 #%%
-re_graph = rg.reverse(occ,Gcv)
-re_graph.get_supergraph(newpoints)
+#com_list, com_list = rgf.get_all_com(Gcv, ncluster)
+#%% take a test
 
-ncluster = re_graph.ncluster
+testnc= rgf.test([Gsv[30]])
