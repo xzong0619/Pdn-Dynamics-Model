@@ -47,3 +47,6 @@ Gcv = tlasso.Gcv_nonzero
 
 #%%
 re_graph = rg.reverse(occ,Gcv)
+re_graph.get_supergraph(newpoints)
+
+ncluster = re_graph.ncluster
