@@ -60,7 +60,7 @@ testnc= rgf.test([Gsv[30]])
 
 
 #%%
-from scipy.misc import comb
+from scipy.special import comb
 
-
+x = comb(39,19, exact = False)
 
