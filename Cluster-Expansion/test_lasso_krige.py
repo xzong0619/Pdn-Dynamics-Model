@@ -55,3 +55,12 @@ ncluster_int = np.round(ncluster).astype(int)
 #%% take a test
 
 testnc= rgf.test([Gsv[30]])
+
+
+
+
+#%%
+from scipy.misc import comb
+
+
+
