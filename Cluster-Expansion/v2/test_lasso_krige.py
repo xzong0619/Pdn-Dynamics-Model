@@ -16,7 +16,7 @@ import pyKriging
 from pyKriging.krige import kriging
 
 import test_lasso as tlasso
-import reverse_graph as rg
+#import reverse_graph as rg
 import lattice_functions as lf
 from config import Gsv
 
@@ -31,7 +31,7 @@ y = tlasso.y
 Do kriging
 '''
 k = kriging(X, y)
-k.train(optimizer='ga')
+k.train(optimizer='ga')  
 newpoints = k.infill(3, method = 'ei')
 
 
