@@ -63,83 +63,83 @@ for i in range(coef_path.shape[1]):
     n_nonzero.append(len(np.nonzero(coef_path[:,i])[0]))
     
 #%%
-
-'''
-#plot alphas vs MSE along the path
-'''
-
-plt.figure(figsize=(40,40))
-fig, ax = plt.subplots()
-
-plt.plot(-np.log10(alphas),np.log10(MSE_path),
-         label='Average across the folds', linewidth=2)  
-plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
-            label='alpha: CV estimate') 
-
-plt.legend(frameon=False)
-plt.xlabel("-log10(alphas)")
-plt.ylabel("log10(Mean Square Error (eV))")    
-font = {'family' : 'normal',
-        'size'   : 15}
-
-matplotlib.rc('font', **font)
-
-plt.show()   
-plt.savefig('a_vs_cv.png')
-
-
-'''
-#plot alphas vs nonzero coefficents
-'''
-
-plt.figure(figsize=(20,20))
-fig, ax = plt.subplots()
-
-plt.plot(-np.log10(alphas),n_nonzero,
-         label='Average across the folds', linewidth=2)     
-plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
-            label='alpha: CV estimate') 
-plt.legend(frameon=False)
-
-plt.xlabel("-log10(alphas)")
-plt.ylabel("Number of Nonzero Coefficients ")    
-
-matplotlib.rc('font', **font)
-
-plt.show() 
-plt.savefig('a_vs_n.png')
-
-'''
-#plot parity plot
-'''
-y_predict_all = lasso_cv.predict(X)
-
-
-plt.figure(figsize=(20,20))
-
-fig, ax = plt.subplots()
-ax.scatter(Ec,y_predict_all, s=60, facecolors='none', edgecolors='r')
-
-plt.xlabel("Eads DFT (eV)")
-plt.ylabel("Eads Model Prediction(eV)")
-
-
-lims = [
-    np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
-    np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
-]
-
-# now plot both limits against eachother
-ax.plot(lims, lims, 'k--', alpha=0.75, zorder=0)
-ax.set_xlim(lims)
-ax.set_ylim(lims)
-
-font = {'family' : 'normal',
-        'size'   : 15}
-
-matplotlib.rc('font', **font)
-plt.show()
-plt.savefig('parity.png')
+def plot_lasso():
+    '''
+    #plot alphas vs MSE along the path
+    '''
+    
+    plt.figure(figsize=(40,40))
+    fig, ax = plt.subplots()
+    
+    plt.plot(-np.log10(alphas),np.log10(MSE_path),
+             label='Average across the folds', linewidth=2)  
+    plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
+                label='alpha: CV estimate') 
+    
+    plt.legend(frameon=False)
+    plt.xlabel("-log10(alphas)")
+    plt.ylabel("log10(Mean Square Error (eV))")    
+    font = {'family' : 'normal',
+            'size'   : 15}
+    
+    matplotlib.rc('font', **font)
+    
+    plt.show()   
+    plt.savefig('a_vs_cv.png')
+    
+    
+    '''
+    #plot alphas vs nonzero coefficents
+    '''
+    
+    plt.figure(figsize=(20,20))
+    fig, ax = plt.subplots()
+    
+    plt.plot(-np.log10(alphas),n_nonzero,
+             label='Average across the folds', linewidth=2)     
+    plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
+                label='alpha: CV estimate') 
+    plt.legend(frameon=False)
+    
+    plt.xlabel("-log10(alphas)")
+    plt.ylabel("Number of Nonzero Coefficients ")    
+    
+    matplotlib.rc('font', **font)
+    
+    plt.show() 
+    plt.savefig('a_vs_n.png')
+    
+    '''
+    #plot parity plot
+    '''
+    y_predict_all = lasso_cv.predict(X)
+    
+    
+    plt.figure(figsize=(20,20))
+    
+    fig, ax = plt.subplots()
+    ax.scatter(Ec,y_predict_all, s=60, facecolors='none', edgecolors='r')
+    
+    plt.xlabel("Eads DFT (eV)")
+    plt.ylabel("Eads Model Prediction(eV)")
+    
+    
+    lims = [
+        np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
+        np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
+    ]
+    
+    # now plot both limits against eachother
+    ax.plot(lims, lims, 'k--', alpha=0.75, zorder=0)
+    ax.set_xlim(lims)
+    ax.set_ylim(lims)
+    
+    font = {'family' : 'normal',
+            'size'   : 15}
+    
+    matplotlib.rc('font', **font)
+    plt.show()
+    plt.savefig('parity.png')
 
 
     

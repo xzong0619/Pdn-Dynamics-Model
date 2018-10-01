@@ -367,7 +367,7 @@ class calculations():
                 
                 progress = progress + 1
                 per = progress/n1/n2 *100
-                print('%.2f %% done!' %per)
+                #print('%.2f %% done!' %per)
                         
         self.pi = pi
         

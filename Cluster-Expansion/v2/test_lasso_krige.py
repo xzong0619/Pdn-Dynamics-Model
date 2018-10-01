@@ -32,12 +32,12 @@ Do kriging
 '''
 k = kriging(X, y)
 k.train(optimizer='ga')
-newpoints = k.infill(3, method = 'ei')
+newpoints = k.infill(1, method = 'ei')
 
-
+'''
 #%% 
 '''
-Generate reverse graph
+#Generate reverse graph
 '''
 empty = 'grey'
 filled = 'r'
@@ -64,3 +64,4 @@ from scipy.special import comb
 
 x = comb(39,19, exact = False)
 
+'''
