@@ -57,12 +57,20 @@ def occupancy():
     
 def individual_config(individual, Clusters):
     
-    ind_list = list(np.nonzero([individual])[0])
+    ind_list = list(np.nonzero(individual)[0])
     Clusters.get_configs([ind_list])
     Gsv = Clusters.Gsv
     
     return Gsv
 
+def evaluate_pi(individual, Clusters, occ, Gcv, pi_true):
+    
+    Gsv = individual_config(individual, Clusters)
+    Cal = lf.calculations(occ)
+    pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
+    
+    return pi_pred
+    
 def evaluate(individual, Clusters, occ, Gcv, pi_true):
       
     Gsv = individual_config(individual, Clusters)

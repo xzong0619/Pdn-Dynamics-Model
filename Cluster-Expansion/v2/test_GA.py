@@ -56,10 +56,11 @@ Clusters.get_mother(mother, dz)
 
 #%%
 #Genetic Hyperparameters
+nodes = 36
 n = 100 #Size of population
 ngen = 100 #Number of generations
 cxpb = 1.0 #The probability of mating two individuals
-mutpb = 0.001 #The probability of mutating an individual
+mutpb = 0.1 #The probability of mutating an individual
 k = n
 tournsize = 5
 
@@ -76,7 +77,7 @@ toolbox = base.Toolbox()
 
 toolbox.register("attr_binary", GA.occupancy)
 toolbox.register("individual", tools.initRepeat, creator.Individual,
-                 toolbox.attr_binary, n=n)
+                 toolbox.attr_binary, n=nodes)
 
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
@@ -87,9 +88,14 @@ toolbox.register("evaluate", GA.evaluate, Clusters = Clusters, occ = occ, Gcv = 
 population = GA.make_initial_population(COMM, toolbox, n)
 population = GA.evaluate_population(COMM, toolbox, population)
 
+#%%
 ind1 = toolbox.individual()
 fit1 = toolbox.evaluate(ind1)
- 
+pi1 = GA.evaluate_pi(ind1, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero, pi_true = newpoints) 
+
+ind2 = toolbox.individual()
+fit2 = toolbox.evaluate(ind2)
+pi2 = GA.evaluate_pi(ind2, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero, pi_true = newpoints) 
 #%%
 sim_mat = np.zeros(shape = (n, n))
 for generation in range(ngen):
@@ -100,5 +106,5 @@ for generation in range(ngen):
     population = GA.make_next_population(COMM, population, offspring)
     GA.calculate_statistics(COMM, generation, population)
     GA.find_best_individual(COMM, population)
-    GA.save_population(COMM, population, 'population{}.txt'.format(generation))
+    #GA.save_population(COMM, population, 'population{}.txt'.format(generation))
     

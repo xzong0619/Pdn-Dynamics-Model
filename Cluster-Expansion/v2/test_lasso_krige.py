@@ -16,7 +16,7 @@ import pyKriging
 from pyKriging.krige import kriging
 
 import test_lasso as tlasso
-#import reverse_graph as rg
+import reverse_graph as rg
 import lattice_functions as lf
 from config import Gsv
 
@@ -32,12 +32,13 @@ Do kriging
 '''
 k = kriging(X, y)
 k.train(optimizer='ga')  
-newpoints = k.infill(3, method = 'ei')
+newpoints = k.infill(1, method = 'ei')
 
 
 #%% 
 '''
-Generate reverse graph
+'''
+#Generate reverse graph
 '''
 empty = 'grey'
 filled = 'r'
@@ -64,3 +65,4 @@ from scipy.special import comb
 
 x = comb(39,19, exact = False)
 
+'''
