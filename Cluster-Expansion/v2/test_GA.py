@@ -91,11 +91,11 @@ population = GA.evaluate_population(COMM, toolbox, population)
 #%%
 ind1 = toolbox.individual()
 fit1 = toolbox.evaluate(ind1)
-pi1 = GA.evaluate_pi(ind1, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero, pi_true = newpoints) 
+pi1 = GA.evaluate_pi(ind1, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero) 
 
 ind2 = toolbox.individual()
 fit2 = toolbox.evaluate(ind2)
-pi2 = GA.evaluate_pi(ind2, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero, pi_true = newpoints) 
+pi2 = GA.evaluate_pi(ind2, Clusters = Clusters, occ = occ, Gcv =  Gcv_nonzero) 
 #%%
 sim_mat = np.zeros(shape = (n, n))
 for generation in range(ngen):
@@ -108,3 +108,7 @@ for generation in range(ngen):
     GA.find_best_individual(COMM, population)
     #GA.save_population(COMM, population, 'population{}.txt'.format(generation))
     
+#%%
+    
+(best_ind, best_fitness, best_pi, best_config) = GA.final_best_individual(population, Clusters, occ, Gcv_nonzero)
+lf.drawing(best_config[0])

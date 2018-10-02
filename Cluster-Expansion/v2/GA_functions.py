@@ -16,8 +16,7 @@ except:
 from datetime import datetime
 from sklearn.metrics import mean_squared_error
 import lattice_functions as lf
-
-
+from numpy.linalg import norm
 
 #%%
 def get_rank(COMM = None):
@@ -63,7 +62,7 @@ def individual_config(individual, Clusters):
     
     return Gsv
 
-def evaluate_pi(individual, Clusters, occ, Gcv, pi_true):
+def evaluate_pi(individual, Clusters, occ, Gcv):
     
     Gsv = individual_config(individual, Clusters)
     Cal = lf.calculations(occ)
@@ -76,8 +75,8 @@ def evaluate(individual, Clusters, occ, Gcv, pi_true):
     Gsv = individual_config(individual, Clusters)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
-
-    fitness = mean_squared_error(pi_pred, pi_true) 
+    fitness = norm(pi_pred-pi_true, ord = np.inf)
+    #fitness = mean_squared_error(pi_pred, pi_true) 
     # possible to put lower energy clusters as fitness
     return (fitness,)
 
@@ -200,3 +199,18 @@ def find_best_individual(COMM = None, population = None):
 
 def get_fitnesses(population):
     return np.array([individual.fitness.values for individual in population])
+
+
+def final_best_individual(population, Clusters, occ, Gcv):
+    
+    fitnesses = get_fitnesses(population)
+    i = np.where(fitnesses == min(fitnesses))[0][0]
+    
+    best_ind = population[i]
+    best_fitness = best_ind.fitness.values[0]
+    best_pi = evaluate_pi(best_ind, Clusters, occ, Gcv)
+    best_config = individual_config(best_ind, Clusters)
+    
+    return(best_ind, best_fitness, best_pi, best_config)
+    
+    
