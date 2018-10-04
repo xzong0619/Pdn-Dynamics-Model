@@ -71,7 +71,7 @@ def evaluate_pi(individual, Clusters, Gcv):
     
     return pi_pred
     
-def evaluate(individual, Clusters, Gcv, pi_true):
+def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
@@ -80,8 +80,9 @@ def evaluate(individual, Clusters, Gcv, pi_true):
     fitness1 = mean_squared_error(pi_pred, pi_true) 
     fitness2 = norm(pi_pred-pi_true, ord = np.inf)
     fitness3 = connect_score(individual)
+    fitness4 = (np.dot(pi_pred, J) + intercept)[0]
     # possible to put lower energy clusters as fitness
-    return (fitness1,fitness2,fitness3)
+    return (fitness1,fitness2,fitness3,fitness4)
 
 
 def make_initial_population(COMM = None, toolbox = None, n = None):
@@ -197,14 +198,19 @@ def find_best_individual(COMM = None, population = None):
         fitnesses = get_fitnesses(population)
         i = np.where(fitnesses == min(fitnesses))[0][0]
         print( '\tIndividual with best fitness:')
-        print( '\tFitness = {} eV^2'.format(population[i].fitness.values))
-        print( '\tCV RMSE = {} eV'.format(np.sqrt(population[i].fitness.values[0])))
+        print( '\tFitness = {} '.format(population[i].fitness.values))
+        #print( '\tCV RMSE = {} eV'.format(np.sqrt(population[i].fitness.values[0])))
 
 def get_fitnesses(population):
     '''
     Add the sum of the fitness values
     '''
-    return np.array([individual.fitness.values for individual in population]).sum(axis = 1)
+    fitness_tuple = abs(np.array([individual.fitness.values for individual in population]))
+    fitness_max = np.max(fitness_tuple, axis = 0)
+    normalized_fit = fitness_tuple/fitness_max
+    normalized_fit[:,-1] = 1-normalized_fit[:,-1]
+    
+    return normalized_fit.sum(axis = 0)
 
 
 def final_best_individual(population, Clusters, Gcv):
@@ -213,7 +219,7 @@ def final_best_individual(population, Clusters, Gcv):
     i = np.where(fitnesses == min(fitnesses))[0][0]
     
     best_ind = population[i]
-    best_fitness = best_ind.fitness.values[0]
+    best_fitness = best_ind.fitness.values
     best_pi = evaluate_pi(best_ind, Clusters, Gcv)
     best_config = individual_config(best_ind, Clusters)
     

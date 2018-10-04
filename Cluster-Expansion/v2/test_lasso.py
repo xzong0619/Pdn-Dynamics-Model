@@ -21,9 +21,10 @@ import matplotlib
 Gcv = Gcv1+Gcv2+Gcv3
 
 x = np.load('pi3.npy')
-X = np.ones((x.shape[0], x.shape[1]+1))
-X[:,1:] = x        
-    
+X =x
+
+#X = np.ones((x.shape[0], x.shape[1]+1))
+#X[:,1:] = x        
 #%%
 
 y = np.array(Ec)
@@ -33,12 +34,12 @@ X_train, X_test, y_train, y_test = cv.train_test_split(X, y, test_size=0.1, rand
 
 rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
 
-lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.001)
+lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.001, fit_intercept=True)
 lasso_cv.fit(X_train, y_train)
 alpha = lasso_cv.alpha_
 alphas = lasso_cv.alphas_
 
-alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=False)
+alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=True)
 #cv_scores = cv.cross_val_score(lasso_cv,X_train, y_train)
 
 
@@ -49,12 +50,16 @@ MSE_test = sum((y_test - y_predict)**2)/len(y_test)
 MSE_train = sum((y_train - lasso_cv.predict(X_train))**2)/len(y_train)
 
 MSE_path = np.mean(lasso_cv.mse_path_, axis = 1)
+intercept = lasso_cv.intercept_
 
 #%%
-J_index = np.nonzero(coefs)[0] -1 #for the matrix before we add column 1
-J_nonzero = coefs[np.nonzero(coefs)[0]] 
-pi_nonzero = X[:, np.nonzero(coefs)[0]]
-n_nonzero = []
+Tol = 1e-4
+J_index = np.where(abs(coefs)>=Tol)[0]
+#J_index = np.nonzero(coefs)[0] #-1 #for the matrix before we add column 1
+n_coef = len(J_index)
+J_nonzero = coefs[J_index] 
+pi_nonzero = X[:, J_index]
+n_nonzero = [] # number of nonzeor coefficients in the trajectory
 
 Gcv_nonzero = []
 for i in J_index:
@@ -63,6 +68,13 @@ for i in range(coef_path.shape[1]):
     n_nonzero.append(len(np.nonzero(coef_path[:,i])[0]))
     
 #%%
+    
+def real_predict(x, intercept, J_nonzero):
+    
+    y = np.dot(x, J_nonzero) + intercept
+    
+    return y
+    
 def plot_lasso():
     '''
     #plot alphas vs MSE along the path
@@ -113,7 +125,7 @@ def plot_lasso():
     #plot parity plot
     '''
     y_predict_all = lasso_cv.predict(X)
-    
+    #y_predict_all = real_predict(pi_nonzero, J_nonzero)
     
     plt.figure(figsize=(20,20))
     
