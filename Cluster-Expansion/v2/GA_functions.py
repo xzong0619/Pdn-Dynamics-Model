@@ -17,7 +17,7 @@ from datetime import datetime
 from sklearn.metrics import mean_squared_error
 import lattice_functions as lf
 from numpy.linalg import norm
-
+from test_connectivity_fitness import connect_score
 #%%
 def get_rank(COMM = None):
     if COMM is None:
@@ -79,8 +79,9 @@ def evaluate(individual, Clusters, Gcv, pi_true):
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
     fitness1 = mean_squared_error(pi_pred, pi_true) 
     fitness2 = norm(pi_pred-pi_true, ord = np.inf)
+    fitness3 = connect_score(individual)
     # possible to put lower energy clusters as fitness
-    return (fitness1,fitness2)
+    return (fitness1,fitness2,fitness3)
 
 
 def make_initial_population(COMM = None, toolbox = None, n = None):

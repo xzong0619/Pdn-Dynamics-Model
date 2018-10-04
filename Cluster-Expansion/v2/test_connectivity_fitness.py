@@ -4,9 +4,13 @@ Created on Wed Oct  3 11:55:36 2018
 
 @author: wangyf
 """
-
+import numpy as np
 import GA_functions as GA
-import networkx as nx
+
+
+import lattice_functions as lf
+from structure_constants import mother, dz
+
 def initialize_Clusters_object():
     
     empty = 'grey'
@@ -20,7 +24,7 @@ def initialize_Clusters_object():
     '''
     Draw mother/conifgurations/clusters?
     '''
-    draw = [0, 1, 0]
+    draw = [0, 0, 0]
     
     
     Clusters = lf.clusters(occ, NN1, draw)
@@ -31,9 +35,9 @@ def get_color(Gsv):
     
     return [Gsv.nodes[i]['color'] for i in Gsv.nodes]
     
-def get_occupied_nodes(colorsv):
+def get_occupied_nodes(colorsv, Clusters):
     nodes = len(colorsv)
-    boov =  [color == 'r' for color in colorsv]
+    boov =  [color == Clusters.occupancy[1] for color in colorsv]
     occ_nodes = np.arange(nodes)[np.array(boov)]
 
     return occ_nodes
@@ -52,20 +56,41 @@ def get_edge_score(edges, Gsv):
     count = 0
     for edge in edges:
         if edge in Gsv.edges: count = count+1
-    score = count/len(edges)
+    percentage = count/len(edges)
+    
+    return 1-percentage
+
+
+def connect_score(individual):
+    
+    Clusters = initialize_Clusters_object()
+    ind_Gsv = GA.individual_config(individual, Clusters)[0]
+    node_color = get_color(ind_Gsv)
+    occ_nodes = get_occupied_nodes(node_color, Clusters)
+    occ_edges = get_possible_edges(occ_nodes)
+    score = get_edge_score(occ_edges, ind_Gsv)
     
     return score
 
-Clusters = initialize_Clusters_object()
-occ = Clusters.occupancy
+
+
+
+
+
+
+
+
+
 '''
 ind = [1,1,1,1]
 ind_Gsv = GA.individual_config(ind, Clusters)[0]
+'''
 '''
 ind_list = [24,21,1,2,3]
 Clusters.get_configs([ind_list])
 ind_Gsv = Clusters.Gsv[0]
 node_color = get_color(ind_Gsv)
-occ_nodes = get_occupied_nodes(node_color)
+occ_nodes = get_occupied_nodes(node_color, Clusters)
 occ_edges = get_possible_edges(occ_nodes)
 score = get_edge_score(occ_edges, ind_Gsv)
+'''
