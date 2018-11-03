@@ -64,7 +64,7 @@ cxpb = 1.0 #The probability of mating two individuals
 mutpb = 0.01 #The probability of mutating an individual
 k = n
 tournsize = 5
-score_weights = (-1.0,-1.0) #tuple for min-1.0, max+1.0
+score_weights = (-1.0,-1.0,-1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
