@@ -24,7 +24,7 @@ from deap import creator
 from deap import tools
 
 from GA_functions import get_time
-from test_lasso import Gcv_nonzero
+from test_lasso import Gcv_nonzero, J_nonzero, intercept
 from test_lasso_krige import newpoints
 import GA_functions as GA
 import lattice_functions as lf
@@ -64,7 +64,11 @@ cxpb = 1.0 #The probability of mating two individuals
 mutpb = 0.01 #The probability of mutating an individual
 k = n
 tournsize = 5
+<<<<<<< HEAD
 score_weights = (-1.0,-1.0,-1.0) #tuple for min-1.0, max+1.0
+=======
+score_weights = (-1.0,-1.0,-1.0,-1) #tuple for min-1.0, max+1.0
+>>>>>>> aa3295d97abc46f1e6bcdf3dd7e92d6fbc929afd
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
@@ -84,7 +88,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutFlipBit, indpb = mutpb)
 toolbox.register("select", tools.selTournament, k = k, tournsize = tournsize)
-toolbox.register("evaluate", GA.evaluate, Clusters = Clusters, Gcv =  Gcv_nonzero, pi_true = newpoints)
+toolbox.register("evaluate", GA.evaluate, Clusters = Clusters, Gcv =  Gcv_nonzero, pi_true = newpoints, J = J_nonzero, intercept = intercept)
 
 population = GA.make_initial_population(COMM, toolbox, n)
 population = GA.evaluate_population(COMM, toolbox, population)

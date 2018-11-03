@@ -21,9 +21,9 @@ import lattice_functions as lf
 from config import Gsv
 
 
-
-X = tlasso.pi_nonzero
-y = tlasso.y
+# one note is that when k>n, kriging will not work, pay attention to the results of LASSO
+X = tlasso.pi_nonzero # n*k matrix
+y = tlasso.y # n*1 vector 
 
 
 #%%
