@@ -7,7 +7,7 @@ Created on Mon Oct  1 10:17:00 2018
 
 # test the genetic algorithm 
 import numpy as np
-
+import pickle
 
 try:
 	from mpi4py import MPI
@@ -24,8 +24,11 @@ from deap import creator
 from deap import tools
 
 from GA_functions import get_time
-from test_lasso import Gcv_nonzero, J_nonzero, intercept
-from test_lasso_krige import newpoints
+[Gcv_nonzero, J_nonzero, 
+ intercept, MSE_test, MSE_train,
+ pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
+
+newpoints = np.load('kriging_pts.npy')
 import GA_functions as GA
 import lattice_functions as lf
 from structure_constants import mother, dz
@@ -61,14 +64,11 @@ nodes = 36
 n = 100 #Size of population
 ngen = 100 #Number of generations
 cxpb = 1.0 #The probability of mating two individuals
-mutpb = 0.01 #The probability of mutating an individual
+mutpb = 0.3 #The probability of mutating an individual
 k = n
 tournsize = 5
-<<<<<<< HEAD
-score_weights = (-1.0,-1.0,-1.0) #tuple for min-1.0, max+1.0
-=======
+
 score_weights = (-1.0,-1.0,-1.0,-1) #tuple for min-1.0, max+1.0
->>>>>>> aa3295d97abc46f1e6bcdf3dd7e92d6fbc929afd
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
@@ -117,4 +117,5 @@ for generation in range(ngen):
     
 (best_ind, best_fitness, best_pi, best_config) = GA.final_best_individual(population, Clusters, Gcv_nonzero)
 lf.drawing(best_config[0])
-ind_index = GA.individual_config(best_ind, Clusters)
+best_G = GA.individual_config(best_ind, Clusters)
+GA.ase_object(best_ind)

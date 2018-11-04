@@ -10,8 +10,6 @@ from ase.visualize import view
 from ase.data import covalent_radii
 from ase import Atoms, Atom
 from ase.build import surface
-import numpy as np
-import os
 from structure_constants import mother
 
 
@@ -19,7 +17,7 @@ Pdr = covalent_radii[46]
 Or = covalent_radii[8]
 PdPd = Pdr*2
 PdO = Pdr + Or
-
+PdOcc = mother[best_ind_index]
 OO = 3.882
 
 def ceria():
@@ -54,14 +52,14 @@ def ceria():
     return slab
 
 support = ceria()
-view(support)
+#view(support)
 
 #%%
 origin = support[89].position
 origin[2] = origin[2] +  PdO
-Pdm = mother*PdPd + origin
-PdNP = Atoms('Pd36', positions = Pdm)
-nPd = 36
+Pdm = PdOcc*PdPd + origin
+#PdNP = Atoms('Pd36', positions = Pdm)
+nPd = len(PdOcc)
 for i in range(nPd):
     support.append(Atom('Pd', position = Pdm[i]))
 view(support) 

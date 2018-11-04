@@ -7,6 +7,7 @@ Created on Mon Sep 24 16:55:29 2018
 import sys
 import os
 import numpy as np
+import pickle
 from matplotlib import pyplot as plt
 
 HomePath = os.path.expanduser('~')
@@ -15,15 +16,18 @@ sys.path.append(os.path.join(HomePath,'Google Drive (wangyf@udel.edu)','Udel', '
 import pyKriging
 from pyKriging.krige import kriging
 
-import test_lasso as tlasso
+[Gcv_nonzero, J_nonzero, 
+ intercept, MSE_test, MSE_train,
+ pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
+
 import reverse_graph as rg
 import lattice_functions as lf
 from config import Gsv
 
 
 # one note is that when k>n, kriging will not work, pay attention to the results of LASSO
-X = tlasso.pi_nonzero # n*k matrix
-y = tlasso.y # n*1 vector 
+X = pi_nonzero # n*k matrix
+y = y # n*1 vector 
 
 
 #%%
@@ -34,7 +38,8 @@ k = kriging(X, y)
 k.train(optimizer='ga')  
 newpoints = k.infill(1, method = 'ei')
 
-
+#%%
+np.save('kriging_pts', newpoints)
 #%% 
 '''
 '''

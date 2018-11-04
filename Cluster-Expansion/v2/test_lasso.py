@@ -24,7 +24,8 @@ x = np.load('pi3.npy')
 X =x
 
 #X = np.ones((x.shape[0], x.shape[1]+1))
-#X[:,1:] = x        
+#X[:,1:] = x     
+   
 #%%
 
 y = np.array(Ec)
@@ -66,6 +67,14 @@ for i in J_index:
     Gcv_nonzero.append(Gcv[i])
 for i in range(coef_path.shape[1]):
     n_nonzero.append(len(np.nonzero(coef_path[:,i])[0]))
+#%%
+
+'''
+Save Gcv_nonzero and n_nonzero for further use
+''' 
+pickle.dump([Gcv_nonzero, J_nonzero, 
+             intercept, MSE_test, MSE_train, 
+             pi_nonzero, y], open('lasso.p','wb'))
     
 #%%
     
