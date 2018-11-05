@@ -139,12 +139,16 @@ def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     Gsv = individual_config(individual, Clusters)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
+    '''
     fitness1 = mean_squared_error(pi_pred, pi_true) 
     fitness2 = norm(pi_pred-pi_true, ord = np.inf)
     fitness3 = connect_score(individual)
     fitness4 = (np.dot(pi_pred, J) + intercept)[0]
     # possible to put lower energy clusters as fitness
     return (fitness1,fitness2,fitness3,fitness4)
+    '''
+    fitness3 = connect_score(individual)
+    return fitness3
 
 
 

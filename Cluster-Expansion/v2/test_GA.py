@@ -63,12 +63,12 @@ Clusters = initialize_Clusters_object()
 nodes = 36
 n = 100 #Size of population
 ngen = 100 #Number of generations
-cxpb = 0.5 #The probability of mating two individuals
+cxpb = 1 #The probability of mating two individuals
 mutpb = 0.2 #The probability of mutating an individual
 k = n
-tournsize = 5
+tournsize = 3
 
-score_weights = (-1.0,-1.0,-1.0,-1) #tuple for min-1.0, max+1.0
+score_weights = (-1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
