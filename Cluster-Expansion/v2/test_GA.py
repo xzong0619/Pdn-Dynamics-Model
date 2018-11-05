@@ -63,8 +63,8 @@ Clusters = initialize_Clusters_object()
 nodes = 36
 n = 100 #Size of population
 ngen = 100 #Number of generations
-cxpb = 1.0 #The probability of mating two individuals
-mutpb = 0.3 #The probability of mutating an individual
+cxpb = 0.5 #The probability of mating two individuals
+mutpb = 0.2 #The probability of mutating an individual
 k = n
 tournsize = 5
 
