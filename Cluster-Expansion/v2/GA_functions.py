@@ -148,7 +148,7 @@ def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     return (fitness1,fitness2,fitness3,fitness4)
     '''
     fitness3 = connect_score(individual)
-    return fitness3
+    return fitness3,
 
 
 

@@ -68,7 +68,7 @@ mutpb = 0.2 #The probability of mutating an individual
 k = n
 tournsize = 3
 
-score_weights = (-1.0) #tuple for min-1.0, max+1.0
+score_weights = (-1.0,) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
