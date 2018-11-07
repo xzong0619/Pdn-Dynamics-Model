@@ -11,13 +11,13 @@ from ase.data import covalent_radii
 from ase import Atoms, Atom
 from ase.build import surface
 from structure_constants import mother
-
+#from test_connectivity_fitness import ind_list
 
 Pdr = covalent_radii[46]
 Or = covalent_radii[8]
 PdPd = Pdr*2
 PdO = Pdr + Or
-PdOcc = mother[best_ind_index]
+PdOcc = mother[ind_list]
 OO = 3.882
 
 def ceria():

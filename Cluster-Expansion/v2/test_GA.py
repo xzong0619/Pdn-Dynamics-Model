@@ -63,12 +63,12 @@ Clusters = initialize_Clusters_object()
 nodes = 36
 n = 100 #Size of population
 ngen = 100 #Number of generations
-cxpb = 1 #The probability of mating two individuals
-mutpb = 0.2 #The probability of mutating an individual
+cxpb = 0.8 #The probability of mating two individuals
+mutpb = 0.03 #The probability of mutating an individual
 k = n
-tournsize = 3
+tournsize = 10
 
-score_weights = (-1.0,) #tuple for min-1.0, max+1.0
+score_weights = (-1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
@@ -92,6 +92,7 @@ toolbox.register("evaluate", GA.evaluate, Clusters = Clusters, Gcv =  Gcv_nonzer
 
 population = GA.make_initial_population(COMM, toolbox, n)
 population = GA.evaluate_population(COMM, toolbox, population)
+history = []
 
 #%%
 ind1 = toolbox.individual()
@@ -111,11 +112,13 @@ for generation in range(ngen):
     population = GA.make_next_population(COMM, population, offspring)
     GA.calculate_statistics(COMM, generation, population)
     GA.find_best_individual(COMM, population)
-    #GA.save_population(COMM, population, 'population{}.txt'.format(generation))
+    history = GA.write_history(population, history)
     
-#%%
-    
-(best_ind, best_fitness, best_pi, best_config) = GA.final_best_individual(population, Clusters, Gcv_nonzero)
+#%%   
+ihof  = GA.hall_of_fame(COMM, history, 10)
+(best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof, Clusters, Gcv_nonzero)
 lf.drawing(best_config[0])
 best_G = GA.individual_config(best_ind, Clusters)
 GA.ase_object(best_ind)
+
+

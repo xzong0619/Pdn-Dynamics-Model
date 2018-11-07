@@ -139,16 +139,17 @@ def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     Gsv = individual_config(individual, Clusters)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
-    '''
-    fitness1 = mean_squared_error(pi_pred, pi_true) 
-    fitness2 = norm(pi_pred-pi_true, ord = np.inf)
-    fitness3 = connect_score(individual)
-    fitness4 = (np.dot(pi_pred, J) + intercept)[0]
+    
+    fitness1 = mean_squared_error(pi_pred, pi_true)/4
+    #fitness2 = norm(pi_pred-pi_true, ord = np.inf)
+    #fitness3 = connect_score(individual)
+    #fitness4 = (np.dot(pi_pred, J) + intercept)[0]/-30
     # possible to put lower energy clusters as fitness
-    return (fitness1,fitness2,fitness3,fitness4)
-    '''
+    #return (fitness1,fitness2,fitness3,fitness4)
+    
     fitness3 = connect_score(individual)
-    return fitness3,
+    fitness5 = sum(individual)/36
+    return fitness3, fitness1, fitness5 
 
 
 
@@ -259,31 +260,75 @@ def print_generation_number(COMM = None, generation = None):
     if rank == 0:
         print( '{}  Core {}  Generation {}'.format(get_time(), rank, generation))
 
-def find_best_individual(COMM = None, population = None):
+def find_best_individual(COMM = None, population = None, nbest = 1):
     rank = get_rank(COMM)
     if rank == 0:
         fitnesses = get_fitnesses(population)
-        i = np.where(fitnesses == min(fitnesses))[0][0]
+        fiv = []
+        for fi in range(fitnesses.shape[1]):
+            fiv.append(fitnesses[:,fi])
+           
+        ind = np.lexsort((fiv[-1], fiv[1],fiv[0]))
+        i = ind[0]
+        
         print( '\tIndividual with best fitness:')
         print( '\tFitness = {} '.format(population[i].fitness.values))
         #print( '\tCV RMSE = {} eV'.format(np.sqrt(population[i].fitness.values[0])))
+    return i 
 
-def get_fitnesses(population):
+
+def find_best_individuals(COMM = None, population = None, nbest = 1):
+    
+    rank = get_rank(COMM)
+    if rank == 0:
+        fitnesses = get_fitnesses(population)
+        fiv = []
+        for fi in range(fitnesses.shape[1]):
+            fiv.append(fitnesses[:,fi])
+           
+        ind = np.lexsort((fiv[-1], fiv[1],fiv[0]))
+        i = ind[0:nbest]
+        
+    return i
+        
+    
+    
+def get_fitnesses(population = None):
     '''
-    Add the sum of the fitness values
+    normalize the fitness values
     '''
-    fitness_tuple = abs(np.array([individual.fitness.values for individual in population]))
+    fitness_tuple = np.array([individual.fitness.values for individual in population])
+    
     fitness_max = np.max(fitness_tuple, axis = 0)
     normalized_fit = fitness_tuple/fitness_max
-    normalized_fit[:,-1] = 1-normalized_fit[:,-1]
+    #normalized_fit[:,-1] = 1-normalized_fit[:,-1]
     
-    return normalized_fit.sum(axis = 0)
+    return normalized_fit
+
+def write_history(population, history):
+    for pi in population:
+        history.append(pi)
+    
+    return history
+    
+def hall_of_fame(COMM = None, history = None, nbest = None):
+    
+    print( '\nHall of Fame top {}:'.format(nbest))
+    ihof = find_best_individuals(COMM, history, nbest)
+    hof = []
+    for ih in ihof:
+        hof.append(history[ih])
+    for i in range(nbest):
+        print( '\tIndividual {} with best fitness:  Fitness = {}'.format(i, hof[i].fitness.values))
+    
+    return hof 
 
 
-def final_best_individual(population, Clusters, Gcv):
+
+def winner_details(COMM = None, population = None, Clusters = None, Gcv = None):
     
-    fitnesses = get_fitnesses(population)
-    i = np.where(fitnesses == min(fitnesses))[0][0]
+    print( '\nWinner Details:')
+    i = find_best_individual(COMM, population)
     
     best_ind = population[i]
     best_fitness = best_ind.fitness.values
