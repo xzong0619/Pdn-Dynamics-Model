@@ -4,7 +4,7 @@ Created on Fri Aug 31 12:00:34 2018
 
 @author: wangyf
 """
-from DistCal import dem, labels
+ 
 from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA 
 from sklearn.preprocessing import StandardScaler 
@@ -13,34 +13,14 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
-
-import pandas as pd
+import pickle
 import numpy as np
 import matplotlib as mat
 
 mat.rc('font', size=12)
-
+[dem, Eads, labels] = pickle.load(open("pca_data.p", "rb"))
 X = dem
-y = np.array([-2.4,
-                -2.98,
-                -3.06,
-                -2.58,
-                -3.03,
-                -2.28,
-                -2.2,
-                -2.36,
-                -2.03,
-                -2.31,
-                -2.29,
-                -2.43,
-                -2.38,
-                -2.31,
-                -2.25,
-                -2.29,
-                -2.33,
-                -2.33,
-                -2.08,
-                -2])
+y = Eads
 
 #%% Plot the trend 
 
@@ -141,10 +121,11 @@ ax.set_ylabel("Normalized Descriptoor Loading")
 ax.set_xlabel("Principal Component #")    
 
 ax.legend(descriptors, bbox_to_anchor = (1.05, 1),loc= 'upper left', prop={'size':10},frameon=False)  
+'''
 leg = ax.get_legend()
 for c in range(n):
     leg.legendHandles[c].set_color(cm[c])
-
+'''
 plt.plot(linex, linex*0, c = 'k', lw = 0.8)
 plt.show()
 
@@ -152,7 +133,7 @@ plt.show()
  
 #%% Regression
 # Create linear regression object
-pc = 4
+pc = len(descriptors)
 Xreg = Xpc[:,:pc]
 def fit_linear_regression(X, y, degree):
     return Pipeline([("polynomial_features", PolynomialFeatures(degree=degree,
