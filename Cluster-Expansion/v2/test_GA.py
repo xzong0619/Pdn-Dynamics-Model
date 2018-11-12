@@ -28,7 +28,8 @@ from GA_functions import get_time
  intercept, MSE_test, MSE_train,
  pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
 
-newpoints = np.load('kriging_pts.npy')
+k_ind = 0
+newpoints = np.array([np.load('kriging_pts.npy')[k_ind]])
 import GA_functions as GA
 import lattice_functions as lf
 from structure_constants import mother, dz
@@ -121,4 +122,5 @@ lf.drawing(best_config[0])
 best_G = GA.individual_config(best_ind, Clusters)
 GA.ase_object(best_ind)
 
+pickle.dump((best_ind, best_fitness, best_pi, best_config),open('k_point0.p','wb'))
 

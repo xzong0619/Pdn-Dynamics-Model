@@ -36,7 +36,7 @@ Do kriging
 '''
 k = kriging(X, y)
 k.train(optimizer='ga')  
-newpoints = k.infill(1, method = 'ei')
+newpoints = k.infill(10, method = 'ei')
 
 #%%
 np.save('kriging_pts', newpoints)
