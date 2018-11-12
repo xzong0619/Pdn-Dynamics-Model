@@ -28,7 +28,7 @@ from GA_functions import get_time
  intercept, MSE_test, MSE_train,
  pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
 
-k_ind = 0
+k_ind = 5
 newpoints = np.array([np.load('kriging_pts.npy')[k_ind]])
 import GA_functions as GA
 import lattice_functions as lf
@@ -62,14 +62,14 @@ Clusters = initialize_Clusters_object()
 #%%
 #Genetic Hyperparameters
 nodes = 36
-n = 100 #Size of population
-ngen = 100 #Number of generations
+n = 50 #Size of population
+ngen = 20 #Number of generations
 cxpb = 0.8 #The probability of mating two individuals
 mutpb = 0.03 #The probability of mutating an individual
 k = n
 tournsize = 10
 
-score_weights = (-1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
+score_weights = (-1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 

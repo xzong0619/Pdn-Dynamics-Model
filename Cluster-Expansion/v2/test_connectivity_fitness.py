@@ -13,7 +13,7 @@ import lattice_functions as lf
 from structure_constants import mother, dz
 
 
-NN1_edges = [(0, 1), (0, 2), (0, 6), (0, 10), (0, 11), (0, 14), (0, 20), (0, 21), 
+NN1_edges1 = [(0, 1), (0, 2), (0, 6), (0, 10), (0, 11), (0, 14), (0, 20), (0, 21), 
              (0, 23), (0, 27), (0, 28), (0, 29), (1, 2), (1, 3), (1, 6), (1, 7), 
              (1, 21), (1, 24), (1, 29), (2, 3), (2, 4), (2, 5), (2, 14), (2, 18), 
              (2, 19), (2, 21), (2, 27), (3, 5), (3, 19), (4, 5), (4, 13), (4, 14), 
@@ -33,8 +33,19 @@ NN1_edges = [(0, 1), (0, 2), (0, 6), (0, 10), (0, 11), (0, 14), (0, 20), (0, 21)
              (29, 34), (30, 31), (30, 32), (30, 34), (30, 35), (31, 32), (31, 33), 
              (31, 34), (31, 35), (32, 33), (32, 34), (32, 35), (34, 35)]
 
+def inverse_ab(ab):
+    a = ab[0]
+    b = ab[1]
+    return (b,a)
 
+NN1_edges2 = []
+for edge in NN1_edges1:
+    NN1_edges2.append(inverse_ab(edge))
     
+NN1_edges = NN1_edges1 + NN1_edges2
+      
+
+#%%  
 def get_possible_edges(nodes):
     
     edges = []
@@ -54,15 +65,35 @@ def get_edge_score(edges):
     return ratio
 
 
+
 def connect_score(occ_nodes):
     
     occ_edges = get_possible_edges(occ_nodes)
     score = get_edge_score(occ_edges)
     
+    return 1-score
+
+def connect_score_2(occ_nodes):
+    
+    count = 0
+    for i, nodei in enumerate(occ_nodes):
+        nNN1 = 0 
+        edges = []
+        for j,nodej in enumerate(occ_nodes):
+            if not nodei == nodej: edges.append((nodei, nodej))
+        for edge in edges:
+            if edge in NN1_edges: nNN1 = nNN1+1  
+        #print(nNN1)
+            
+        if nNN1 >= 3: count = count +1 
+
+    #print(count)
+    score = 1 - count/len(occ_nodes)
+    
     return score
 
-'''
-occ_nodes = [10,1,2,21]
+occ_nodes = [0,1,2,21]
 occ_edges = get_possible_edges(occ_nodes)
 score = get_edge_score(occ_edges)
-'''
+
+score2 = connect_score_2(occ_nodes)

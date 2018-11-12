@@ -17,7 +17,7 @@ from datetime import datetime
 from sklearn.metrics import mean_squared_error
 import lattice_functions as lf
 from numpy.linalg import norm
-from test_connectivity_fitness import connect_score
+from test_connectivity_fitness import connect_score_2
 from ase.io import read, write
 from ase.visualize import view
 from ase.data import covalent_radii
@@ -137,19 +137,21 @@ def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
+    occ_nodes = list(np.nonzero(individual)[0])
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
+    
     
     fitness1 = mean_squared_error(pi_pred, pi_true)/4
     #fitness2 = norm(pi_pred-pi_true, ord = np.inf)
     #fitness3 = connect_score(individual)
-    #fitness4 = (np.dot(pi_pred, J) + intercept)[0]/-30
+    fitness4 = (np.dot(pi_pred, J) + intercept)[0]/30
     # possible to put lower energy clusters as fitness
     #return (fitness1,fitness2,fitness3,fitness4)
     
-    fitness3 = connect_score(individual)
+    fitness3 = connect_score_2(occ_nodes)
     fitness5 = sum(individual)/36
-    return fitness3, fitness1, fitness5 
+    return fitness3, fitness1, fitness4, fitness5
 
 
 
