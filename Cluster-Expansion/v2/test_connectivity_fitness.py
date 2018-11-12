@@ -91,9 +91,10 @@ def connect_score_2(occ_nodes):
     score = 1 - count/len(occ_nodes)
     
     return score
-
+'''
 occ_nodes = [0,1,2,21]
 occ_edges = get_possible_edges(occ_nodes)
 score = get_edge_score(occ_edges)
 
 score2 = connect_score_2(occ_nodes)
+'''
