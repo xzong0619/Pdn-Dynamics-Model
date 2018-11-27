@@ -108,6 +108,7 @@ class PdCO():
         
         Pd_C, Pdi = sort_i_and_d(Pd_C, Pdi) #sorted Pd-C bond length
         
+        #The distance of Pd to the first nearest C
         PdC3 = np.zeros(3)
         
         if len(Pd_C) >= 3: PdC3 = Pd_C[:3] 
@@ -174,12 +175,12 @@ class PdCO():
         Make a column in data frame
         '''
         
-        self.descriptors =  [ self.NN1_wavg, self.NN2_wavg, self.Dsupport, self.charge, sum(PdC3)]
+        self.descriptors =  [ self.NN1_wavg, self.NN2_wavg, self.Dsupport, self.charge, self.PdC1, self.PdC2, self.PdC3]
         # take out the number of sites and NPd
 
 #%% Analyse the structures
 Ntot = len(structures)
-labels = ['CN1', 'CN2', 'Z', 'charge', 'PdC']
+labels = ['CN1', 'CN2', 'Z', 'charge', 'PdC1', 'PdC2', 'PdC3']
 dem = np.zeros((Ntot, len(labels)))
 Eads = np.zeros(Ntot)
         
