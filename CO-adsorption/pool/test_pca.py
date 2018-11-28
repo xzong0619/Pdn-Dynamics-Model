@@ -158,11 +158,11 @@ def error_distribution(yobj, ypred, method  = 'PCA'):
     return the standard deviation of the error distribution
     '''
     fig, ax = plt.subplots(figsize=(6,4))
-    ax.hist(yobj - ypred,density=1)
+    ax.hist(yobj - ypred,density=1, alpha=0.5, color='steelblue')
     mu = 0
     sigma = np.std(yobj - ypred)
     x_resid = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
-    ax.plot(x_resid,norm.pdf(x_resid, mu, sigma))
+    ax.plot(x_resid,norm.pdf(x_resid, mu, sigma), color='r')
     plt.title(r'Method-{}, $\sigma$-{:.2}'.format(method, sigma))
     
     return sigma

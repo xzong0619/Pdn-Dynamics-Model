@@ -72,16 +72,16 @@ class PdCO():
         self.sitetype  = []
         self.descriptors = []
         
-    def get_descriptors(self, structure, data, CI_PdC = 0.5):
+    def get_descriptors(self, structure, data, CI_PdC = 0.2):
         '''
         Takes in a structure dictionary with an atoms object and filename 
         Input tolerance for Pd-C bond 0.3 A for detecting CO ads site
         '''
-        atoms = structure['atoms']
-        filename =structure['filename']
+        self.atoms = structure['atoms']
+        self.filename =structure['filename']
         
-        self.Eads = float(data[data['Filename'] == filename]['Eads'])
-        self.charge = float(data[data['Filename'] == filename]['Charge'])
+        self.Eads = float(data[data['Filename'] == self.filename]['Eads'])
+        self.charge = float(data[data['Filename'] == self.filename]['Charge'])
         
         '''
         Count number of atoms
@@ -91,20 +91,20 @@ class PdCO():
         Cei = []
         Ci = []
         
-        for i, atom in enumerate(atoms):
+        for i, atom in enumerate(self.atoms):
             if atom.symbol == 'Pd': Pdi.append(i)
             if atom.symbol == 'Ce': Cei.append(i)
             if atom.symbol == 'C':  Ci.append(i)
         
         #No of Pd atoms in the cluster
-        self.NPd = len(Pdi)   
+        self.NPd = int(len(Pdi))   
         
         '''
         Get the bond length of C-Ce, Pd-C, Pd-Pd
         and NN table for each Pd
         '''
 
-        Pd_C = atoms.get_distances(Ci[0], Pdi, mic = True) #all Pd-C bond length 
+        Pd_C = self.atoms.get_distances(Ci[0], Pdi, mic = True) #all Pd-C bond length 
         
         Pd_C, Pdi = sort_i_and_d(Pd_C, Pdi) #sorted Pd-C bond length
         
@@ -119,13 +119,13 @@ class PdCO():
         self.PdC3 = PdC3[2]
         
         
-        C_Ce = atoms.get_distances(Ci[0], Cei, mic = True)#all Ce-C bond length
+        C_Ce = self.atoms.get_distances(Ci[0], Cei, mic = True)#all Ce-C bond length
         C_Ce, Cei = sort_i_and_d(C_Ce, Cei) #sorted Ce-C bond length
         
         Pd_Pd = pd.DataFrame() #Pd to Pd bond length table 
         PdNN = pd.DataFrame() #Pd NN table         
         for i in Pdi:
-           PdD =  atoms.get_distances(i, Pdi)
+           PdD =  self.atoms.get_distances(i, Pdi)
            PdD, Pdisort = sort_i_and_d(PdD,Pdi)
            Pd_Pd['Pd'+str(i)] =  PdD
            Pd_Pd['i'+str(i)] = Pdisort
@@ -135,10 +135,10 @@ class PdCO():
         
         #take the  distance of CO to Ce plane (determined by 3 Ce points)
         # as the distance to support
-        Ce_plane = Plane(Point3D(atoms[Cei[0]].position), 
-                         Point3D(atoms[Cei[1]].position), 
-                         Point3D(atoms[Cei[2]].position))
-        self.Dsupport = Ce_plane.distance(Point3D(atoms[Ci[0]].position))
+        Ce_plane = Plane(Point3D(self.atoms[Cei[0]].position), 
+                         Point3D(self.atoms[Cei[1]].position), 
+                         Point3D(self.atoms[Cei[2]].position))
+        self.Dsupport = float(Ce_plane.distance(Point3D(self.atoms[Ci[0]].position)))
         #self.Dsupport = C_Ce[0] 
         
         '''
@@ -151,9 +151,9 @@ class PdCO():
         COsites = np.array(Pdi)[np.logical_and(Pd_C>=PdC_range[0], Pd_C<=PdC_range[1])]
         self.Nsites = len(COsites)
         
-        if self.Nsites== 3: self.sitetype = 'h'
-        if self.Nsites == 2: self.sitetype = 'b'
-        if self.Nsites == 1: self.sitetype = 't'
+        if self.Nsites== 3: self.sitetype = 'hollow'
+        if self.Nsites == 2: self.sitetype = 'bridge'
+        if self.Nsites == 1: self.sitetype = 'top'
         
         
         COsites_cols = []
@@ -180,9 +180,13 @@ class PdCO():
 
 #%% Analyse the structures
 Ntot = len(structures)
-labels = ['CN1', 'CN2', 'Z', 'charge', 'PdC1', 'PdC2', 'PdC3']
+labels = ['CN1', 'CN2', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
 dem = np.zeros((Ntot, len(labels)))
 Eads = np.zeros(Ntot)
+Nsites = np.zeros(Ntot)
+NPd = np.zeros(Ntot)
+filename_list = []
+sitetype_list =  []
         
 for i,struct in enumerate(structures):
 
@@ -190,10 +194,18 @@ for i,struct in enumerate(structures):
     PdCO_ob.get_descriptors(struct, data)
     dv = PdCO_ob.descriptors
     dem[i,:] = np.array(dv)
+    
+    filename_list.append(PdCO_ob.filename)
     Eads[i] = PdCO_ob.Eads
+    
+    NPd[i] = PdCO_ob.NPd
+    Nsites[i] = PdCO_ob.Nsites
+    sitetype_list.append(PdCO_ob.sitetype)
 
 pickle.dump([dem, Eads, labels], open('pca_data.p','wb'))
 
-
-        
-        
+#%% Put descirptors and corresponding values in a dataframe
+fdata = pd.DataFrame(list(zip(filename_list, Eads, NPd,Nsites, sitetype_list)),
+              columns=['Filename','Eads', 'NPd', 'Nsites', 'SiteType'])
+fdata[labels] = pd.DataFrame(dem)
+fdata.to_csv('descriptor_data.csv')
