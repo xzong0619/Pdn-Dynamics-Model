@@ -14,6 +14,7 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
+from scipy.stats import norm
 import pickle
 import numpy as np
 import matplotlib as mat
@@ -41,24 +42,24 @@ with plt.style.context('seaborn-whitegrid'):
 #%% PCA 
 # Normalize the data
 X_std = StandardScaler().fit_transform(X)
-# Covriance matrix 
+# Covriance matrix of original data
 cov_mat = np.cov(X_std.T) 
-
-# Plot Covariance structure 
-plt.figure()
-ax1 = plt.subplot(121)
-ax1.set_title('X')
-ax1.imshow(cov_mat)
 
 # PCA use sklearn
 pca = PCA()    
 Xpc = pca.fit_transform(X_std) 
 # Covriance matrix from PCA
 cov_pc = np.cov(Xpc.T) 
+
+
 # Plot Covariance structure 
-ax2 = plt.subplot(122)
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10,6))
+ax1.set_title('X')
+im1 = ax1.imshow(cov_mat)
+fig.colorbar(im1, ax = ax1, shrink = 0.5)
 ax2.set_title('X_PCA')
-ax2.imshow(cov_pc)
+im2 = ax2.imshow(cov_pc)
+fig.colorbar(im2, ax = ax2, shrink = 0.5)
 
 #eig_vals, eig_vecs = np.linalg.eig(cov_mat)
 eig_vals = pca.explained_variance_ #eigenvalues 
@@ -133,14 +134,55 @@ plt.plot(linex, linex*0, c = 'k', lw = 0.8)
 plt.show()
 
 #%% Regression
-# Create linear regression object
-pc_reg = 7 #len(descriptors)
-Xreg = Xpc[:,:pc_reg]
+def parity_plot(yobj,ypred, method = 'PCA'):
+    '''
+    Plot the parity plot of y vs ypred
+    return R2 score and MSE for the model
+    '''
+    MSE = mean_squared_error(yobj, ypred)
+    score = r2_score(yobj, ypred)
+    fig, ax = plt.subplots()
+    ax.scatter(yobj, ypred, facecolor = 'r', s  = 60, edgecolors=(0, 0, 0))
+    ax.plot([yobj.min(), yobj.max()], [yobj.min(), yobj.max()], 'k--', lw=2)
+    ax.set_xlabel('Objective')
+    ax.set_ylabel('Predicted')
+    plt.title(r'Method-{}, MSE-{:.2}, $r^2$ -{:.2}'.format(method, MSE, score))
+    plt.show()
+    
+    return MSE, score
+
+def error_distribution(yobj, ypred, method  = 'PCA'):
+    
+    '''
+    Plot the error distribution
+    return the standard deviation of the error distribution
+    '''
+    fig, ax = plt.subplots(figsize=(6,4))
+    ax.hist(yobj - ypred,density=1)
+    mu = 0
+    sigma = np.std(yobj - ypred)
+    x_resid = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
+    ax.plot(x_resid,norm.pdf(x_resid, mu, sigma))
+    plt.title(r'Method-{}, $\sigma$-{:.2}'.format(method, sigma))
+    
+    return sigma
+
 def fit_linear_regression(X, y, degree):
+    '''
+    # Create linear regression object
+    '''
     return Pipeline([("polynomial_features", PolynomialFeatures(degree=degree,
                                                                 include_bias=False)),
                      ("linear_regression", linear_model.LinearRegression())]
-                    ).fit(X, y) 
+                    ).fit(X, y)  
+    
+#def detect_outlier(yobj, ypred):
+    
+    
+    
+
+pc_reg = 7 #len(descriptors)
+Xreg = Xpc[:,:pc_reg]
         
 degree = 2
 
@@ -163,22 +205,18 @@ degree = 2
 #mse_cv = mean_squared_error(y, y_cv)
 
 estimator  = fit_linear_regression(Xreg, y, degree)
-regr_poly = estimator.named_steps['linear_regression']
-coefs = regr_poly.coef_
+regr_pca = estimator.named_steps['linear_regression']
+coefs = regr_pca.coef_
 poly = estimator.named_steps['polynomial_features']
 terms = poly.get_feature_names(['x1','x2','x3','x4','x5','x6','x7'])
 
-y_poly = estimator.predict(Xreg)
-score_poly = r2_score(y, y_poly)
-mse_poly = mean_squared_error(y, y_poly)
+y_pca = estimator.predict(Xreg)
+mse_pca, score_pca = parity_plot(y, y_pca)
+sigma_pca = error_distribution(y, y_pca)
 
-fig, ax = plt.subplots()
-ax.scatter(y, y_poly, facecolor = 'r', s  = 60, edgecolors=(0, 0, 0))
-ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=2)
-ax.set_xlabel('Measured')
-ax.set_ylabel('Predicted')
-plt.show()
-
+'''
+Plot the magnitude of each parameters
+'''
 xi = np.arange(len(coefs))
 fig, ax = plt.subplots()
 plt.bar(xi, coefs)
@@ -189,6 +227,16 @@ plt.ylabel("Regression Coefficient Value (eV)")
 plt.xlabel("Regression Coefficient")  
 plt.show()
 
+#%%detect the outlier
+threshold = 0.2
+diff = abs(y-y_pca)
+outlier_index = np.where(diff>threshold)[0]
+outlier_file = []
+outlier_stype = []
+for i in outlier_index: 
+    outlier_file.append(filename_list[i])
+    outlier_stype.append(sitetype_list[i])
+
 #%%PLS regression
 from sklearn.cross_decomposition import PLSRegression
 
@@ -196,15 +244,8 @@ N = 7
 PLS = PLSRegression(n_components = N, tol=1e-8) #<- N_components tells the model how many sub-components to select
 PLS.fit(X,y) #<- we have to pass y into the fit function now
 yhat_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
-
-fig, ax = plt.subplots()
-
 # make a parity plot
-ax.scatter(y,yhat_PLS)
-ax.plot(y,y,ls='--',color='k')
+mse_PLS, score_PLS = parity_plot(y, yhat_PLS, 'PLS')
+sigma_PLS = error_distribution(y, yhat_PLS, 'PLS')
 
-# print R^2
-print(PLS.score(X,y))
 
-# print MAE
-print(np.mean(np.abs(y-yhat_PLS)))
