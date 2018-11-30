@@ -20,7 +20,7 @@ import numpy as np
 import matplotlib as mat
 
 mat.rc('font', size=12)
-[dem, Eads, labels] = pickle.load(open("pca_data.p", "rb"))
+[dem, Eads, descriptors] = pickle.load(open("pca_data.p", "rb"))
 X = dem
 y = Eads
 
@@ -33,7 +33,7 @@ with plt.style.context('seaborn-whitegrid'):
     for cnt in range(nPC):
         plt.figure(figsize=(6, 4))
         plt.scatter(X[:,cnt],y)
-        plt.xlabel(labels[cnt])
+        plt.xlabel(descriptors[cnt])
         plt.ylabel('CO Adsorption Energy (eV)')
     plt.legend(loc='upper right', fancybox=True, fontsize=8)
     plt.tight_layout()
@@ -91,14 +91,13 @@ with plt.style.context('seaborn-whitegrid'):
 Need to be completed
 '''
 # select the number of PCs to plot in the bar graph
-pc = 5
+pc = len(descriptors)
 ind = 0
 yvals = []
 ylabels = []
 bar_vals = []
 space = 0.3
 
-descriptors = labels
 cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey'][:len(descriptors)]
 fig = plt.figure(figsize=(10,6))
 
@@ -208,7 +207,9 @@ estimator  = fit_linear_regression(Xreg, y, degree)
 regr_pca = estimator.named_steps['linear_regression']
 coefs = regr_pca.coef_
 poly = estimator.named_steps['polynomial_features']
-terms = poly.get_feature_names(['x1','x2','x3','x4','x5','x6','x7'])
+feature_names = []
+for i in range(pc_reg): feature_names.append('x'+ str(i+1))
+terms = poly.get_feature_names(feature_names)
 
 y_pca = estimator.predict(Xreg)
 mse_pca, score_pca = parity_plot(y, y_pca)

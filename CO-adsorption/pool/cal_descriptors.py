@@ -82,6 +82,7 @@ class PdCO():
         
         self.Eads = float(data[data['Filename'] == self.filename]['Eads'])
         self.charge = float(data[data['Filename'] == self.filename]['Charge'])
+        self.realsite = data[data['Filename'] == self.filename]['RealSite'].values[0]
         
         '''
         Count number of atoms
@@ -110,9 +111,31 @@ class PdCO():
         
         #The distance of Pd to the first nearest C
         PdC3 = np.zeros(3)
+        #The bond tolerance is 
+        bond_tol = 0.7
+        if len(Pd_C) == 1: 
+            
+            PdC3[0] = Pd_C[0]
+            COsites = np.array(Pdi)[:1] #top
         
-        if len(Pd_C) >= 3: PdC3 = Pd_C[:3] 
-        else: PdC3[:len(Pd_C)] = Pd_C[:len(Pd_C)]
+        if len(Pd_C) == 2:    
+            
+            PdC3[:2] = Pd_C[:2]
+            diff = Pd_C[1] - Pd_C[0]
+            
+            if diff < bond_tol: COsites = np.array(Pdi)[:2] #bridge
+            else: COsites = np.array(Pdi)[:1] #top
+            
+        if len(Pd_C) >= 3: 
+            
+            PdC3 = Pd_C[:3] 
+            diff1 = Pd_C[1] - Pd_C[0]
+            diff2 = Pd_C[2] - Pd_C[1]
+            
+            if diff1 > bond_tol: COsites = np.array(Pdi)[:1] #top
+            else:
+                if diff2 > bond_tol: COsites = np.array(Pdi)[:2] #bridge
+                else: COsites = np.array(Pdi)[:3] #hollow
         
         self.PdC1 = PdC3[0]
         self.PdC2 = PdC3[1]
@@ -145,10 +168,10 @@ class PdCO():
         Detect CO adsorption sites
         '''
           
-        PdC_range = (PdC - CI_PdC, PdC + CI_PdC)   
+        #PdC_range = (PdC - CI_PdC, PdC + CI_PdC)   
               
         #Atom index of CO adsorption sites
-        COsites = np.array(Pdi)[np.logical_and(Pd_C>=PdC_range[0], Pd_C<=PdC_range[1])]
+        #COsites = np.array(Pdi)[np.logical_and(Pd_C>=PdC_range[0], Pd_C<=PdC_range[1])]
         self.Nsites = len(COsites)
         
         if self.Nsites== 3: self.sitetype = 'hollow'
@@ -172,40 +195,45 @@ class PdCO():
         self.NN2_wavg = np.dot(weights, PdNN_CO.loc['NN2'].values)
         
         '''
-        Make a column in data frame
+        Make a row in dataframe as an ID for each structure including filenames and properties etc
         '''
+        self.structureID =  [self.filename, #filename
+                             self.atoms, # atoms object
+                             self.Eads, #Eads
+                             self.NPd, #Npd
+                             self.realsite, #real sitetype
+                             self.sitetype, #sitetype from calculation
+                             self.NN1_wavg, #CN1
+                             self.NN2_wavg, #CN2
+                             self.Dsupport, #Z
+                             self.charge, #Bader charge
+                             self.Nsites, #number of sites
+                             self.PdC1, 
+                             self.PdC2, 
+                             self.PdC3]
+                            
         
-        self.descriptors =  [ self.NN1_wavg, self.NN2_wavg, self.Dsupport, self.charge, self.PdC1, self.PdC2, self.PdC3]
-        # take out the number of sites and NPd
 
 #%% Analyse the structures
 Ntot = len(structures)
-labels = ['CN1', 'CN2', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
-dem = np.zeros((Ntot, len(labels)))
-Eads = np.zeros(Ntot)
-Nsites = np.zeros(Ntot)
-NPd = np.zeros(Ntot)
-filename_list = []
-sitetype_list =  []
-        
-for i,struct in enumerate(structures):
 
+labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
+          'CN1', 'CN2', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+descriptors =  ['NPd', 'CN1', 'CN2', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+fdata = pd.DataFrame(columns = labels)
+
+
+for i,struct in enumerate(structures):
+    
     PdCO_ob = PdCO()
     PdCO_ob.get_descriptors(struct, data)
-    dv = PdCO_ob.descriptors
-    dem[i,:] = np.array(dv)
-    
-    filename_list.append(PdCO_ob.filename)
-    Eads[i] = PdCO_ob.Eads
-    
-    NPd[i] = PdCO_ob.NPd
-    Nsites[i] = PdCO_ob.Nsites
-    sitetype_list.append(PdCO_ob.sitetype)
-
-pickle.dump([dem, Eads, labels], open('pca_data.p','wb'))
-
-#%% Put descirptors and corresponding values in a dataframe
-fdata = pd.DataFrame(list(zip(filename_list, Eads, NPd,Nsites, sitetype_list)),
-              columns=['Filename','Eads', 'NPd', 'Nsites', 'SiteType'])
-fdata[labels] = pd.DataFrame(dem)
+    fdata.loc[i,:] = PdCO_ob.structureID
 fdata.to_csv('descriptor_data.csv')
+
+dem =  np.array(fdata.loc[:,descriptors], dtype = float)
+Eads = np.array(fdata.loc[:,'Eads'], dtype = float)
+filename_list = list(fdata.loc[:,'Filename'])
+sitetype_list = list(fdata.loc[:,'SiteType'])
+
+pickle.dump([dem, Eads, descriptors], open('pca_data.p','wb'))
+
