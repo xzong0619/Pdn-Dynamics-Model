@@ -146,16 +146,23 @@ class PdCO():
         C_Ce, Cei = sort_i_and_d(C_Ce, Cei) #sorted Ce-C bond length
         
         Pd_Pd = pd.DataFrame() #Pd to Pd bond length table 
-        PdNN = pd.DataFrame() #Pd NN table         
+        PdNN = pd.DataFrame() #Pd NN table      
+        Pd1NN= dict() #Pd NN table 
+        
+        
         for i in Pdi:
            PdD =  self.atoms.get_distances(i, Pdi)
            PdD, Pdisort = sort_i_and_d(PdD,Pdi)
+           
            Pd_Pd['Pd'+str(i)] =  PdD
            Pd_Pd['i'+str(i)] = Pdisort
            PdNN['Pd'+str(i)] = [sum(np.logical_and(PdD>=NN1[0], PdD<=NN1[1])),
                 sum(np.logical_and(PdD>=NN2[0], PdD<=NN2[1]))]
+           Pd1NN['Pd'+str(i)] = np.array(Pdisort)[np.where(np.logical_and(PdD>=NN1[0],PdD<=NN1[1]))[0]]
+           
         PdNN.index = ['NN1','NN2']   
         
+
         #take the  distance of CO to Ce plane (determined by 3 Ce points)
         # as the distance to support
         Ce_plane = Plane(Point3D(self.atoms[Cei[0]].position), 
@@ -178,7 +185,6 @@ class PdCO():
         if self.Nsites == 2: self.sitetype = 'bridge'
         if self.Nsites == 1: self.sitetype = 'top'
         
-        
         COsites_cols = []
         for s in range(len(COsites)):
             COsites_cols.append('Pd'+str(COsites[s]))
@@ -189,10 +195,22 @@ class PdCO():
         '''
         Weighted average for NN1, NN2
         '''
-        
         weights = np.array(Pd_C_CO)/np.sum(Pd_C_CO) #weights based on CO-Pd distance
-        self.NN1_wavg = np.dot(weights, PdNN_CO.loc['NN1'].values)
-        self.NN2_wavg = np.dot(weights, PdNN_CO.loc['NN2'].values)
+        self.CN1 = np.dot(weights, PdNN_CO.loc['NN1'].values)
+        self.CN2 = np.dot(weights, PdNN_CO.loc['NN2'].values)
+        
+        '''
+        GCN calculation
+        '''
+        cn_max = [12, 18, 22]
+        gcn_sum = 0
+        for i in COsites:
+            #Pd1NN['Pd'+str(i)] is a list of cn number for 1NN
+            for j in Pd1NN['Pd'+str(i)]:
+                gcn_sum  = gcn_sum + PdNN.loc['NN1']['Pd'+str(j)]
+        
+        self.GCN = gcn_sum/cn_max[self.Nsites -1]
+        
         
         '''
         Make a row in dataframe as an ID for each structure including filenames and properties etc
@@ -203,23 +221,32 @@ class PdCO():
                              self.NPd, #Npd
                              self.realsite, #real sitetype
                              self.sitetype, #sitetype from calculation
-                             self.NN1_wavg, #CN1
-                             self.NN2_wavg, #CN2
+                             self.CN1, #CN1
+                             self.CN2, #CN2
+                             self.GCN, # general cooridination number
                              self.Dsupport, #Z
                              self.charge, #Bader charge
                              self.Nsites, #number of sites
                              self.PdC1, #1st Pd-C distance 
                              self.PdC2, #2nd Pd-C distance
                              self.PdC3] #3rd Pd-C distance
-                            
-        
+        self.PdNN = PdNN
+        self.Pd_Pd = Pd_Pd
+        self.PdNN_CO = PdNN_CO
+        self.PdD = PdD
+        self.Pdisort = Pdisort
+        self.Pd1NN = Pd1NN
 
 #%% Analyse the structures
 Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
-          'CN1', 'CN2', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
-descriptors =  ['CN1', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+#possible descriptors
+#descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3'] #9 in total
+#descriptors = ['NPd', 'CN1', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3'] 
+#descriptors =  ['CN1', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
+descriptors =  ['GCN', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
 fdata = pd.DataFrame(columns = labels)
 
 
@@ -235,5 +262,12 @@ Eads = np.array(fdata.loc[:,'Eads'], dtype = float)
 filename_list = list(fdata.loc[:,'Filename'])
 sitetype_list = list(fdata.loc[:,'SiteType'])
 
-pickle.dump([dem, Eads, descriptors], open('pca_data.p','wb'))
+pickle.dump([dem, Eads, descriptors, filename_list, sitetype_list], open('pca_data.p','wb'))
 
+
+#%%
+PdNN = PdCO_ob.PdNN
+Pd_Pd = PdCO_ob.Pd_Pd
+PdNN_CO = PdCO_ob.PdNN_CO
+Pdisort = PdCO_ob.Pdisort
+Pd1NN = PdCO_ob.Pd1NN

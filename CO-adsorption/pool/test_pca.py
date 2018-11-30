@@ -20,24 +20,61 @@ import numpy as np
 import matplotlib as mat
 
 mat.rc('font', size=12)
-[dem, Eads, descriptors] = pickle.load(open("pca_data.p", "rb"))
+[dem, Eads, descriptors, filename_list, sitetype_list] = pickle.load(open("pca_data.p", "rb"))
 X = dem
 y = Eads
 
-#%% Plot the trend for each discriptor
+#%% PCA parameters
 
 nPC = X.shape[1]
+# select the number of PCs to plot in the bar graph
+pc = len(descriptors)
+# select the number of PCs to plot in regression
+pc_reg = min(7, pc) 
 
-with plt.style.context('seaborn-whitegrid'):
-    
-    for cnt in range(nPC):
-        plt.figure(figsize=(6, 4))
-        plt.scatter(X[:,cnt],y)
-        plt.xlabel(descriptors[cnt])
-        plt.ylabel('CO Adsorption Energy (eV)')
-    plt.legend(loc='upper right', fancybox=True, fontsize=8)
-    plt.tight_layout()
-    plt.show()
+
+#%% Plot the trend for each discriptor
+def plot_discriptors():
+    '''
+    Plot the trend for each discriptor
+    '''
+    with plt.style.context('seaborn-whitegrid'):
+        
+        for cnt in range(nPC):
+            plt.figure(figsize=(6, 4))
+            plt.scatter(X[:,cnt],y)
+            plt.xlabel(descriptors[cnt])
+            plt.ylabel('CO Adsorption Energy (eV)')
+        plt.legend(loc='upper right', fancybox=True, fontsize=8)
+        plt.tight_layout()
+        plt.show()
+
+
+def plot_discriptors_st():    
+    '''
+    Plot the trend for each discriptor with site type color coded
+    '''
+    with plt.style.context('seaborn-whitegrid'):
+        for cnt in range(nPC):
+            plt.figure(figsize=(6, 4))
+            for site, col in zip(('top', 'bridge', 'hollow'),
+                        ('red', 'green', 'blue')):
+                indices = np.where(np.array(sitetype_list) == site)[0]
+                plt.scatter(X[:,cnt][indices],
+                            y[indices],
+                            label=site,
+                            facecolor = col, 
+                            alpha = 0.5,
+                            s  = 60)
+                
+                plt.xlabel(descriptors[cnt])
+                plt.ylabel('CO Adsorption Energy (eV)')
+                
+            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+            plt.tight_layout()
+            plt.show()    
+
+plot_discriptors_st()
 
 #%% PCA 
 # Normalize the data
@@ -90,15 +127,13 @@ with plt.style.context('seaborn-whitegrid'):
 '''
 Need to be completed
 '''
-# select the number of PCs to plot in the bar graph
-pc = len(descriptors)
 ind = 0
 yvals = []
 ylabels = []
 bar_vals = []
 space = 0.3
 
-cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey'][:len(descriptors)]
+cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey', 'green', 'brown'][:len(descriptors)]
 fig = plt.figure(figsize=(10,6))
 
 
@@ -127,7 +162,7 @@ patches = []
 for c in range(n):
     patches.append(mpatches.Patch(color=cm[c]))
 plt.legend(patches, descriptors,
-           bbox_to_anchor = (1.02, 1),loc= 'upper left', prop={'size':10},frameon=False)
+           bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
 
 plt.plot(linex, linex*0, c = 'k', lw = 0.8)
 plt.show()
@@ -146,6 +181,33 @@ def parity_plot(yobj,ypred, method = 'PCA'):
     ax.set_xlabel('Objective')
     ax.set_ylabel('Predicted')
     plt.title(r'Method-{}, MSE-{:.2}, $r^2$ -{:.2}'.format(method, MSE, score))
+    plt.show()
+    
+    return MSE, score
+
+def parity_plot_st(yobj,ypred, method = 'PCA'):
+    '''
+    Plot the parity plot of y vs ypred
+    return R2 score and MSE for the model
+    colorcode different site types
+    '''
+    MSE = mean_squared_error(yobj, ypred)
+    score = r2_score(yobj, ypred)
+    fig, ax = plt.subplots()
+    for site, col in zip(('top', 'bridge', 'hollow'),
+                    ('red', 'green', 'blue')):
+            indices = np.where(np.array(sitetype_list) == site)[0]
+            ax.scatter(yobj[indices],
+                        ypred[indices],
+                        label=site,
+                        facecolor = col, 
+                        alpha = 0.5,
+                        s  = 60)
+    ax.plot([yobj.min(), yobj.max()], [yobj.min(), yobj.max()], 'k--', lw=2)
+    ax.set_xlabel('Objective')
+    ax.set_ylabel('Predicted')
+    plt.title(r'Method-{}, MSE-{:.2}, $r^2$ -{:.2}'.format(method, MSE, score))
+    plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
     plt.show()
     
     return MSE, score
@@ -174,15 +236,9 @@ def fit_linear_regression(X, y, degree):
                                                                 include_bias=False)),
                      ("linear_regression", linear_model.LinearRegression())]
                     ).fit(X, y)  
-    
-#def detect_outlier(yobj, ypred):
-    
-    
-    
+   
 
-pc_reg = 7 #len(descriptors)
 Xreg = Xpc[:,:pc_reg]
-        
 degree = 2
 
 #regr = linear_model.LinearRegression()
@@ -212,7 +268,7 @@ for i in range(pc_reg): feature_names.append('x'+ str(i+1))
 terms = poly.get_feature_names(feature_names)
 
 y_pca = estimator.predict(Xreg)
-mse_pca, score_pca = parity_plot(y, y_pca)
+mse_pca, score_pca = parity_plot_st(y, y_pca)
 sigma_pca = error_distribution(y, y_pca)
 
 '''
@@ -223,7 +279,7 @@ fig, ax = plt.subplots()
 plt.bar(xi, coefs)
 linex = np.arange(xi.min()-1, xi.max()+2)
 plt.plot(linex, linex*0, c = 'k')
-plt.xticks(xi, terms, rotation=45 )
+plt.xticks(xi, terms, rotation=45, fontsize = 8 )
 plt.ylabel("Regression Coefficient Value (eV)")
 plt.xlabel("Regression Coefficient")  
 plt.show()
@@ -241,12 +297,12 @@ for i in outlier_index:
 #%%PLS regression
 from sklearn.cross_decomposition import PLSRegression
 
-N = 7
+N = pc_reg
 PLS = PLSRegression(n_components = N, tol=1e-8) #<- N_components tells the model how many sub-components to select
 PLS.fit(X,y) #<- we have to pass y into the fit function now
 yhat_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
 # make a parity plot
-mse_PLS, score_PLS = parity_plot(y, yhat_PLS, 'PLS')
+mse_PLS, score_PLS = parity_plot_st(y, yhat_PLS, 'PLS')
 sigma_PLS = error_distribution(y, yhat_PLS, 'PLS')
 
 
