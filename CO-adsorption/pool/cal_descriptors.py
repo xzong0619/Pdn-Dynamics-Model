@@ -208,9 +208,9 @@ class PdCO():
                              self.Dsupport, #Z
                              self.charge, #Bader charge
                              self.Nsites, #number of sites
-                             self.PdC1, 
-                             self.PdC2, 
-                             self.PdC3]
+                             self.PdC1, #1st Pd-C distance 
+                             self.PdC2, #2nd Pd-C distance
+                             self.PdC3] #3rd Pd-C distance
                             
         
 
@@ -219,7 +219,7 @@ Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
           'CN1', 'CN2', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
-descriptors =  ['NPd', 'CN1', 'CN2', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+descriptors =  ['CN1', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
 fdata = pd.DataFrame(columns = labels)
 
 
