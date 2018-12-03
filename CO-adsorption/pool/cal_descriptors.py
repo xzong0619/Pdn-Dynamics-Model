@@ -190,14 +190,15 @@ class PdCO():
             COsites_cols.append('Pd'+str(COsites[s]))
         
         PdNN_CO = PdNN.loc[:, COsites_cols] #NN dataframe 
-        Pd_C_CO = Pd_C[:len(COsites)] #CO distance to neighboring Pd atoms
+        Pd_C_CO = np.array(Pd_C[:len(COsites)]) #CO distance to neighboring Pd atoms
         
         '''
         Weighted average for NN1, NN2
         '''
-        weights = np.array(Pd_C_CO)/np.sum(Pd_C_CO) #weights based on CO-Pd distance
-        self.CN1 = np.dot(weights, PdNN_CO.loc['NN1'].values)
-        self.CN2 = np.dot(weights, PdNN_CO.loc['NN2'].values)
+        norm_weights = (1/Pd_C_CO)/np.sum(1/Pd_C_CO) #weights based on 1 over CO-Pd distance
+        
+        self.CN1 = np.dot(norm_weights, PdNN_CO.loc['NN1'].values)
+        self.CN2 = np.dot(norm_weights, PdNN_CO.loc['NN2'].values)
         
         '''
         GCN calculation
@@ -236,17 +237,19 @@ class PdCO():
         self.PdD = PdD
         self.Pdisort = Pdisort
         self.Pd1NN = Pd1NN
+        self.Pd_C_CO = Pd_C_CO
 
 #%% Analyse the structures
 Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
-          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3']
+          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
 #possible descriptors
-#descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'PdC1', 'PdC2', 'PdC3'] #9 in total
-#descriptors = ['NPd', 'CN1', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3'] 
-#descriptors =  ['CN1', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
-descriptors =  ['GCN', 'Z', 'Charge', 'PdC1', 'PdC2', 'PdC3']
+#descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #9 in total
+#descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
+descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
+#descriptors =  ['CN1', 'Z', 'Charge',   'Pd1C', 'Pd2C', 'Pd3C']
+#descriptors =  ['GCN', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
 fdata = pd.DataFrame(columns = labels)
 
 
@@ -264,10 +267,10 @@ sitetype_list = list(fdata.loc[:,'SiteType'])
 
 pickle.dump([dem, Eads, descriptors, filename_list, sitetype_list], open('pca_data.p','wb'))
 
+#%%Count the number of sites 
+ntop = (np.array(sitetype_list) == 'top').astype(int).sum()
+nbridge = (np.array(sitetype_list) == 'bridge').astype(int).sum()
+nhollow = (np.array(sitetype_list) == 'hollow').astype(int).sum()
 
-#%%
-PdNN = PdCO_ob.PdNN
-Pd_Pd = PdCO_ob.Pd_Pd
-PdNN_CO = PdCO_ob.PdNN_CO
-Pdisort = PdCO_ob.Pdisort
-Pd1NN = PdCO_ob.Pd1NN
+# show one example -Pd10 hollow
+fdata.loc[1]

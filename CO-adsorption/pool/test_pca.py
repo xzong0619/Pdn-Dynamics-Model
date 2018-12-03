@@ -28,7 +28,7 @@ y = Eads
 
 nPC = X.shape[1]
 # select the number of PCs to plot in the bar graph
-pc = len(descriptors)
+pc = min(7, len(descriptors))
 # select the number of PCs to plot in regression
 pc_reg = min(7, pc) 
 
@@ -304,5 +304,4 @@ yhat_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
 # make a parity plot
 mse_PLS, score_PLS = parity_plot_st(y, yhat_PLS, 'PLS')
 sigma_PLS = error_distribution(y, yhat_PLS, 'PLS')
-
 
