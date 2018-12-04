@@ -247,8 +247,9 @@ labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite',
 #possible descriptors
 #descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #9 in total
 #descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
-descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
-#descriptors =  ['CN1', 'Z', 'Charge',   'Pd1C', 'Pd2C', 'Pd3C']
+#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
+#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
+descriptors =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C']
 #descriptors =  ['GCN', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
 fdata = pd.DataFrame(columns = labels)
 
