@@ -26,7 +26,7 @@ y = Eads
 
 #%% PCA parameters
 
-nPC = X.shape[1]
+nDescriptors = X.shape[1]
 # select the number of PCs to plot in the bar graph
 pc = min(7, len(descriptors))
 # select the number of PCs to plot in regression
@@ -40,7 +40,7 @@ def plot_discriptors():
     '''
     with plt.style.context('seaborn-whitegrid'):
         
-        for cnt in range(nPC):
+        for cnt in range(nDescriptors):
             plt.figure(figsize=(6, 4))
             plt.scatter(X[:,cnt],y)
             plt.xlabel(descriptors[cnt])
@@ -55,7 +55,7 @@ def plot_discriptors_st():
     Plot the trend for each discriptor with site type color coded
     '''
     with plt.style.context('seaborn-whitegrid'):
-        for cnt in range(nPC):
+        for cnt in range(nDescriptors):
             plt.figure(figsize=(6, 4))
             for site, col in zip(('top', 'bridge', 'hollow'),
                         ('red', 'green', 'blue')):
@@ -72,10 +72,70 @@ def plot_discriptors_st():
                 
             plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
             plt.tight_layout()
-            plt.show()    
+            plt.show() 
+
+def plot_PdC_distances(): 
+    '''
+    Plot the histogram of PdC bond length
+    '''
+    PdCs = ['Pd1C', 'Pd2C', 'Pd3C'] 
+    PdCi = []
+    for PdC in PdCs: PdCi.append(descriptors.index(PdC))
+    
+    with plt.style.context('seaborn-whitegrid'):
+        for cnt in PdCi:
+            plt.figure(figsize=(8, 2))
+            for site, col in zip(('top', 'bridge', 'hollow'),
+                            ('red', 'green', 'blue')):
+                indices = np.where(np.array(sitetype_list) == site)[0]
+                plt.hist(X[:,cnt][indices],
+                         bins= 160,
+                         range= (1.5, 4),
+                         label=site,
+                         color = col,
+                         alpha=0.5,)
+            plt.xlabel(descriptors[cnt])
+            plt.ylabel('Count')
+            plt.xlim((1.5,4))
+            plt.ylim((0,10))
+            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+            plt.tight_layout()
+            plt.show()
+
+
+def plot_PdC1_distances(): 
+    '''
+    Plot the histogram of PdC bond length in a short x range
+    '''
+    PdCs = ['Pd1C', 'Pd2C', 'Pd3C'] 
+    PdCi = []
+    for PdC in PdCs: PdCi.append(descriptors.index(PdC))
+    
+    with plt.style.context('seaborn-whitegrid'):
+        for cnt in PdCi:
+            plt.figure(figsize=(6, 3))
+            for site, col in zip(('top', 'bridge', 'hollow'),
+                            ('red', 'green', 'blue')):
+                indices = np.where(np.array(sitetype_list) == site)[0]
+                plt.hist(X[:,cnt][indices],
+                         bins= 60,
+                         range= (1.6, 2.4),
+                         label=site,
+                         color = col,
+                         alpha=0.5,)
+            plt.xlabel(descriptors[cnt])
+            plt.ylabel('Count')
+            plt.xlim((1.6,2.4))
+            plt.ylim((0,10))
+            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+            plt.tight_layout()
+            plt.show()
 
 plot_discriptors_st()
+plot_PdC_distances()
+plot_PdC1_distances()
 
+        
 #%% PCA 
 # Normalize the data
 X_std = StandardScaler().fit_transform(X)
@@ -112,14 +172,14 @@ cum_var_exp = np.cumsum(var_exp) #cumulative variance ratio
 with plt.style.context('seaborn-whitegrid'):
     plt.figure(figsize=(6, 4))
 
-    plt.bar(range(nPC), var_exp, alpha=0.5, align='center',
+    plt.bar(range(nDescriptors), var_exp, alpha=0.5, align='center',
             label='individual explained variance')
-    plt.step(range(nPC), cum_var_exp, where='mid',
+    plt.step(range(nDescriptors), cum_var_exp, where='mid',
              label='cumulative explained variance')
     plt.ylabel('Explained variance ratio')
     plt.xlabel('Principal components')
-    plt.xticks(np.arange(nPC), 
-                ['PC %i'%(w+1) for w in range(nPC)])
+    plt.xticks(np.arange(nDescriptors), 
+                ['PC %i'%(w+1) for w in range(nDescriptors)])
     plt.legend(loc='best')
     plt.tight_layout()
 
