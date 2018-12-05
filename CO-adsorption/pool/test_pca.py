@@ -10,7 +10,6 @@ import matplotlib.patches as mpatches
 from sklearn.decomposition import PCA 
 from sklearn.preprocessing import StandardScaler 
 from sklearn import linear_model 
-from sklearn.model_selection import cross_val_predict 
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
@@ -301,23 +300,6 @@ def fit_linear_regression(X, y, degree):
 Xreg = Xpc[:,:pc_reg]
 degree = 2
 
-#regr = linear_model.LinearRegression()
-## Fit
-#regr.fit(Xreg, y)
-#
-## Calibration
-#y_c = regr.predict(Xreg)
-#
-## Cross-validation
-#y_cv = cross_val_predict(regr, Xreg, y, cv=20)
-#
-## Calculate scores for calibration and cross-validation
-#score_c = r2_score(y, y_c)
-#score_cv = r2_score(y, y_cv)
-#
-## Calculate mean square error for calibration and cross validation
-#mse_c = mean_squared_error(y, y_c)
-#mse_cv = mean_squared_error(y, y_cv)
 
 estimator  = fit_linear_regression(Xreg, y, degree)
 regr_pca = estimator.named_steps['linear_regression']
