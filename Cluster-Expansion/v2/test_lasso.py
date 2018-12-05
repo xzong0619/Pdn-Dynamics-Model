@@ -141,8 +141,8 @@ def plot_lasso():
     fig, ax = plt.subplots()
     ax.scatter(Ec,y_predict_all, s=60, facecolors='none', edgecolors='r')
     
-    plt.xlabel("Eads DFT (eV)")
-    plt.ylabel("Eads Model Prediction(eV)")
+    plt.xlabel("DFT Cluster Energy (eV)")
+    plt.ylabel("Predicted Cluster Energy (eV)")
     
     
     lims = [

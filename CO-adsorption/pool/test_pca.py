@@ -327,7 +327,7 @@ plt.xlabel("Regression Coefficient")
 plt.show()
 
 #%%detect the outlier
-threshold = 0.2
+threshold = 0.4
 diff = abs(y-y_pca)
 outlier_index = np.where(diff>threshold)[0]
 outlier_file = []
