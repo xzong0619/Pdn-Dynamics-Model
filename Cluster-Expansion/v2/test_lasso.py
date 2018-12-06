@@ -8,10 +8,11 @@ Created on Thu Aug 16 16:37:24 2018
 from sklearn.linear_model import LassoCV
 from sklearn.linear_model import lasso_path
 from sklearn.model_selection import RepeatedKFold
+from sklearn.metrics import mean_squared_error
 import sklearn.cross_validation as cv
 
 import numpy as np
-from structure_constants import Ec
+from structure_constants import Ec, NPd_list
 import pickle 
 
 import matplotlib.pyplot as plt 
@@ -22,7 +23,7 @@ Gcv = Gcv1+Gcv2+Gcv3
 
 x = np.load('pi3.npy')
 X =x
-
+NPd_list = np.array(NPd_list)
 #X = np.ones((x.shape[0], x.shape[1]+1))
 #X[:,1:] = x     
    
@@ -33,6 +34,14 @@ y = np.array(Ec)
 
 X_train, X_test, y_train, y_test = cv.train_test_split(X, y, test_size=0.1, random_state=0)
 
+NPd_test = []
+NPd_train = []
+for i in y_test: NPd_test.append(NPd_list[np.where(y==i)[0][0]])
+for i in y_train: NPd_train.append(NPd_list[np.where(y==i)[0][0]])
+                               
+NPd_test = np.array(NPd_test)
+NPd_train = np.array(NPd_train)                              
+                                 
 rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
 
 lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.001, fit_intercept=True)
@@ -45,10 +54,11 @@ alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, f
 
 
 coefs = lasso_cv.coef_
-y_predict = lasso_cv.predict(X_test)
+y_predict_test = lasso_cv.predict(X_test)
+y_predict_train = lasso_cv.predict(X_train)
 
-MSE_test = sum((y_test - y_predict)**2)/len(y_test)
-MSE_train = sum((y_train - lasso_cv.predict(X_train))**2)/len(y_train)
+MSE_test = sum(((y_test - y_predict_test)/NPd_test)**2)/len(y_test)
+MSE_train = sum(((y_train - y_predict_train)/NPd_train)**2)/len(y_test)
 
 MSE_path = np.mean(lasso_cv.mse_path_, axis = 1)
 intercept = lasso_cv.intercept_

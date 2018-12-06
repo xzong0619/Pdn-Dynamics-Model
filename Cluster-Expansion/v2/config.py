@@ -46,7 +46,7 @@ sub = lf.subgraphs(mother, dz)
 Gcv1 = sub.get_s2(1)
 Gcv2 = sub.get_s2(2)
 Gcv3 = sub.get_s2(3)
-
+Gcv4 = sub.get_s2(4)
 
 pickle.dump([Gm, Gsv, Gcv1, Gcv2, Gcv3], open('clusters.p','wb'))
 
