@@ -17,7 +17,7 @@ from sklearn.model_selection import RepeatedKFold, cross_validate, LeaveOneOut
 
 import pandas as pd
 import numpy as np
-import pickle
+
 
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt 
@@ -32,17 +32,40 @@ matplotlib.rcParams['ytick.major.size'] = 8
 matplotlib.rcParams['ytick.major.width'] = 2
 
 
-[dem, Eads, descriptors, filename_list, sitetype_list] = pickle.load(open("pca_data.p", "rb"))
-X = dem
+
+#%% Processs descriptor_data.cvs
+fdata = pd.read_csv('descriptor_data.csv')
+
+#possible descriptors
+descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #10 in total
+#descriptors =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #5 geometric descriptors
+#descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
+#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
+#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
+#descriptors =  ['GCN', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
+dem1 =  np.array(fdata.loc[:,descriptors], dtype = float)
+Eads = np.array(fdata.loc[:,'Eads'], dtype = float)
+filename_list = list(fdata.loc[:,'Filename'])
+sitetype_list = list(fdata.loc[:,'SiteType'])
+
+#%%Count the number of sites 
+ntop = (np.array(sitetype_list) == 'top').astype(int).sum()
+nbridge = (np.array(sitetype_list) == 'bridge').astype(int).sum()
+nhollow = (np.array(sitetype_list) == 'hollow').astype(int).sum()
+
+# show one example -Pd10 hollow
+fdata.loc[1]
+
+X = dem1
 y = Eads
 
 #%% PCA parameters
 
 nDescriptors = X.shape[1]
 # select the number of PCs to plot in the bar graph
-pc = min(7, len(descriptors))
+pc_draw = min(5, len(descriptors))
 # select the number of PCs to plot in regression
-pc_reg = min(7, pc) 
+pc_reg = min(7, len(descriptors)) 
 
 
 #%% Plot the trend for each discriptor
@@ -50,41 +73,40 @@ def plot_discriptors():
     '''
     Plot the trend for each discriptor
     '''
-    with plt.style.context('seaborn-whitegrid'):
         
-        for cnt in range(nDescriptors):
-            plt.figure(figsize=(6, 4))
-            plt.scatter(X[:,cnt],y)
-            plt.xlabel(descriptors[cnt])
-            plt.ylabel('CO Adsorption Energy (eV)')
-        plt.legend(loc='upper right', fancybox=True, fontsize=8)
-        plt.tight_layout()
-        plt.show()
+    for cnt in range(nDescriptors):
+        plt.figure(figsize=(6, 4))
+        plt.scatter(X[:,cnt],y)
+        plt.xlabel(descriptors[cnt])
+        plt.ylabel('CO Adsorption Energy (eV)')
+    plt.legend(loc='upper right', fancybox=True, fontsize=8)
+    plt.tight_layout()
+    plt.show()
 
 
 def plot_discriptors_st():    
     '''
     Plot the trend for each discriptor with site type color coded
     '''
-    with plt.style.context('seaborn-whitegrid'):
-        for cnt in range(nDescriptors):
-            plt.figure(figsize=(6, 4))
-            for site, col in zip(('top', 'bridge', 'hollow'),
-                        ('red', 'green', 'blue')):
-                indices = np.where(np.array(sitetype_list) == site)[0]
-                plt.scatter(X[:,cnt][indices],
-                            y[indices],
-                            label=site,
-                            facecolor = col, 
-                            alpha = 0.5,
-                            s  = 60)
-                
-                plt.xlabel(descriptors[cnt])
-                plt.ylabel('CO Adsorption Energy (eV)')
-                
-            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-            plt.tight_layout()
-            plt.show() 
+    
+    for cnt in range(nDescriptors):
+        plt.figure(figsize=(6, 4))
+        for site, col in zip(('top', 'bridge', 'hollow'),
+                    ('red', 'green', 'blue')):
+            indices = np.where(np.array(sitetype_list) == site)[0]
+            plt.scatter(X[:,cnt][indices],
+                        y[indices],
+                        label=site,
+                        facecolor = col, 
+                        alpha = 0.5,
+                        s  = 60)
+            
+            plt.xlabel(descriptors[cnt])
+            plt.ylabel('CO Adsorption Energy (eV)')
+            
+        plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+        plt.tight_layout()
+        plt.show() 
 
 def plot_PdC_distances(): 
     '''
@@ -94,25 +116,24 @@ def plot_PdC_distances():
     PdCi = []
     for PdC in PdCs: PdCi.append(descriptors.index(PdC))
     
-    with plt.style.context('seaborn-whitegrid'):
-        for cnt in PdCi:
-            plt.figure(figsize=(8, 2))
-            for site, col in zip(('top', 'bridge', 'hollow'),
-                            ('red', 'green', 'blue')):
-                indices = np.where(np.array(sitetype_list) == site)[0]
-                plt.hist(X[:,cnt][indices],
-                         bins= 160,
-                         range= (1.5, 4),
-                         label=site,
-                         color = col,
-                         alpha=0.5,)
-            plt.xlabel(descriptors[cnt])
-            plt.ylabel('Count')
-            plt.xlim((1.5,4))
-            plt.ylim((0,10))
-            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-            plt.tight_layout()
-            plt.show()
+    for cnt in PdCi:
+        plt.figure(figsize=(8, 2))
+        for site, col in zip(('top', 'bridge', 'hollow'),
+                        ('red', 'green', 'blue')):
+            indices = np.where(np.array(sitetype_list) == site)[0]
+            plt.hist(X[:,cnt][indices],
+                     bins= 160,
+                     range= (1.5, 4),
+                     label=site,
+                     color = col,
+                     alpha=0.5,)
+        plt.xlabel(descriptors[cnt])
+        plt.ylabel('Count')
+        plt.xlim((1.5,4))
+        plt.ylim((0,10))
+        plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+        plt.tight_layout()
+        plt.show()
 
 
 def plot_PdC1_distances(): 
@@ -123,25 +144,24 @@ def plot_PdC1_distances():
     PdCi = []
     for PdC in PdCs: PdCi.append(descriptors.index(PdC))
     
-    with plt.style.context('seaborn-whitegrid'):
-        for cnt in PdCi:
-            plt.figure(figsize=(6, 3))
-            for site, col in zip(('top', 'bridge', 'hollow'),
-                            ('red', 'green', 'blue')):
-                indices = np.where(np.array(sitetype_list) == site)[0]
-                plt.hist(X[:,cnt][indices],
-                         bins= 60,
-                         range= (1.6, 2.4),
-                         label=site,
-                         color = col,
-                         alpha=0.5,)
-            plt.xlabel(descriptors[cnt])
-            plt.ylabel('Count')
-            plt.xlim((1.6,2.4))
-            plt.ylim((0,10))
-            plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-            plt.tight_layout()
-            plt.show()
+    for cnt in PdCi:
+        plt.figure(figsize=(6, 3))
+        for site, col in zip(('top', 'bridge', 'hollow'),
+                        ('red', 'green', 'blue')):
+            indices = np.where(np.array(sitetype_list) == site)[0]
+            plt.hist(X[:,cnt][indices],
+                     bins= 60,
+                     range= (1.6, 2.4),
+                     label=site,
+                     color = col,
+                     alpha=0.5,)
+        plt.xlabel(descriptors[cnt])
+        plt.ylabel('Count')
+        plt.xlim((1.6,2.4))
+        plt.ylim((0,10))
+        plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+        plt.tight_layout()
+        plt.show()
 
 plot_discriptors_st()
 plot_PdC_distances()
@@ -162,11 +182,20 @@ cov_pc = np.cov(Xpc.T)
 
 
 # Plot Covariance structure 
-fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(10,6))
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(15,6))
 ax1.set_title('X')
+ax1.set_xticks(range(0,nDescriptors))
+ax1.set_xticklabels(descriptors, rotation = 40)
+ax1.set_yticks(range(0,nDescriptors))
+ax1.set_yticklabels(descriptors)
 im1 = ax1.imshow(cov_mat)
+
 fig.colorbar(im1, ax = ax1, shrink = 0.5)
 ax2.set_title('X_PCA')
+ax2.set_xticks(range(0,nDescriptors))
+ax2.set_xticklabels(descriptors, rotation = 40)
+ax2.set_yticks(range(0,nDescriptors))
+ax2.set_yticklabels(descriptors)
 im2 = ax2.imshow(cov_pc)
 fig.colorbar(im2, ax = ax2, shrink = 0.5)
 
@@ -180,20 +209,22 @@ cum_var_exp = np.cumsum(var_exp) #cumulative variance ratio
 #print('Eigenvectors \n%s' %eig_vecs)
 #print('\nEigenvalues \n%s' %eig_vals)
 
+'''
+Scree plot for PCs
+'''
                       
-with plt.style.context('seaborn-whitegrid'):
-    plt.figure(figsize=(6, 4))
+plt.figure(figsize=(6, 4))
 
-    plt.bar(range(nDescriptors), var_exp, alpha=0.5, align='center',
-            label='individual explained variance')
-    plt.step(range(nDescriptors), cum_var_exp, where='mid',
-             label='cumulative explained variance')
-    plt.ylabel('Explained variance ratio')
-    plt.xlabel('Principal components')
-    plt.xticks(np.arange(nDescriptors), 
-                ['PC%i'%(w+1) for w in range(nDescriptors)])
-    plt.legend(loc='best')
-    plt.tight_layout()
+plt.bar(range(nDescriptors), var_exp, alpha=0.5, align='center',
+        label='individual explained variance')
+plt.step(range(nDescriptors), cum_var_exp, where='mid',
+         label='cumulative explained variance')
+plt.ylabel('Explained variance ratio')
+plt.xlabel('Principal components')
+plt.xticks(np.arange(nDescriptors), 
+            ['PC%i'%(w+1) for w in range(nDescriptors)])
+plt.legend(loc='best')
+plt.tight_layout()
 
 #%% Plot the normalized desciptor loading
 '''
@@ -203,29 +234,29 @@ ind = 0
 yvals = []
 ylabels = []
 bar_vals = []
-space = 0.3
+space = 0.4
 
-cm = ['r', 'coral', 'pink',  'orange', 'y', 'gold', 'lightblue', 'lime', 'grey', 'green', 'brown'][:len(descriptors)]
-fig = plt.figure(figsize=(10,6))
+cm = ['r', 'coral', 'pink',  'orange',  'gold', 'y','lightgreen', 'lightblue',  'c', 'mediumpurple', 'brown'][:len(descriptors)]
+fig = plt.figure(figsize=(12,6))
 
 
 ax = fig.add_subplot(111)
 n = len(descriptors)
 width = (1 - space) / (len(descriptors))
-indeces = np.arange(0, pc) + 0.5  
+indeces = np.arange(0, pc_draw) + 0.5  
 
 # Create a set of bars at each position
-for i, pci in enumerate(eig_vecs[:pc]):
+for i, pci in enumerate(eig_vecs[:pc_draw]):
     
     vals = pci/np.sum(np.absolute(pci))
     
     pos = width*np.arange(n) + i 
-    ax.bar(pos, vals, width=width, label=str(i+1), color = cm) 
+    ax.bar(pos, vals, width=width, label=str(i+1), color = cm, alpha = 1) 
         
-linex = np.arange(np.arange(0, pc).min() -0.5  , np.arange(0, pc).max()+ 2)
+linex = np.arange(np.arange(0, pc_draw).min() -0.1  , np.arange(0, pc_draw).max()+ 1)
 
 ax.set_xticks(indeces)
-ax.set_xticklabels(list(np.arange(0,pc)+1))
+ax.set_xticklabels(list(np.arange(0,pc_draw)+1))
 ax.set_ylabel("Normalized Descriptoor Loading")
 ax.set_xlabel("Principal Component #")    
   
@@ -233,10 +264,10 @@ ax.set_xlabel("Principal Component #")
 patches = []
 for c in range(n):
     patches.append(mpatches.Patch(color=cm[c]))
-plt.legend(patches, descriptors,
+plt.legend(patches, descriptors, 
            bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
 
-plt.plot(linex, linex*0, c = 'k', lw = 0.8)
+plt.plot(linex, linex*0, c = 'k', lw = 1.5)
 plt.show()
 
 #%% Regression
@@ -287,7 +318,7 @@ def cross_validation(X, y, estimator):
     '''
     Cross-validation
     '''
-    #rkf = RepeatedKFold(n_splits = 60, n_repeats = 3) #change this to leave one out
+    #rkf = RepeatedKFold(n_splits = 10, n_repeats = 10) #change this to leave one out
     loo = LeaveOneOut()
     scores  = cross_validate(estimator, X, y, cv=loo,
                                 scoring=('neg_mean_squared_error'),
@@ -316,6 +347,10 @@ def linear_regression(degree):
                     )
 
 def regression_pipeline(X, y, estimator, method):
+    '''
+    Standard regression procedure including predict, plot parity plot and 
+    perform cross validation
+    '''
 
     y_predict = estimator.predict(X)
     RMSE, r2 = parity_plot_st(y, y_predict, method)
@@ -323,21 +358,21 @@ def regression_pipeline(X, y, estimator, method):
     
     return RMSE, r2, scores
     
-#def detect_outliers(y, y_predict, threshold = 0.5):
-#    '''
-#    detect the outlier
-#    '''
-#    diff = abs(y-y_predict)
-#    outlier_index = np.where(diff>threshold)[0]
-#    outliers_metal = []
-#    outliers_surface = []
-#    print('\nOutliers with AE in eV:')
-#    for i in outlier_index: 
-#        outliers_metal.append(data['Metal'][i])
-#        outliers_surface.append(data['surface'][i])
-#        print('{} {} - {:.2}'.format(outliers_metal[-1],outliers_surface[-1], diff[i]))
-#        
-#    return outliers_metal, outliers_surface
+def detect_outliers(y, y_predict, threshold = 0.2):
+    '''
+    detect the outlier
+    '''
+    diff = abs(y-y_predict)
+    outlier_index = np.where(diff>threshold)[0]
+    outliers_files = []
+    outliers_sites = []
+    print('\nOutliers with AE in eV:')
+    for i in outlier_index: 
+        outliers_files.append(filename_list[i])
+        outliers_sites.append(sitetype_list[i])
+        print('{} {} {} - {:.2}'.format(i,filename_list[i],sitetype_list[i], diff[i]))
+        
+    return outliers_files, outliers_sites
 
 def ploy_coef(estimator, nreg):
     '''
@@ -373,7 +408,7 @@ y_pc2 = pc2_estimator.predict(Xreg)
 
 RMSE_pc2, r2_pc2, scores_pc2 = regression_pipeline(Xreg, y, pc2_estimator, 'PC2')
 sigma_pc2 = error_distribution(y, y_pc2, 'PC2')
-#detect_outliers(y, y_pc2)
+detect_outliers(y, y_pc2)
 intercept_pc2, coefs_pc2 = ploy_coef(pc2_estimator, pc_reg)
 
 
@@ -409,43 +444,47 @@ y_second = second.predict(X)
 RMSE_second, r2_second, scores_second = regression_pipeline(X, y, second, 'Second Order')
 intercept_second, coefs_second = ploy_coef(second,  X.shape[1])
 
+'''
+PLS regression 
+'''
+from sklearn.cross_decomposition import PLSRegression
+
+PLS = PLSRegression(n_components = pc_reg, tol=1e-8) #<- N_components tells the model how many sub-components to select
+PLS.fit(X,y) 
+y_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
+RMSE_PLS, r2_PLS, scores_PLS = regression_pipeline(X, y, PLS, 'PLS')
+
 
 #%%
 '''
 Compare different regression models 
 '''
 
-regression_method = ['PCR 1st Order', 'PCR 2nd Order', '1st Order', '2nd Order']
-means_train = np.array([scores_pc1[0], scores_pc2[0], scores_first[0], scores_second[0]])
-std_train = np.array([scores_pc1[1], scores_pc2[1], scores_first[1], scores_second[1]])
-means_test = np.array([scores_pc1[2], scores_pc2[2], scores_first[2], scores_second[2]])
-std_test = np.array([scores_pc1[3], scores_pc2[3], scores_first[3], scores_second[3]])
+regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'Poly 1st', 'Poly 2nd']
+scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_first, scores_second])
+means_train = np.array(scores_mx[:,0])
+std_train = np.array(scores_mx[:,1])
+means_test = np.array(scores_mx[:,2])
+std_test = np.array(scores_mx[:,3])
 base_line = 0
 x_pos = np.arange(len(regression_method))
 opacity = 0.8
 bar_width = 0.35
 plt.figure(figsize=(8,6))
-rects1 = plt.bar(x_pos, means_train - base_line, bar_width, yerr=std_train,
+rects1 = plt.bar(x_pos, means_train - base_line, bar_width, #yerr=std_train,
                 alpha=opacity, color='lightblue',
                 label='Train')
-rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, yerr=std_test,  
+rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, #yerr=std_test,  
                 alpha=opacity, color='salmon',
                 label='Test')
 #plt.ylim([-1,18])
 plt.xticks(x_pos+bar_width/2, regression_method, rotation=0)
 plt.xlabel('Regression Method')
-plt.ylabel('RMSE (eV)')
-plt.legend(loc= 'upper right', frameon=False)
+plt.ylabel('CV RMSE (eV)')
+plt.ylim([0,2])
+plt.legend(loc= 'best', frameon=False)
 
 
-#%%PLS regression
-from sklearn.cross_decomposition import PLSRegression
 
-N = pc_reg
-PLS = PLSRegression(n_components = N, tol=1e-8) #<- N_components tells the model how many sub-components to select
-PLS.fit(X,y) #<- we have to pass y into the fit function now
-yhat_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
-# make a parity plot
-mse_PLS, score_PLS = parity_plot_st(y, yhat_PLS, 'PLS')
-sigma_PLS = error_distribution(y, yhat_PLS, 'PLS')
+
 

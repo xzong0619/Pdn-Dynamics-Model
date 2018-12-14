@@ -7,62 +7,45 @@ Created on Tue Dec  4 17:43:46 2018
 
 '''
 Perform Cross Validation PCA regression
+Leave one out cross-validation 
+Choose the number of PC with lowest test CV score
 '''
 from sklearn.model_selection import RepeatedKFold, cross_validate
 import sklearn.cross_validation as cv
 
-degree = 2
-
-def fit_linear_regression(X, y, degree):
-    '''
-    # Create linear regression object
-    '''
-    return Pipeline([("polynomial_features", PolynomialFeatures(degree=degree,
-                                                                include_bias=False)),
-                     ("linear_regression", linear_model.LinearRegression())]
-                    ).fit(X, y)  
-
-
-
-estimator =  Pipeline([("polynomial_features", PolynomialFeatures(degree=degree,
-                                                                include_bias=False)),
-                     ("linear_regression", linear_model.LinearRegression())])
- 
-# PCA analysis 
-X_std = StandardScaler().fit_transform(X)
-pca = PCA()    
-Xpc = pca.fit_transform(X_std) 
-nPC =  Xpc.shape[1]
-
-# CV just to predict number of PC to use in regression    
-# Split data into test and train set
-# We only touch the training set from now on
-X_train, X_test, y_train, y_test = cv.train_test_split(Xpc, y, test_size=0.1, random_state=0)
-
-
-# Use repeated k fold cross validation
-rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
-
-# Make a loop to change the hyperparameter
-# The hypermeter in our case is number of PCs
-test_mses = []
 test_r2 = []
+test_RMSEs = []
+train_r2 = []
+train_RMSEs = []
 
-for nPCi in range(1,nPC):
-    Xreg = X_train[:,:nPCi]
-    scores  = cross_validate(estimator, Xreg, y_train, cv=rkf,
+for nPCi in np.arange(0,nPC): 
+    Xreg = Xpc[:,:nPCi+1]
+    scores  = cross_validate(pc2_estimator, Xreg, y, cv=loo,
                                 scoring=('r2', 'neg_mean_squared_error'),
                                 return_train_score=True)
-    test_mses.append(-np.mean(scores['test_neg_mean_squared_error']))
+    
+    train_scores = np.sqrt(np.abs(scores['train_neg_mean_squared_error'])) 
+    train_score_mean = np.mean(train_scores)
+    train_r2.append(np.mean(scores['train_r2']))
+    
+    test_scores = np.sqrt(np.abs(scores['test_neg_mean_squared_error'])) 
+    test_score_mean = np.mean(test_scores)
     test_r2.append(np.mean(scores['test_r2']))
-
-plt.figure()    
-plt.plot(range(1,nPC), test_mses, c = 'r')
-plt.plot(range(1,nPC), test_r2, c = 'b')    
-
+    
+    train_RMSEs.append(train_score_mean)
+    test_RMSEs.append(test_score_mean)
 #%%
-nPC = nPC
-Xreg = X_train[:,:nPC]
-pcr_estimator  = fit_linear_regression(Xreg, y_train, degree)
-y_predict_test = pcr_estimator.predict(X_test[:,:nPC])
-mse_pca, score_pca = parity_plot(y_test, y_predict_test)
+nplot = 8
+plt.figure()    
+plt.plot(np.arange(1,nPC+1)[:nplot], test_RMSEs[:nplot], c = 'r', label = 'Test')
+plt.plot(np.arange(1,nPC+1)[:nplot], train_RMSEs[:nplot], c = 'b', label = 'Train')
+plt.ylabel('RMSE(eV)')
+plt.xlabel('nPC')
+plt.legend(loc= 'best', frameon=False)   
+ 
+plt.figure() 
+#plt.plot(np.arange(1,nPC+1)[:nplot], test_r2[:nplot], c = 'r', label = 'Test')
+plt.plot(np.arange(1,nPC+1)[:nplot], train_r2[:nplot], c = 'b', label = 'Train')
+plt.ylabel('r2')
+plt.xlabel('nPC')
+plt.legend(loc= 'best', frameon=False)    

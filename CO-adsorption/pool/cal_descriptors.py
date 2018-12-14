@@ -239,40 +239,20 @@ class PdCO():
         self.Pd1NN = Pd1NN
         self.Pd_C_CO = Pd_C_CO
 
-#%% Analyse the structures
+#%% Analyse the structures and save into a csv file
 Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
           'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
-#possible descriptors
-#descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #10 in total
-descriptors =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #5 geometric descriptors
-#descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
-#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
-#descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
-#descriptors =  ['GCN', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
-fdata = pd.DataFrame(columns = labels)
 
+fdata = pd.DataFrame(columns = labels)
 
 for i,struct in enumerate(structures):
     
     PdCO_ob = PdCO()
     PdCO_ob.get_descriptors(struct, data)
-    if PdCO_ob.filename != 'pd5-ceria-co-CONTCAR':
-        fdata.loc[i,:] = PdCO_ob.structureID
-fdata.to_csv('descriptor_data.csv')
+    #if PdCO_ob.filename != 'pd5-ceria-co-CONTCAR':
+    fdata.loc[i,:] = PdCO_ob.structureID
+fdata.to_csv('descriptor_data.csv', index=False, index_label=False)
 
-dem =  np.array(fdata.loc[:,descriptors], dtype = float)
-Eads = np.array(fdata.loc[:,'Eads'], dtype = float)
-filename_list = list(fdata.loc[:,'Filename'])
-sitetype_list = list(fdata.loc[:,'SiteType'])
 
-pickle.dump([dem, Eads, descriptors, filename_list, sitetype_list], open('pca_data.p','wb'))
-
-#%%Count the number of sites 
-ntop = (np.array(sitetype_list) == 'top').astype(int).sum()
-nbridge = (np.array(sitetype_list) == 'bridge').astype(int).sum()
-nhollow = (np.array(sitetype_list) == 'hollow').astype(int).sum()
-
-# show one example -Pd10 hollow
-fdata.loc[1]
