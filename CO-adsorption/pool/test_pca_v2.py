@@ -12,7 +12,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures 
 from sklearn.pipeline import Pipeline
 from scipy.stats import norm
-from sklearn.model_selection import RepeatedKFold, cross_validate
+from sklearn.model_selection import RepeatedKFold, cross_validate, LeaveOneOut
 
 
 import pandas as pd
@@ -191,7 +191,7 @@ with plt.style.context('seaborn-whitegrid'):
     plt.ylabel('Explained variance ratio')
     plt.xlabel('Principal components')
     plt.xticks(np.arange(nDescriptors), 
-                ['PC %i'%(w+1) for w in range(nDescriptors)])
+                ['PC%i'%(w+1) for w in range(nDescriptors)])
     plt.legend(loc='best')
     plt.tight_layout()
 
@@ -287,8 +287,9 @@ def cross_validation(X, y, estimator):
     '''
     Cross-validation
     '''
-    rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
-    scores  = cross_validate(estimator, X, y, cv=rkf,
+    #rkf = RepeatedKFold(n_splits = 60, n_repeats = 3) #change this to leave one out
+    loo = LeaveOneOut()
+    scores  = cross_validate(estimator, X, y, cv=loo,
                                 scoring=('neg_mean_squared_error'),
                                 return_train_score=True)
     # RMSE for repeated 10 fold test data 
@@ -372,7 +373,7 @@ y_pc2 = pc2_estimator.predict(Xreg)
 
 RMSE_pc2, r2_pc2, scores_pc2 = regression_pipeline(Xreg, y, pc2_estimator, 'PC2')
 sigma_pc2 = error_distribution(y, y_pc2, 'PC2')
-detect_outliers(y, y_pc2)
+#detect_outliers(y, y_pc2)
 intercept_pc2, coefs_pc2 = ploy_coef(pc2_estimator, pc_reg)
 
 
