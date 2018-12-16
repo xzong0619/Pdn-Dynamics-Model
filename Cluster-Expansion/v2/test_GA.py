@@ -61,9 +61,9 @@ Clusters = initialize_Clusters_object()
 
 #%%
 #Genetic Hyperparameters
-nodes = 36
+nodes = 1
 n = 50 #Size of population
-ngen = 20 #Number of generations
+ngen = 2 #Number of generations
 cxpb = 0.8 #The probability of mating two individuals
 mutpb = 0.03 #The probability of mutating an individual
 k = n

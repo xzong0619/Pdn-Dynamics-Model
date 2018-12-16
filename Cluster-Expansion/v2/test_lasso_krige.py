@@ -11,9 +11,8 @@ import pickle
 from matplotlib import pyplot as plt
 
 HomePath = os.path.expanduser('~')
-sys.path.append(os.path.join(HomePath,'Google Drive (wangyf@udel.edu)','Udel', 'Research', 'Code', 'pyKridging'))
+sys.path.append(os.path.join(HomePath,'Google Drive (wangyf@udel.edu)','Udel', 'Research','Kriging', 'Code', 'pyKridging'))
 
-import pyKriging
 from pyKriging.krige import kriging
 
 [Gcv_nonzero, J_nonzero, 
