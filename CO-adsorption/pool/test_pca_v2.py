@@ -481,7 +481,7 @@ rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, #yerr=std_t
 plt.xticks(x_pos+bar_width/2, regression_method, rotation=0)
 plt.xlabel('Regression Method')
 plt.ylabel('CV RMSE (eV)')
-plt.ylim([0,2])
+plt.ylim([0,1])
 plt.legend(loc= 'best', frameon=False)
 
 

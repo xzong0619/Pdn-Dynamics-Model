@@ -13,7 +13,7 @@ from ase.data import covalent_radii
 from Pdbulk import NN1,NN2
 from ase.visualize import view
 from sympy import Plane, Point3D
-import pickle 
+
 '''
 read adsoprtion energy and barder charge from a csv file
 '''
