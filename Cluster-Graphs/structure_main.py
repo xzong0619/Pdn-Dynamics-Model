@@ -69,7 +69,6 @@ new_H = Pd9.H_u
 new_wt_i = Pd9.wt_i_u
 print('Pd%d done' %n)
 
-'''
 n = 10
 Pd10 = cs.Parallel_growth(n, ni_u, new_H, new_wt_i)
 Pd10.unique()
@@ -85,4 +84,3 @@ ni_u = Pd11.mi_u
 new_H = Pd11.H_u
 new_wt_i = Pd11.wt_i_u
 print('Pd%d done' %n)
-'''

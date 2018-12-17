@@ -133,7 +133,7 @@ def evaluate_pi(individual, Clusters, Gcv):
     
     return pi_pred
     
-def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
+def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
     
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
@@ -142,16 +142,17 @@ def evaluate(individual, Clusters, Gcv, pi_true, J, intercept):
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
     
     
-    fitness1 = mean_squared_error(pi_pred, pi_true)/4
+    #fitness1 = mean_squared_error(pi_pred, pi_true)/4
     #fitness2 = norm(pi_pred-pi_true, ord = np.inf)
     #fitness3 = connect_score(individual)
-    fitness4 = (np.dot(pi_pred, J) + intercept)[0]/30
+    #fitness4 = (np.dot(pi_pred, J) + intercept)[0]
     # possible to put lower energy clusters as fitness
     #return (fitness1,fitness2,fitness3,fitness4)
+    fitness1 = abs(sum(individual)-ngoal)
+    fitness2, fitness3, fitness4, fitness5 = connect_score_2(occ_nodes)
+    fitness6 = (np.dot(pi_pred, J) + intercept)[0]
     
-    fitness3 = connect_score_2(occ_nodes)
-    fitness5 = sum(individual)/36
-    return fitness3, fitness1, fitness4, fitness5
+    return fitness1,  fitness2, fitness3, fitness4, fitness5, fitness6
 
 
 
@@ -270,7 +271,7 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
         for fi in range(fitnesses.shape[1]):
             fiv.append(fitnesses[:,fi])
            
-        ind = np.lexsort((fiv[-1], fiv[1],fiv[0]))
+        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6]))
         i = ind[0]
         
         print( '\tIndividual with best fitness:')
@@ -288,7 +289,7 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
         for fi in range(fitnesses.shape[1]):
             fiv.append(fitnesses[:,fi])
            
-        ind = np.lexsort((fiv[-1], fiv[1],fiv[0]))
+        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6]))
         i = ind[0:nbest]
         
     return i
@@ -301,11 +302,11 @@ def get_fitnesses(population = None):
     '''
     fitness_tuple = np.array([individual.fitness.values for individual in population])
     
-    fitness_max = np.max(fitness_tuple, axis = 0)
-    normalized_fit = fitness_tuple/fitness_max
+    #fitness_max = np.max(fitness_tuple, axis = 0)
+    #normalized_fit = fitness_tuple/fitness_max
     #normalized_fit[:,-1] = 1-normalized_fit[:,-1]
     
-    return normalized_fit
+    return fitness_tuple
 
 def write_history(population, history):
     for pi in population:

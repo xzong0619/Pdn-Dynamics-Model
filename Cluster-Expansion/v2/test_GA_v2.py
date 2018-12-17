@@ -1,11 +1,16 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct  1 10:17:00 2018
+Created on Sun Dec 16 14:48:22 2018
 
-@author: wangyf
+@author: wangyifan
 """
 
-# test the genetic algorithm 
+'''
+Test_GA version two
+Test on Pd20 
+'''
+
 import numpy as np
 import pickle
 
@@ -28,12 +33,10 @@ from GA_functions import get_time
  intercept, MSE_test, MSE_train,
  pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
 
-k_ind = 0
-newpoints = np.array([np.load('kriging_pts.npy')[k_ind]])
+
 import GA_functions as GA
 import lattice_functions as lf
 from structure_constants import mother, dz
-
 
 #%%
 def initialize_Clusters_object():
@@ -61,15 +64,16 @@ Clusters = initialize_Clusters_object()
 
 #%%
 #Genetic Hyperparameters
-nodes = 36
-n = 50 #Size of population
-ngen = 2 #Number of generations
+ngoal = 16 #5, 10, 15, 20
+nodes = 36 #lattice node size
+n = 100 #Size of population
+ngen = 50 #Number of generations
 cxpb = 0.8 #The probability of mating two individuals
-mutpb = 0.03 #The probability of mutating an individual
+mutpb = 0.05 #The probability of mutating an individual
 k = n
 tournsize = 10
 
-score_weights = (-1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
+score_weights = (-1.0, -1.0, -1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
@@ -89,11 +93,13 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutFlipBit, indpb = mutpb)
 toolbox.register("select", tools.selTournament, k = k, tournsize = tournsize)
-toolbox.register("evaluate", GA.evaluate, Clusters = Clusters, Gcv =  Gcv_nonzero, pi_true = newpoints, J = J_nonzero, intercept = intercept)
+toolbox.register("evaluate", GA.evaluate, 
+                 Clusters = Clusters, Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercept, ngoal= ngoal)
 
 population = GA.make_initial_population(COMM, toolbox, n)
 population = GA.evaluate_population(COMM, toolbox, population)
 history = []
+
 
 #%%
 ind1 = toolbox.individual()
@@ -115,12 +121,12 @@ for generation in range(ngen):
     GA.find_best_individual(COMM, population)
     history = GA.write_history(population, history)
     
-#%%   
+    
+#%%
 ihof  = GA.hall_of_fame(COMM, history, 10)
 (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof, Clusters, Gcv_nonzero)
 lf.drawing(best_config[0])
 best_G = GA.individual_config(best_ind, Clusters)
 GA.ase_object(best_ind)
-
-pickle.dump((best_ind, best_fitness, best_pi, best_config),open('k_point0.p','wb'))
-
+ind_list = list(np.nonzero(best_ind)[0])
+#pickle.dump((best_ind, best_fitness, best_pi, best_config),open('k_point0.p','wb'))
