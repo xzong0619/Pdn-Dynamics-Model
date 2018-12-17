@@ -38,7 +38,7 @@ fdata = pd.read_csv('descriptor_data.csv')
 
 #possible descriptors
 descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #10 in total
-#descriptors =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #5 geometric descriptors
+descriptors_g =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #5 geometric descriptors
 #descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
@@ -454,14 +454,27 @@ PLS.fit(X,y)
 y_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
 RMSE_PLS, r2_PLS, scores_PLS = regression_pipeline(X, y, PLS, 'PLS')
 
+#%%
+'''
+Use geomertric descriptors only
+'''
+Xg =  np.array(fdata.loc[:,descriptors_g], dtype = float)
+X_std_g = StandardScaler().fit_transform(Xg)
+Xpc_g = pca.fit_transform(X_std_g) 
+pcg_estimator  = linear_regression(2)
+pcg_estimator.fit(Xpc_g, y)
+y_pcg = pcg_estimator.predict(Xpc_g)
+RMSE_pcg, r2_pcg, scores_pcg = regression_pipeline(Xpc_g, y, pcg_estimator, 'PCg')
+detect_outliers(y, y_pcg)
+intercept_pcg, coefs_pcg = ploy_coef(pcg_estimator, Xpc_g.shape[1])
 
 #%%
 '''
 Compare different regression models 
 '''
 
-regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'Poly 1st', 'Poly 2nd']
-scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_first, scores_second])
+regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'PC Geometric', 'Poly 1st', 'Poly 2nd']
+scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_pcg, scores_first, scores_second])
 means_train = np.array(scores_mx[:,0])
 std_train = np.array(scores_mx[:,1])
 means_test = np.array(scores_mx[:,2])
@@ -478,7 +491,7 @@ rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, #yerr=std_t
                 alpha=opacity, color='salmon',
                 label='Test')
 #plt.ylim([-1,18])
-plt.xticks(x_pos+bar_width/2, regression_method, rotation=0)
+plt.xticks(x_pos+bar_width/2, regression_method, rotation=40)
 plt.xlabel('Regression Method')
 plt.ylabel('CV RMSE (eV)')
 plt.ylim([0,1])

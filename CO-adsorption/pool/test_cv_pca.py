@@ -10,9 +10,11 @@ Perform Cross Validation PCA regression
 Leave one out cross-validation 
 Choose the number of PC with lowest test CV score
 '''
-from sklearn.model_selection import RepeatedKFold, cross_validate
+from sklearn.model_selection import RepeatedKFold, cross_validate, LeaveOneOut
 import sklearn.cross_validation as cv
 
+nPC = 10
+loo = LeaveOneOut() 
 test_r2 = []
 test_RMSEs = []
 train_r2 = []
@@ -41,6 +43,7 @@ plt.plot(np.arange(1,nPC+1)[:nplot], test_RMSEs[:nplot], c = 'r', label = 'Test'
 plt.plot(np.arange(1,nPC+1)[:nplot], train_RMSEs[:nplot], c = 'b', label = 'Train')
 plt.ylabel('RMSE(eV)')
 plt.xlabel('nPC')
+plt.xticks(np.arange(1,nplot+1))
 plt.legend(loc= 'best', frameon=False)   
  
 plt.figure() 
@@ -48,4 +51,5 @@ plt.figure()
 plt.plot(np.arange(1,nPC+1)[:nplot], train_r2[:nplot], c = 'b', label = 'Train')
 plt.ylabel('r2')
 plt.xlabel('nPC')
+plt.xticks(np.arange(1,nplot+1))
 plt.legend(loc= 'best', frameon=False)    
