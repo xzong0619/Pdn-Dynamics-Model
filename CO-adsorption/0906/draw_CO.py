@@ -1,25 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Sep  8 14:15:41 2018
+Created on Tue Dec 18 17:35:08 2018
 
 @author: yifan
 """
 
-from ase.io import read, write
-from ase.visualize import view
-import glob
-files = []
-for file in glob.glob("*CONTCAR"):
-    files.append(file)
-
-
-filename = files[0]
-
-atoms = read('pd1-ceria-co-CONTCAR')
-
-
-
+from ase.build import molecule
+atoms = molecule('CO')
 view(atoms)
+
 
 pov_args = {
 	'transparent': True, #Makes background transparent. I don't think I've had luck with this option though
@@ -37,7 +26,4 @@ pov_args = {
 
 #write('Pd1CO.POV', atoms, **pov_args)
 
-del atoms[98]
-del atoms[96]
-write('Pd1.POV', atoms, **pov_args)
-
+write('CO.POV', atoms, **pov_args)
