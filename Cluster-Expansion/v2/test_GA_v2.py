@@ -64,7 +64,7 @@ Clusters = initialize_Clusters_object()
 
 #%%
 #Genetic Hyperparameters
-ngoal = 16 #5, 10, 15, 20
+ngoal = 5 #5, 10, 15, 20
 nodes = 36 #lattice node size
 n = 100 #Size of population
 ngen = 50 #Number of generations
