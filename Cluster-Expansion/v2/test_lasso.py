@@ -24,8 +24,8 @@ Gcv = Gcv1+Gcv2+Gcv3
 x = np.load('pi3.npy')
 X =x
 NPd_list = np.array(NPd_list)
-#X = np.ones((x.shape[0], x.shape[1]+1))
-#X[:,1:] = x     
+X = np.ones((x.shape[0], x.shape[1]+1))
+X[:,1:] = x     
    
 #%%
 
@@ -44,7 +44,7 @@ NPd_train = np.array(NPd_train)
                                  
 rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
 
-lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.001, fit_intercept=True)
+lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.0001, fit_intercept=False)
 lasso_cv.fit(X_train, y_train)
 alpha = lasso_cv.alpha_
 alphas = lasso_cv.alphas_
@@ -64,7 +64,7 @@ MSE_path = np.mean(lasso_cv.mse_path_, axis = 1)
 intercept = lasso_cv.intercept_
 
 #%%
-Tol = 1e-4
+Tol = 1e-7
 J_index = np.where(abs(coefs)>=Tol)[0]
 #J_index = np.nonzero(coefs)[0] #-1 #for the matrix before we add column 1
 n_coef = len(J_index)
@@ -108,7 +108,7 @@ def plot_lasso():
                 label='alpha: CV estimate') 
     
     plt.legend(frameon=False)
-    plt.xlabel("-log10(alphas)")
+    plt.xlabel(r"$-log10(\lambda)$")
     plt.ylabel("log10(Mean Square Error (eV))")    
     font = {'family' : 'normal',
             'size'   : 15}
@@ -132,7 +132,7 @@ def plot_lasso():
                 label='alpha: CV estimate') 
     plt.legend(frameon=False)
     
-    plt.xlabel("-log10(alphas)")
+    plt.xlabel(r"$-log10(\lambda)$")
     plt.ylabel("Number of Nonzero Coefficients ")    
     
     matplotlib.rc('font', **font)
