@@ -15,7 +15,7 @@ for file in glob.glob("*CONTCAR"):
 
 filename = files[0]
 
-atoms = read('pd1-ceria-co-CONTCAR')
+atoms = read('pd20-ceria-co-CONTCAR')
 
 
 
@@ -37,7 +37,7 @@ pov_args = {
 
 #write('Pd1CO.POV', atoms, **pov_args)
 
-del atoms[98]
-del atoms[96]
-write('Pd1.POV', atoms, **pov_args)
+#del atoms[98]
+#del atoms[96]
+#write('Pd1.POV', atoms, **pov_args)
 
