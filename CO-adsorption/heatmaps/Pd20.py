@@ -19,9 +19,13 @@ Cr = covalent_radii[6]
 CO = Cr + Or - 0.3
 PdO = Pdr+Or -0.3
 #%%
+'''
+Read the old CONTCAR file with a CO onto it
+'''
+
 old_name = 'pd20-ceria-co-CONTCAR'
 atoms = read(old_name)
-view(atoms)
+
 
 nPd = 0
 
@@ -31,22 +35,22 @@ for i, atom in enumerate(atoms):
         
 for j, atom in enumerate(atoms):
     if atom.symbol == 'C':
-        Cj = j
+        C_in_CO = j
         
-Dist  = []
-Ok  = []       
+C_O_Dist  = []
+O_in_CO  = []       
  
 for k, atom in enumerate(atoms):
     if atom.symbol == 'O':
-        dist = atoms.get_distance(Cj, k)
-        Dist.append(dist)
-        Ok.append(k)
+        dist = atoms.get_distance(C_in_CO, k)
+        C_O_Dist.append(dist)
+        O_in_CO.append(k)
 
-Ok = Ok[Dist.index(min(Dist))]
+O_in_CO = O_in_CO[C_O_Dist.index(min(C_O_Dist))]
 
 
 #%%
-Pdi = [116]
+Pdi = [113]
 nsite = len(Pdi)
 
 if nsite == 1: sitetype = 't'
@@ -63,8 +67,8 @@ if nsite == 1: #top site
     rotate = [sin(radians(phi))*cos(radians(theta)),  
               sin(radians(phi))*sin(radians(theta)), 
               cos(radians(phi))]
-    atoms[Cj].position = Pdpos[0] + np.array([rotate])*PdO
-    atoms[Ok].position = atoms[Cj].position + np.array([rotate])*CO
+    atoms[C_in_CO].position = Pdpos[0] + np.array([rotate])*PdO
+    atoms[O_in_CO].position = atoms[C_in_CO].position + np.array([rotate])*CO
 
 if nsite == 2 or nsite == 3: #bridge or hollow site
     phi = 30
@@ -73,7 +77,7 @@ if nsite == 2 or nsite == 3: #bridge or hollow site
               sin(radians(phi))*sin(radians(theta)), 
               cos(radians(phi))]
     translate = [0.8, 0.8, 0.5] 
-    atoms[Cj].position = np.mean(Pdpos, axis = 0) + (np.array([translate])*np.array([rotate])) *PdO
-    atoms[Ok].position = atoms[Cj].position + (np.array([translate])* np.array([rotate])) *CO   
+    atoms[C_in_CO].position = np.mean(Pdpos, axis = 0) + (np.array([translate])*np.array([rotate])) *PdO
+    atoms[O_in_CO].position = atoms[C_in_CO].position + (np.array([translate])* np.array([rotate])) *CO   
     
 view(atoms)
