@@ -50,7 +50,7 @@ O_in_CO = O_in_CO[C_O_Dist.index(min(C_O_Dist))]
 
 
 #%%
-Pdi = [113]
+Pdi = [116, 113, 114]
 nsite = len(Pdi)
 
 if nsite == 1: sitetype = 't'
