@@ -4,52 +4,31 @@ Created on Sun Dec 23 17:00:42 2018
 
 @author: yifan
 """
+import sys
+import os
 import numpy as np
 import pandas as pd
+
 
 from ase.io import read, write
 from ase.visualize import view
 from ase import Atom
 from sympy import nsolve
+from sympy import Plane, Point3D
 from sympy.abc import x,y,z
 
+HomePath = os.path.expanduser('~')
+sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model','CO-adsorption', 'pool'))
+
 from Pdbulk import NN1,NN2
-from sympy import Plane, Point3D
-#%%
-'''
-Bond length value calculation from the given dataset
-'''
-PdCs = ['Pd1C', 'Pd2C', 'Pd3C'] 
-PdCi = []
 
-for PdC in PdCs: PdCi.append(descriptors.index(PdC))
-Xsite = []   
-for cnt in PdCi:
-    for site in ['top', 'bridge', 'hollow']:
-        indices = np.where(np.array(sitetype_list) == site)[0]
-        Xsite.append(X[:,cnt][indices])
-
-top_PC1 = np.mean(Xsite[0])
-bridge_PC1 = np.mean(Xsite[1])
-hollow_PC1 = np.mean(Xsite[2])
-
-top_PC2 = np.mean(Xsite[3][np.nonzero(Xsite[3])])
-bridge_PC2 = np.mean(Xsite[4][np.nonzero(Xsite[4])])
-hollow_PC2 = np.mean(Xsite[5][np.nonzero(Xsite[5])])
-
-top_PC3 = np.mean(Xsite[6][np.nonzero(Xsite[6])])
-bridge_PC3 = np.mean(Xsite[7][np.nonzero(Xsite[7])])
-hollow_PC3 = np.mean(Xsite[8][np.nonzero(Xsite[8])])
-
-
-#%%
+#%% User define function block
 
 def remove_CO(filename):
     '''
     Read the old CONTCAR file with a CO onto it
     remove the CO and save as a new CONTCAR
-    '''
-    
+    '''  
     old_name = filename #'pd20-ceria-co-CONTCAR'
     atoms = read(old_name)
     view(atoms)
@@ -79,20 +58,13 @@ def remove_CO(filename):
     view(atoms)
     write('pd'+str(nPd)+'-test-CONTCAR', atoms)
     
-#remove_CO('pd20-ceria-co-CONTCAR')
-    
-'''
-Load the CONTCAR file with Pdn structure
-'''
-    
-filename = 'pd20-test-CONTCAR'
-atoms = read(filename)
-view(atoms)
-
-#%%
+    #Example: remove_CO('pd20-ceria-co-CONTCAR')
 
 def sort_i_and_d(D,I):
-    
+    '''
+    Sort indices based on the atomic bond length
+    return the sorted bond length and indices in ascending order
+    '''
     Dsort = np.sort(D)
     Dsort = list(Dsort)
     D = list(D)
@@ -101,6 +73,58 @@ def sort_i_and_d(D,I):
         Isort.append(I[D.index(d)])
         
     return Dsort,Isort
+
+def find_all_Pd(atoms):
+    '''
+    Count number of atoms, return all Pd atom indices
+    '''
+    Pd_indices = []
+    
+    for i, atom in enumerate(atoms):
+        if atom.symbol == 'Pd': Pd_indices.append(i)  
+        
+    return Pd_indices
+
+def find_nearest_Pd(Pdi, Pd_indices):
+    '''
+    Input one target Pd atom index and all the indices for Pd atoms
+    return the three relevent indices
+    n = 3 for top sites
+    '''
+    #Get the bond length of C-Ce, Pd-C, Pd-Pd
+    #and NN table for each Pd
+
+    Pd_Pd = atoms.get_distances(Pdi, Pd_indices, mic = True) #all Pd-Pd bond length 
+    Pd_Pd, Pd_indices = sort_i_and_d(Pd_Pd, Pd_indices) #sorted Pd-Pd bond length    
+    Pd_sites = Pd_indices
+    
+    return Pd_sites
+
+def find_nearest_Pd_top(Pdi, Pd_indices):
+    
+    Pd_sites = find_nearest_Pd(Pdi, Pd_indices)[:3]
+    return Pd_sites
+
+def find_nearest_Pd_bridge(Pdi, Pd_indices):
+    '''
+    Input two target Pd atom index and all the indices for Pd atoms
+    return the three relevent indices
+    '''
+    Pd1 = Pdi[0]
+    Pd2 = Pdi[1]
+    
+    Pd_sites1 = find_nearest_Pd(Pd1, Pd_indices)
+    Pd_sites1 = [x for x in Pd_sites1 if x not in Pdi]
+    Pd_sites2 = find_nearest_Pd(Pd2, Pd_indices)
+    Pd_sites2 = [x for x in Pd_sites2 if x not in Pdi]
+    
+    Pd3 = [i for i in Pd_sites1 if i in Pd_sites2]
+    
+    Pd_sites = [Pd1, Pd2, Pd3[0]]
+    
+    return Pd_sites
+
+
 
 # write a class for it
 class PdCO():
@@ -274,6 +298,59 @@ class PdCO():
                              self.PdC3] #3rd Pd-C distance
 
 
+#%%
+'''
+Bond length value calculation from the given dataset
+'''
+PdCs = ['Pd1C', 'Pd2C', 'Pd3C'] 
+PdCi = []
+
+for PdC in PdCs: PdCi.append(descriptors.index(PdC))
+Xsite = []   
+for cnt in PdCi:
+    for site in ['top', 'bridge', 'hollow']:
+        indices = np.where(np.array(sitetype_list) == site)[0]
+        Xsite.append(X[:,cnt][indices])
+
+top_PC1 = np.mean(Xsite[0])
+bridge_PC1 = np.mean(Xsite[1])
+hollow_PC1 = np.mean(Xsite[2])
+
+top_PC2 = np.mean(Xsite[3][np.nonzero(Xsite[3])])
+bridge_PC2 = bridge_PC1 #np.mean(Xsite[4][np.nonzero(Xsite[4])])
+hollow_PC2 = hollow_PC1 #np.mean(Xsite[5][np.nonzero(Xsite[5])])
+
+top_PC3 = np.mean(Xsite[6][np.nonzero(Xsite[6])])
+bridge_PC3 = np.mean(Xsite[7][np.nonzero(Xsite[7])])
+hollow_PC3 = hollow_PC1 #np.mean(Xsite[8][np.nonzero(Xsite[8])])
+
+
+#%%
+    
+'''
+Load the CONTCAR file with Pdn structure
+'''
+    
+filename = 'pd20-test-CONTCAR'
+atoms = read(filename)
+view(atoms)
+
+#Find all Pd atoms
+Pd_indices =  find_all_Pd(atoms)
+Pd_no_interest = [97, 100, 102, 103]
+Pd_interest = [x for x in Pd_indices if x not in Pd_no_interest]
+
+
+top_sites = []
+
+#Find all CO adsorption sites
+for Pdi in Pd_interest:
+    
+     top_sites.append(find_nearest_Pd_top(Pdi, Pd_indices))
+
+
+
+#%%        
 Pdi = [115, 113, 112]
 nsite = len(Pdi)
 
