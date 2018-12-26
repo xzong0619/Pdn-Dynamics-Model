@@ -17,7 +17,7 @@ Pdr = covalent_radii[46]
 Or = covalent_radii[8]
 Cr = covalent_radii[6]
 CO = Cr + Or - 0.3
-PdO = Pdr+Or -0.3
+PdC = Pdr+Cr -0.3
 #%%
 '''
 Read the old CONTCAR file with a CO onto it
@@ -50,7 +50,7 @@ O_in_CO = O_in_CO[C_O_Dist.index(min(C_O_Dist))]
 
 
 #%%
-Pdi = [116, 113, 114]
+Pdi = [116]
 nsite = len(Pdi)
 
 if nsite == 1: sitetype = 't'
@@ -62,12 +62,12 @@ for i in Pdi:
     Pdpos.append(atoms[i].position)
 
 if nsite == 1: #top site
-    phi = 0
-    theta = 0
+    phi = 60
+    theta = 180 #300
     rotate = [sin(radians(phi))*cos(radians(theta)),  
               sin(radians(phi))*sin(radians(theta)), 
               cos(radians(phi))]
-    atoms[C_in_CO].position = Pdpos[0] + np.array([rotate])*PdO
+    atoms[C_in_CO].position = Pdpos[0] + np.array([rotate])*PdC
     atoms[O_in_CO].position = atoms[C_in_CO].position + np.array([rotate])*CO
 
 if nsite == 2 or nsite == 3: #bridge or hollow site
@@ -77,7 +77,7 @@ if nsite == 2 or nsite == 3: #bridge or hollow site
               sin(radians(phi))*sin(radians(theta)), 
               cos(radians(phi))]
     translate = [0.8, 0.8, 0.5] 
-    atoms[C_in_CO].position = np.mean(Pdpos, axis = 0) + (np.array([translate])*np.array([rotate])) *PdO
+    atoms[C_in_CO].position = np.mean(Pdpos, axis = 0) + (np.array([translate])*np.array([rotate])) *PdC
     atoms[O_in_CO].position = atoms[C_in_CO].position + (np.array([translate])* np.array([rotate])) *CO   
     
 view(atoms)

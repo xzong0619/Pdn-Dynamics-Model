@@ -13,9 +13,12 @@ import pandas as pd
 from ase.io import read, write
 from ase.visualize import view
 from ase import Atom
+from ase.data import covalent_radii
 from sympy import nsolve
 from sympy import Plane, Point3D
 from sympy.abc import x,y,z
+from itertools import combinations 
+from math import sin, cos,radians
 
 HomePath = os.path.expanduser('~')
 sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model','CO-adsorption', 'pool'))
@@ -124,8 +127,73 @@ def find_nearest_Pd_bridge(Pdi, Pd_indices):
     
     return Pd_sites
 
+def find_bridge_pairs(Pd_pairs, atoms):
+    
+    bridge_pairs = []
+    for pair in Pd_pairs:
+        Pd_Pd = atoms.get_distances([pair[0]], [pair[1]])
+        if np.logical_and(Pd_Pd>=NN1[0], Pd_Pd<=NN1[1]):
+            bridge_pairs.append(pair)
+    
+    return bridge_pairs
+            
+def find_hollow_triples(Pd_triples , atoms):
+    
+    hollow_triples = []
+    for triple in Pd_triples:
+        Pd_Pd1 = atoms.get_distances(triple[0], [triple[1], triple[2]])
+        Pd_Pd2 = atoms.get_distances([triple[1]], [triple[2]])
+        flag1 = np.logical_and(Pd_Pd1>=NN1[0], Pd_Pd1<=NN1[1])
+        flag2 = np.logical_and(Pd_Pd2>=NN1[0], Pd_Pd2<=NN1[1])
+      
+        if np.all(list(flag1)+list(flag2)):
+            hollow_triples.append(list(triple))
+    
+    return hollow_triples
+    
+def sphere_fun(pos, r):
+    f = (x-pos[0])**2 +  (y-pos[1])**2 +  (z-pos[2])**2 - r**2
+    return f
 
+def find_CO_pos(Pdi, atoms, sitetype):
 
+    Pdpos = []
+    for i in Pdi: Pdpos.append(atoms[i].position)
+    PdC = site_PdC[sitetype]
+    
+
+    left_side_indcies = [96, 98, 99, 106, 107, 110, 111, 112, 113, 115]
+    phi = 60
+    
+    if sitetype == 'hollow':
+        flags =[]        
+        for i in Pdi:
+            flags.append(i in left_side_indcies)
+        
+    if sitetype == 'bridge':
+        flags = [Pdi[0] in left_side_indcies, Pdi[1] in left_side_indcies]
+        
+    if sitetype == 'top':
+        flags = Pdi[0] in left_side_indcies
+    
+    if np.all(flags): theta = 180 
+    else: theta = 300
+        
+    rotate = [sin(radians(phi))*cos(radians(theta)),  
+              sin(radians(phi))*sin(radians(theta)), 
+              cos(radians(phi))]
+
+    initial_guess = tuple(Pdpos[0] + np.array(rotate)*PdC)
+#    if sitetype == 'top':
+#        initial_guess = tuple(Pdpos[0])
+    f1 = sphere_fun(Pdpos[0],PdC[0])
+    f2 = sphere_fun(Pdpos[1],PdC[1])
+    f3 = sphere_fun(Pdpos[2],PdC[2])
+
+    CO_pos = np.array(list(nsolve((f1, f2, f3), (x,y,z), initial_guess))).astype(float)
+    
+    return CO_pos
+    
 # write a class for it
 class PdCO():
 
@@ -302,6 +370,13 @@ class PdCO():
 '''
 Bond length value calculation from the given dataset
 '''
+
+csv_file  = os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model','CO-adsorption', 'pool', 'descriptor_data.csv')
+fdata = pd.read_csv(csv_file)
+descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #10 in total
+sitetype_list = list(fdata.loc[:,'SiteType'])
+X =  np.array(fdata.loc[:,descriptors], dtype = float)
+
 PdCs = ['Pd1C', 'Pd2C', 'Pd3C'] 
 PdCi = []
 
@@ -312,19 +387,21 @@ for cnt in PdCi:
         indices = np.where(np.array(sitetype_list) == site)[0]
         Xsite.append(X[:,cnt][indices])
 
-top_PC1 = np.mean(Xsite[0])
-bridge_PC1 = np.mean(Xsite[1])
-hollow_PC1 = np.mean(Xsite[2])
+top_PdC1 = np.mean(Xsite[0])
+bridge_PdC1 = np.mean(Xsite[1])
+hollow_PdC1 = np.mean(Xsite[2])
 
-top_PC2 = np.mean(Xsite[3][np.nonzero(Xsite[3])])
-bridge_PC2 = bridge_PC1 #np.mean(Xsite[4][np.nonzero(Xsite[4])])
-hollow_PC2 = hollow_PC1 #np.mean(Xsite[5][np.nonzero(Xsite[5])])
+top_PdC2 = np.mean(Xsite[3][np.nonzero(Xsite[3])])
+bridge_PdC2 = bridge_PdC1 #np.mean(Xsite[4][np.nonzero(Xsite[4])])
+hollow_PdC2 = hollow_PdC1 #np.mean(Xsite[5][np.nonzero(Xsite[5])])
 
-top_PC3 = np.mean(Xsite[6][np.nonzero(Xsite[6])])
-bridge_PC3 = np.mean(Xsite[7][np.nonzero(Xsite[7])])
-hollow_PC3 = hollow_PC1 #np.mean(Xsite[8][np.nonzero(Xsite[8])])
+top_PdC3 = np.mean(Xsite[6][np.nonzero(Xsite[6])])
+bridge_PdC3 = np.mean(Xsite[7][np.nonzero(Xsite[7])])
+hollow_PdC3 = hollow_PdC1 #np.mean(Xsite[8][np.nonzero(Xsite[8])])
 
-
+site_PdC = dict([('top', [top_PdC1, top_PdC2, top_PdC3]),
+                 ('bridge', [bridge_PdC1, bridge_PdC2, bridge_PdC3]),
+                 ('hollow', [hollow_PdC1, hollow_PdC2, hollow_PdC3])])
 #%%
     
 '''
@@ -340,39 +417,74 @@ Pd_indices =  find_all_Pd(atoms)
 Pd_no_interest = [97, 100, 102, 103]
 Pd_interest = [x for x in Pd_indices if x not in Pd_no_interest]
 
-
-top_sites = []
-
 #Find all CO adsorption sites
+top_sites = []
 for Pdi in Pd_interest:
-    
      top_sites.append(find_nearest_Pd_top(Pdi, Pd_indices))
+top_sites = [[96, 99, 98],
+            [98, 99, 110],
+            [99, 96, 98],
+            [101, 110, 105],
+            [104, 108, 105],
+            [105, 104, 101],
+            [106, 113, 100],
+            [107, 106, 100],
+            [108, 114, 104],
+            [109, 104, 108],
+            [110, 112, 101],
+            [111, 110, 101],
+            [112, 99, 110],
+            [113, 99, 112],
+            [114, 105, 112],
+            [115, 112, 113]]
 
+bridge_sites = []     
+Pd_pairs  = list(combinations(Pd_interest,2))
+bridge_pairs = find_bridge_pairs(Pd_pairs, atoms)
+for Pdi in bridge_pairs:
+     bridge_sites.append(find_nearest_Pd_bridge(Pdi, Pd_indices))
+     
 
+bridge_sites = [[107,96,106], [96,98,99],[98,111,110], [106,99,113],[99,110,112],[112,113,115],
+                [107,106,96], [106,113,99], [113,115,112],
+                [96,99,106], [99,112,113],  [98,110,99],
+                [96,106,99], [99,98,110], [99,113,112],
+                [115,112,113], [112,110,99], [110,111,98],
+                [115,114,112], [114,108,105], [108,109,104],
+                [112,114,105], [110,105,112], [105,108,114], [111,101,110], [101,104,105], [104,109,108],
+                [114,105,108], [105,101,104], [104,108,109],
+                [112,105,114], [105,104,108], [110,101,105]]
+        
+hollow_sites = [] 
+Pd_triples  = list(combinations(Pd_interest,3))
+hollow_triples = find_hollow_triples(Pd_triples, atoms)
+hollow_sites_no_interest = [[98, 101, 111], [98, 101, 110], [99, 105, 110],[99, 105, 112],[112, 113, 114], [113, 114, 115]]
+for triple in hollow_triples:
+    if triple not in hollow_sites_no_interest: hollow_sites.append(triple)            
+            
+            
+#Find corresponding CO position
+CO_pos_hollow = []
+for site in hollow_sites:
+    CO_pos_i_hollow = find_CO_pos(site, atoms, 'hollow')
+    #atoms.append(Atom('C', CO_pos_i_hollow))
+    CO_pos_hollow.append(CO_pos_i_hollow)
+
+CO_pos_bridge = []
+for site in bridge_sites:
+    CO_pos_i_bridge = find_CO_pos(site, atoms, 'bridge')
+    #atoms.append(Atom('C', CO_pos_i_bridge))
+    CO_pos_bridge.append(CO_pos_i_bridge)
+    
+CO_pos_top = []
+  
+for site in top_sites:
+    CO_pos_i_top = find_CO_pos(site, atoms, 'top')
+    atoms.append(Atom('C', CO_pos_i_top))
+    CO_pos_top.append(CO_pos_i_top)
 
 #%%        
-Pdi = [115, 113, 112]
-nsite = len(Pdi)
-
-if nsite == 1: sitetype = 't'
-if nsite == 2: sitetype = 'b'
-if nsite == 3: sitetype = 'h'
-
-Pdpos = []
-for i in Pdi:
-    Pdpos.append(atoms[i].position)
-    
-def sphere_fun(pos, r):
-    f = (x-pos[0])**2 +  (y-pos[1])**2 +  (z-pos[2])**2 - r**2
-    return f
 
 
-f1 = sphere_fun(Pdpos[0],bridge_PC1)
-f2 = sphere_fun(Pdpos[1],bridge_PC2)
-f3 = sphere_fun(Pdpos[2],bridge_PC3)
-initial_guess =  tuple(Pdpos[0])
-CO_pos = np.array(list(nsolve((f1, f2, f3), (x,y,z), initial_guess))).astype(float)
-#atoms[C_in_CO].position = CO_pos
 
-atoms.append(Atom('C', CO_pos))
 view(atoms)
