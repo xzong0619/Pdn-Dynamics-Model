@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Wed Dec 26 12:37:09 2018
+
+@author: yifan
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Sun Dec 23 17:00:42 2018
 
 @author: yifan
@@ -8,7 +15,7 @@ import sys
 import os
 import numpy as np
 import pandas as pd
-
+import pickle 
 
 from ase.io import read, write
 from ase.visualize import view
@@ -18,6 +25,9 @@ from sympy import Plane, Point3D
 from sympy.abc import x,y,z
 from itertools import combinations 
 from math import sin, cos,radians
+
+from sklearn.decomposition import PCA 
+from sklearn.preprocessing import StandardScaler 
 
 HomePath = os.path.expanduser('~')
 sys.path.append(os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model','CO-adsorption', 'pool'))
@@ -67,12 +77,14 @@ def sort_i_and_d(D,I):
     Sort indices based on the atomic bond length
     return the sorted bond length and indices in ascending order
     '''
-    Dsort = np.sort(D)
-    Dsort = list(Dsort)
     D = list(D)
+    Dsort = np.sort(D)
+    D_unqiue_sort = np.sort(np.unique(D))
+    D_unqiue_sort = list(D_unqiue_sort)
     Isort = []
-    for d in Dsort:
-        Isort.append(I[D.index(d)])
+    for d in D_unqiue_sort:
+        indices = [i for i, x in enumerate(D) if x == d]
+        for i in indices: Isort.append(I[i])
         
     return Dsort,Isort
 
@@ -132,7 +144,7 @@ def find_bridge_pairs(Pd_pairs, atoms):
     for pair in Pd_pairs:
         Pd_Pd = atoms.get_distances([pair[0]], [pair[1]])
         if np.logical_and(Pd_Pd>=NN1[0], Pd_Pd<=NN1[1]):
-            bridge_pairs.append(pair)
+            bridge_pairs.append(list(pair))
     
     return bridge_pairs
             
@@ -211,13 +223,28 @@ class PdCO():
         
         self.sitetype  = []
         self.descriptors = []
+        self.site_PdC = site_PdC
         
-    def get_descriptors(self, atoms, CI_PdC = 0.2):
+    def get_descriptors(self, atoms, CO_sites):
         '''
         Takes in a structure dictionary with an atoms object and filename 
         Input tolerance for Pd-C bond 0.3 A for detecting CO ads site
         '''
-        self.atoms = atoms
+        self.atoms = atoms.copy()
+        self.CO_sites = CO_sites 
+
+        '''
+        Determine C position and site type
+        '''
+        Pd_pos = []
+        for i in self.CO_sites: Pd_pos.append(self.atoms[i].position)
+        self.C_pos = np.mean(Pd_pos, axis = 0)
+        self.atoms.append(Atom('C', self.C_pos))
+        self.Nsites = len(self.CO_sites)
+        
+        if self.Nsites== 3: self.sitetype = 'hollow'                     
+        if self.Nsites == 2: self.sitetype = 'bridge'
+        if self.Nsites == 1: self.sitetype = 'top'
         
         '''
         Count number of atoms
@@ -244,38 +271,10 @@ class PdCO():
         
         Pd_C, Pdi = sort_i_and_d(Pd_C, Pdi) #sorted Pd-C bond length
         
-        #The distance of Pd to the first nearest C
-        PdC3 = np.zeros(3)
-        #The bond tolerance is 
-        bond_tol = 0.7
-        if len(Pd_C) == 1: 
-            
-            PdC3[0] = Pd_C[0]
-            COsites = np.array(Pdi)[:1] #top
-        
-        if len(Pd_C) == 2:    
-            
-            PdC3[:2] = Pd_C[:2]
-            diff = Pd_C[1] - Pd_C[0]
-            
-            if diff < bond_tol: COsites = np.array(Pdi)[:2] #bridge
-            else: COsites = np.array(Pdi)[:1] #top
-            
-        if len(Pd_C) >= 3: 
-            
-            PdC3 = Pd_C[:3] 
-            diff1 = Pd_C[1] - Pd_C[0]
-            diff2 = Pd_C[2] - Pd_C[1]
-            
-            if diff1 > bond_tol: COsites = np.array(Pdi)[:1] #top
-            else:
-                if diff2 > bond_tol: COsites = np.array(Pdi)[:2] #bridge
-                else: COsites = np.array(Pdi)[:3] #hollow
-        
+        PdC3 = self.site_PdC[self.sitetype]
         self.PdC1 = PdC3[0]
         self.PdC2 = PdC3[1]
         self.PdC3 = PdC3[2]
-        
         
         C_Ce = self.atoms.get_distances(Ci[0], Cei, mic = True)#all Ce-C bond length
         C_Ce, Cei = sort_i_and_d(C_Ce, Cei) #sorted Ce-C bond length
@@ -304,48 +303,25 @@ class PdCO():
                          Point3D(self.atoms[Cei[1]].position), 
                          Point3D(self.atoms[Cei[2]].position))
         self.Dsupport = float(Ce_plane.distance(Point3D(self.atoms[Ci[0]].position)))
-        #self.Dsupport = C_Ce[0] 
         
         '''
         Detect CO adsorption sites
         '''
-          
-        #PdC_range = (PdC - CI_PdC, PdC + CI_PdC)   
-              
-        #Atom index of CO adsorption sites
-        #COsites = np.array(Pdi)[np.logical_and(Pd_C>=PdC_range[0], Pd_C<=PdC_range[1])]
-        self.Nsites = len(COsites)
-        
-        if self.Nsites== 3: self.sitetype = 'hollow'
-        if self.Nsites == 2: self.sitetype = 'bridge'
-        if self.Nsites == 1: self.sitetype = 'top'
-        
+               
         COsites_cols = []
-        for s in range(len(COsites)):
-            COsites_cols.append('Pd'+str(COsites[s]))
+        for s in range(len(self.CO_sites)):
+            COsites_cols.append('Pd'+str(self.CO_sites[s]))
         
         PdNN_CO = PdNN.loc[:, COsites_cols] #NN dataframe 
-        Pd_C_CO = np.array(Pd_C[:len(COsites)]) #CO distance to neighboring Pd atoms
+        #Pd_C_CO = np.array([:len(self.CO_sites)]) #CO distance to neighboring Pd atoms
         
         '''
-        Weighted average for NN1, NN2
+        Average for NN1, NN2
         '''
-        norm_weights = (1/Pd_C_CO)/np.sum(1/Pd_C_CO) #weights based on 1 over CO-Pd distance
+        #norm_weights = (1/Pd_C_CO)/np.sum(1/Pd_C_CO) #weights based on 1 over CO-Pd distance
         
-        self.CN1 = np.dot(norm_weights, PdNN_CO.loc['NN1'].values)
-        self.CN2 = np.dot(norm_weights, PdNN_CO.loc['NN2'].values)
-        
-        '''
-        GCN calculation
-        '''
-        cn_max = [12, 18, 22]
-        gcn_sum = 0
-        for i in COsites:
-            #Pd1NN['Pd'+str(i)] is a list of cn number for 1NN
-            for j in Pd1NN['Pd'+str(i)]:
-                gcn_sum  = gcn_sum + PdNN.loc['NN1']['Pd'+str(j)]
-        
-        self.GCN = gcn_sum/cn_max[self.Nsites -1]
+        self.CN1 = np.mean(PdNN_CO.loc['NN1'].values)
+        self.CN2 = np.mean(PdNN_CO.loc['NN2'].values)
         
         
         '''
@@ -357,7 +333,7 @@ class PdCO():
                              self.sitetype, #sitetype from calculation
                              self.CN1, #CN1
                              self.CN2, #CN2
-                             self.GCN, # general cooridination number
+                             #self.GCN, # general cooridination number
                              self.Dsupport, #Z
                              self.Nsites, #number of sites
                              self.PdC1, #1st Pd-C distance 
@@ -418,41 +394,12 @@ Pd_interest = [x for x in Pd_indices if x not in Pd_no_interest]
 
 #Find all CO adsorption sites
 top_sites = []
-for Pdi in Pd_interest:
-     top_sites.append(find_nearest_Pd_top(Pdi, Pd_indices))
-top_sites = [[96, 99, 98],
-            [98, 99, 110],
-            [99, 96, 98],
-            [101, 110, 105],
-            [104, 108, 105],
-            [105, 104, 101],
-            [106, 113, 100],
-            [107, 106, 100],
-            [108, 114, 104],
-            [109, 104, 108],
-            [110, 112, 101],
-            [111, 110, 101],
-            [112, 99, 110],
-            [113, 99, 112],
-            [114, 105, 112],
-            [115, 112, 113]]
+for Pdi in Pd_interest: top_sites.append([Pdi])
 
 bridge_sites = []     
 Pd_pairs  = list(combinations(Pd_interest,2))
-bridge_pairs = find_bridge_pairs(Pd_pairs, atoms)
-for Pdi in bridge_pairs:
-     bridge_sites.append(find_nearest_Pd_bridge(Pdi, Pd_indices))
-     
+bridge_sites = find_bridge_pairs(Pd_pairs, atoms)
 
-bridge_sites = [[107,96,100], [96,98,97],[98,111,101], [106,99,103],[99,110,105],[112,113,114],
-                [107,106,96], [106,113,99], [113,115,112],
-                [96,99,106], [99,112,113],  [98,110,99],
-                [96,106,99], [99,98,110], [99,113,112],
-                [115,112,113], [112,110,99], [110,111,98],
-                [115,114,112], [114,108,105], [108,109,104],
-                [112,114,105], [110,105,112], [105,108,114], [111,101,110], [101,104,105], [104,109,108],
-                [114,105,108], [105,101,104], [104,108,109],
-                [112,105,114], [105,104,108], [110,101,105]]
         
 hollow_sites = [] 
 Pd_triples  = list(combinations(Pd_interest,3))
@@ -460,45 +407,58 @@ hollow_triples = find_hollow_triples(Pd_triples, atoms)
 hollow_sites_no_interest = [[98, 101, 111], [98, 101, 110], [99, 105, 110],[99, 105, 112],[112, 113, 114], [113, 114, 115]]
 for triple in hollow_triples:
     if triple not in hollow_sites_no_interest: hollow_sites.append(triple)            
-            
-structures = []            
-#Find corresponding CO position
-CO_pos_hollow = []
-for site in hollow_sites:
-    CO_pos_i_hollow = find_CO_pos(site, atoms, 'hollow')
-    CO_pos_hollow.append(CO_pos_i_hollow)
-    struct = atoms.copy()
-    struct.append(Atom('C', CO_pos_i_hollow))
-    structures.append(struct)
-    
+   
+CO_sites = top_sites + bridge_sites + hollow_sites
 
-CO_pos_bridge = []
-for site in bridge_sites:
-    CO_pos_i_bridge = find_CO_pos(site, atoms, 'bridge')
-    CO_pos_bridge.append(CO_pos_i_bridge)
-    struct = atoms.copy()
-    struct.append(Atom('C', CO_pos_i_bridge))
-    structures.append(struct)
-    
-CO_pos_top = []
-  
-for site in top_sites:
-    CO_pos_i_top = find_CO_pos(site, atoms, 'top')
-    CO_pos_top.append(CO_pos_i_top)
-    struct = atoms.copy()
-    struct.append(Atom('C', CO_pos_i_top))
-    structures.append(struct)
-
+#
 #%% Analyse the structures and save into a csv file
-Ntot = len(structures)        
+Ntot = len(CO_sites)        
 labels = ['AtomsObject', 'Eads', 'NPd', 'SiteType',
-          'CN1', 'CN2', 'GCN', 'Z', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
+          'CN1', 'CN2', 'Z', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
 
 fdata = pd.DataFrame(columns = labels)
-for i,struct in enumerate(structures):
+for i,site in enumerate(CO_sites):
     
     PdCO_ob = PdCO()
-    PdCO_ob.get_descriptors(struct)
+    PdCO_ob.get_descriptors(atoms, site)
     #if PdCO_ob.filename != 'pd5-ceria-co-CONTCAR':
     fdata.loc[i,:] = PdCO_ob.structureID
 fdata.to_csv('g_descriptor_data.csv', index=False, index_label=False)
+
+#%% Predict the energy 
+
+descriptors_g =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #6 geometric descriptors
+dem =  np.array(fdata.loc[:,descriptors_g], dtype = float)
+sitetype_list = list(fdata.loc[:,'SiteType'])
+
+pca = PCA()    
+X_g = dem.copy()
+X_std_g = StandardScaler().fit_transform(X_g)
+Xpc_g = pca.fit_transform(X_std_g) 
+
+estimator_file  = os.path.join(HomePath,'Documents','GitHub', 'Pdn-Dynamics-Model','CO-adsorption', 'pool', 'g_estimator')
+pcg_estimator = pickle.load(open(estimator_file,'rb'))
+y_pcg = pcg_estimator.predict(Xpc_g)
+
+
+#%% Plot the energy value for top, bridge, hollow sites
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
