@@ -331,6 +331,7 @@ class PdCO():
                              self.Eads, #Eads
                              self.NPd, #Npd
                              self.sitetype, #sitetype from calculation
+                             self.CO_sites, #Pd index at the adsoprtion site
                              self.CN1, #CN1
                              self.CN2, #CN2
                              #self.GCN, # general cooridination number
@@ -413,7 +414,7 @@ CO_sites = top_sites + bridge_sites + hollow_sites
 #
 #%% Analyse the structures and save into a csv file
 Ntot = len(CO_sites)        
-labels = ['AtomsObject', 'Eads', 'NPd', 'SiteType',
+labels = ['AtomsObject', 'Eads', 'NPd', 'SiteType', 'CO sites',
           'CN1', 'CN2', 'Z', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
 
 fdata = pd.DataFrame(columns = labels)
