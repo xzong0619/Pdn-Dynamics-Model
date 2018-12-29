@@ -160,3 +160,24 @@ plt.ylim(y_lim)
 #plt.colorbar()
 #plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
 plt.show()
+
+
+#%%
+'''
+Just for the colorbar
+'''
+plt.figure(figsize=(5, 4))   
+x_pos = sites_pos[:,0]
+y_pos = sites_pos[:,1] 
+#plot_neighbors(sites_pos, all_NN, 'grey')
+plt.scatter(x_pos, y_pos, s= 200, c = y_pcg, edgecolors = 'k', cmap = 'viridis')
+
+x_lim = (sites_pos[:,0].min() - unit/5, sites_pos[:,0].max() + unit/5)   
+y_lim = (sites_pos[:,1].min() - unit/5, sites_pos[:,1].max() + unit/5)     
+plt.xlabel('x (nm)')
+plt.ylabel('y (nm)')
+plt.xlim(x_lim)
+plt.ylim(y_lim)
+plt.colorbar()
+#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+plt.show()
