@@ -366,7 +366,7 @@ class calculations():
                 pi[i][j] = self.get_delta_l(G1v[i],G2v[j])
                 
                 progress = progress + 1
-                per = progress/n1/n2 *100
+                #per = progress/n1/n2 *100
                 #print('%.2f %% done!' %per)
                         
         self.pi = pi

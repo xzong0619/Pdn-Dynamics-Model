@@ -129,7 +129,7 @@ def evaluate_pi(individual, Clusters, Gcv):
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
     Cal = lf.calculations(occ)
-    pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
+    pi_pred =  np.append([1], Cal.get_pi_matrix(Gsv ,Gcv))
     
     return pi_pred
     
@@ -139,7 +139,7 @@ def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
     Gsv = individual_config(individual, Clusters)
     occ_nodes = list(np.nonzero(individual)[0])
     Cal = lf.calculations(occ)
-    pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv) 
+    pi_pred =  np.append([1], Cal.get_pi_matrix(Gsv ,Gcv))
     
     
     #fitness1 = mean_squared_error(pi_pred, pi_true)/4
@@ -150,10 +150,9 @@ def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
     #return (fitness1,fitness2,fitness3,fitness4)
     fitness1 = abs(sum(individual)-ngoal)
     fitness2, fitness3, fitness4, fitness5 = connect_score_2(occ_nodes)
-    fitness6 = (np.dot(pi_pred, J) + intercept)[0]
+    fitness6 = float(np.dot(pi_pred, J) + intercept)
     
     return fitness1,  fitness2, fitness3, fitness4, fitness5, fitness6
-
 
 
 def make_initial_population(COMM = None, toolbox = None, n = None):
@@ -164,6 +163,7 @@ def make_initial_population(COMM = None, toolbox = None, n = None):
     else:
         population = None
     return population
+
 
 def evaluate_population(COMM = None, toolbox = None, population = None):
     rank = get_rank(COMM)
@@ -293,8 +293,7 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
         i = ind[0:nbest]
         
     return i
-        
-    
+            
     
 def get_fitnesses(population = None):
     '''

@@ -22,9 +22,9 @@ import matplotlib
 Gcv = Gcv1+Gcv2+Gcv3
 
 x = np.load('pi3.npy')
-X =x
+#X =x
 NPd_list = np.array(NPd_list)
-X = np.ones((x.shape[0], x.shape[1]+1))
+X = np.ones((x.shape[0], x.shape[1]+1)) #the first column of pi matrix is set a 1, to be the intercept
 X[:,1:] = x     
    
 #%%
@@ -42,14 +42,14 @@ for i in y_train: NPd_train.append(NPd_list[np.where(y==i)[0][0]])
 NPd_test = np.array(NPd_test)
 NPd_train = np.array(NPd_train)                              
                                  
-rkf = RepeatedKFold(n_splits = 10, n_repeats = 10)
+rkf = RepeatedKFold(n_splits = 10, n_repeats = 10, random_state=0)
 
-lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.0001, fit_intercept=False)
+lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.0001, fit_intercept=False, random_state=0)
 lasso_cv.fit(X_train, y_train)
 alpha = lasso_cv.alpha_
 alphas = lasso_cv.alphas_
 
-alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=True)
+alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=False)
 #cv_scores = cv.cross_val_score(lasso_cv,X_train, y_train)
 
 
@@ -73,12 +73,11 @@ pi_nonzero = X[:, J_index]
 n_nonzero = [] # number of nonzeor coefficients in the trajectory
 
 Gcv_nonzero = []
-for i in J_index:
-    Gcv_nonzero.append(Gcv[i])
+for i in J_index[1:]: #skip the first one since it is always 1 and doesnt represent an actual graph
+    Gcv_nonzero.append(Gcv[i]) #Gcv is one less than the number in pi matrix, since the first elment of pi is always 1
 for i in range(coef_path.shape[1]):
     n_nonzero.append(len(np.nonzero(coef_path[:,i])[0]))
 #%%
-
 '''
 Save Gcv_nonzero and n_nonzero for further use
 ''' 
@@ -89,7 +88,7 @@ pickle.dump([Gcv_nonzero, J_nonzero,
 #%%
     
 def real_predict(x, intercept, J_nonzero):
-    
+    # x is the column in pi matrix 
     y = np.dot(x, J_nonzero) + intercept
     
     return y
@@ -143,8 +142,8 @@ def plot_lasso():
     '''
     #plot parity plot
     '''
-    y_predict_all = lasso_cv.predict(X)
-    #y_predict_all = real_predict(pi_nonzero, J_nonzero)
+    #y_predict_all = lasso_cv.predict(X)
+    y_predict_all = real_predict(pi_nonzero, intercept, J_nonzero)
     
     plt.figure(figsize=(20,20))
     

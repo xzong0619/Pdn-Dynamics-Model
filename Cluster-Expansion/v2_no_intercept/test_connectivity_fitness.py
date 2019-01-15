@@ -97,11 +97,11 @@ def connect_score_2(occ_nodes):
     # nodes indices with more than 4 edges
     edge4_nodes = np.where(node_edge_counts >= 4)[0]
 
-    # nodes wirh less than 2 edges, need to be minimized 
+    # nodes with less than 2 edges, need to be minimized 
     n1_nodes = len(occ_nodes) - len(edge2_nodes)
-    # nodes wirh less than 3 edges, need to be minimized 
+    # nodes with less than 3 edges, need to be minimized 
     n2_nodes = len(occ_nodes) - len(edge3_nodes)
-    # nodes wirh less than 4 edges, need to be minimized 
+    # nodes with less than 4 edges, need to be minimized 
     n3_nodes = len(occ_nodes) - len(edge4_nodes)
 
 #    if edges == []: score = 0
