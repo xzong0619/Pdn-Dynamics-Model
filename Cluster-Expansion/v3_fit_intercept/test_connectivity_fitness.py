@@ -117,10 +117,16 @@ def connect_score_2(occ_nodes):
     nl2 = len(np.where(np.logical_and(nodes_array > 17,nodes_array <= 30))[0])
     nl3 = len(np.where(np.logical_and(nodes_array > 30,nodes_array <= 35))[0])
     nl4 = len(np.where(nodes_array > 35)[0]) 
+    n_nodes = len(occ_nodes)
+    # Fraction of nodes above base level, need to be minimized
+    n_above1 = 1 
+    if n_nodes>0:
+        n_above1 = (n_nodes - nl1)/n_nodes
+        
     score = np.dot(np.array([0, 1, 2, 3]), np.array([nl1, nl2, nl3, nl4]))
 
     
-    return n1_nodes, n2_nodes, n3_nodes, score
+    return n1_nodes, n2_nodes, n3_nodes, n_above1, score
 
     
 occ_nodes = [0,1,2,21,10,9]

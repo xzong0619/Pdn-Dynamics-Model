@@ -22,14 +22,15 @@ Plot 1 Cluster Size vs DFT cluster energy
 
 
 fig, ax = plt.subplots(figsize= (6,5))
-ax.scatter(NPd_list, Ec,s=120, facecolors='none', edgecolors='b')
+ax.scatter(NPd_list, Ec, s=20, facecolors='b', edgecolors='b')
 ax.set_xlabel('Cluster Size N')
 ax.set_ylabel('DFT Cluster Energy (eV)')
-plt.axis([1, 25, -25, 1])
-plt.xticks(np.arange(0, 30, 5))
+plt.axis([1, 22, -25, 1])
+plt.xticks(np.arange(0, 22, 5))
 plt.yticks(np.arange(-25, 5, 5))
 plt.show()
 
+#%%
 '''
 Plot 2 Parity Plot
 '''

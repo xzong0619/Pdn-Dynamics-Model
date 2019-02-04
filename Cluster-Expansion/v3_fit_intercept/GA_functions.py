@@ -105,7 +105,10 @@ def ase_object(individual):
     nPd = len(Pdnodes)
     for i in range(nPd):
         support.append(Atom('Pd', position = Pdm[i]))
-    view(support) 
+    #view(support) 
+    
+    
+    return support
                 
 #%%
 def occupancy():
@@ -140,7 +143,7 @@ def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
     occ_nodes = list(np.nonzero(individual)[0])
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
-    
+    n_node = sum(individual)
     
     #fitness1 = mean_squared_error(pi_pred, pi_true)/4
     #fitness2 = norm(pi_pred-pi_true, ord = np.inf)
@@ -148,11 +151,16 @@ def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
     #fitness4 = (np.dot(pi_pred, J) + intercept)[0]
     # possible to put lower energy clusters as fitness
     #return (fitness1,fitness2,fitness3,fitness4)
-    fitness1 = abs(sum(individual)-ngoal)
-    fitness2, fitness3, fitness4, fitness5 = connect_score_2(occ_nodes)
-    fitness6 = float(np.dot(pi_pred, J) + intercept)
+    fitness1 = abs(n_node-ngoal)
+    fitness2, fitness3, fitness4, fitness5, fitness6 = connect_score_2(occ_nodes)
+    fitness7 = float(np.dot(pi_pred, J) + intercept)
     
-    return fitness1,  fitness2, fitness3, fitness4, fitness5, fitness6
+    if ngoal <= 10:
+        return fitness1,  fitness2, fitness3, fitness4, fitness5, fitness7, fitness6
+    if ngoal > 10 and ngoal <= 15:
+        return fitness1,  fitness2, fitness3, fitness4, fitness7, fitness5, fitness6
+    if ngoal > 15:
+        return fitness1,  fitness7, fitness2, fitness3, fitness4, fitness5, fitness6
 
 
 def make_initial_population(COMM = None, toolbox = None, n = None):
@@ -271,7 +279,7 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
         for fi in range(fitnesses.shape[1]):
             fiv.append(fitnesses[:,fi])
            
-        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6]))
+        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6], fiv[-7]))
         i = ind[0]
         
         print( '\tIndividual with best fitness:')
@@ -283,16 +291,30 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
 def find_best_individuals(COMM = None, population = None, nbest = 1):
     
     rank = get_rank(COMM)
+    
+    
     if rank == 0:
         fitnesses = get_fitnesses(population)
         fiv = []
         for fi in range(fitnesses.shape[1]):
             fiv.append(fitnesses[:,fi])
            
-        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6]))
-        i = ind[0:nbest]
+        ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6] , fiv[-7]))
+        best_index = np.array([ind[0]])
+        i = 0 #Index of indiviuals
+        count = 1 #count of qualifing individuals
+    
+        while count < nbest:
+            best_pre = population[best_index[-1]]
+            best_next = population[ind[i]]
+            if not best_pre.fitness.values == best_next.fitness.values:
+                best_index = np.append(best_index, ind[i])
+                count = count + 1
+                
+            i = i + 1
+
         
-    return i
+    return best_index
             
     
 def get_fitnesses(population = None):
@@ -318,12 +340,14 @@ def hall_of_fame(COMM = None, history = None, nbest = None):
     print( '\nHall of Fame top {}:'.format(nbest))
     ihof = find_best_individuals(COMM, history, nbest)
     hof = []
+    E_hof = []
     for ih in ihof:
         hof.append(history[ih])
+        E_hof.append(min(history[ih].fitness.values))
     for i in range(nbest):
         print( '\tIndividual {} with best fitness:  Fitness = {}'.format(i, hof[i].fitness.values))
     
-    return hof 
+    return hof, E_hof 
 
 
 

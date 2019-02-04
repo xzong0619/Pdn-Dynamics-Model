@@ -67,13 +67,13 @@ Clusters = initialize_Clusters_object()
 ngoal = 10 #5, 10, 15, 20
 nodes = 36 #lattice node size
 n = 100 #Size of population
-ngen = 10 #Number of generations
+ngen = 100 #Number of generations
 cxpb = 0.8 #The probability of mating two individuals
 mutpb = 0.05 #The probability of mutating an individual
 k = n
 tournsize = 10
 
-score_weights = (-1.0, -1.0, -1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
+score_weights = (-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
 
 print('{}  Core {}  Reading files'.format(get_time(), rank))
 
@@ -123,10 +123,13 @@ for generation in range(ngen):
     
     
 #%%
-ihof  = GA.hall_of_fame(COMM, history, 10)
+n_hof  = 20
+ihof,E_hof  = GA.hall_of_fame(COMM, history, 20)
 (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof, Clusters, Gcv_nonzero)
 lf.drawing(best_config[0])
 best_G = GA.individual_config(best_ind, Clusters)
 GA.ase_object(best_ind)
 ind_list = list(np.nonzero(best_ind)[0])
-#pickle.dump((best_ind, best_fitness, best_pi, best_config),open('k_point0.p','wb'))
+pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))
+
+
