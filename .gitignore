@@ -49,7 +49,7 @@ Temporary Items
 # Compiled python files
 *.pyc
 <<<<<<< HEAD
-*.png
+#*.png
 =======
 *.pyc
 >>>>>>> 3814c60b54ff65fde8bf96091f8549a0a661f6e7
