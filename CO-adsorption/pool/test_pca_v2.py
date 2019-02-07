@@ -498,7 +498,89 @@ plt.ylabel('CV RMSE (eV)')
 plt.ylim([0,1])
 plt.legend(loc= 'best', frameon=False)
 
+#%% 
+'''
+Plot important PC vs each other and observe clustering
+'''
+pc1 = Xpc[:,0]
+pc2 = Xpc[:,1]
+pc3 = Xpc[:,2]
 
 
+# pc1 vs pc2
+plt.figure(figsize=(6, 4))
+for site, col in zip(('top', 'bridge', 'hollow'),
+            ('red', 'green', 'blue')):
+    indices = np.where(np.array(sitetype_list) == site)[0]
+    plt.scatter(pc1[indices],
+                pc2[indices],
+                label=site,
+                facecolor = col, 
+                alpha = 0.5,
+                s  = 60)
+    
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+plt.tight_layout()  
+plt.show() 
+
+plt.figure(figsize=(6,4))
+plt.scatter(pc1, pc2, c = y, s = 80)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
 
 
+from sklearn.cluster import KMeans
+random_state =2
+X_cluster = Xpc[:,0:2]
+cluster_model = KMeans(n_clusters = 3, random_state=random_state)
+cluster_model.fit(X_cluster)
+y_predict = cluster_model.predict(X_cluster)
+centers = cluster_model.cluster_centers_
+
+fig, axes = plt.subplots(1,2,figsize=(8,4))
+axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='RdBu')
+axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
+for center in centers:
+    x_i = center[0]
+    y_i = center[1]
+    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)
+
+
+# pc1 vs pc3
+plt.figure(figsize=(6, 4))
+for site, col in zip(('top', 'bridge', 'hollow'),
+            ('red', 'green', 'blue')):
+    indices = np.where(np.array(sitetype_list) == site)[0]
+    plt.scatter(pc1[indices],
+                pc3[indices],
+                label=site,
+                facecolor = col, 
+                alpha = 0.5,
+                s  = 60)
+    
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+plt.tight_layout()
+plt.show() 
+
+plt.figure(figsize=(6,4))
+plt.scatter(pc1, pc3,  c = y, s = 80)
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+
+X_cluster = Xpc[:,[0,2]]
+cluster_model = KMeans(n_clusters = 3, random_state=random_state)
+cluster_model.fit(X_cluster)
+y_predict = cluster_model.predict(X_cluster)
+centers = cluster_model.cluster_centers_
+
+fig, axes = plt.subplots(1,2,figsize=(8,4))
+axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='RdBu')
+axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
+for center in centers:
+    x_i = center[0]
+    y_i = center[1]
+    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)
