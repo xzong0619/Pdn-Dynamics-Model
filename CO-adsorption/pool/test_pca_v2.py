@@ -534,13 +534,13 @@ plt.ylabel('PC2')
 from sklearn.cluster import KMeans
 random_state =2
 X_cluster = Xpc[:,0:2]
-cluster_model = KMeans(n_clusters = 3, random_state=random_state)
+cluster_model = KMeans(n_clusters = 4, random_state=random_state)
 cluster_model.fit(X_cluster)
 y_predict = cluster_model.predict(X_cluster)
 centers = cluster_model.cluster_centers_
 
 fig, axes = plt.subplots(1,2,figsize=(8,4))
-axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='RdBu')
+axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='jet')
 axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
 for center in centers:
     x_i = center[0]
@@ -572,13 +572,13 @@ plt.xlabel('PC1')
 plt.ylabel('PC3')
 
 X_cluster = Xpc[:,[0,2]]
-cluster_model = KMeans(n_clusters = 3, random_state=random_state)
+cluster_model = KMeans(n_clusters = 4, random_state=random_state)
 cluster_model.fit(X_cluster)
 y_predict = cluster_model.predict(X_cluster)
 centers = cluster_model.cluster_centers_
 
 fig, axes = plt.subplots(1,2,figsize=(8,4))
-axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='RdBu')
+axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='jet')
 axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
 for center in centers:
     x_i = center[0]
