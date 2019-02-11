@@ -584,3 +584,8 @@ for center in centers:
     x_i = center[0]
     y_i = center[1]
     axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)m 
+	
+	
+# Cluster for parity plot
+# Cluster for PC1-PC2
+# Cluster for parameters
