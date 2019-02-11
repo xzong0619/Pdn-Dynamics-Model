@@ -583,4 +583,4 @@ axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
 for center in centers:
     x_i = center[0]
     y_i = center[1]
-    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)
+    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)m 
