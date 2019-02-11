@@ -91,11 +91,18 @@ class PdCO():
         Pdi = []
         Cei = []
         Ci = []
+        Oi = []
         
         for i, atom in enumerate(self.atoms):
             if atom.symbol == 'Pd': Pdi.append(i)
             if atom.symbol == 'Ce': Cei.append(i)
             if atom.symbol == 'C':  Ci.append(i)
+            if atom.symbol == 'O':  Oi.append(i)
+            
+        # Take out the O in CO, only consider lattice O 
+        C_O = self.atoms.get_distances(Ci[0], Oi, mic = True)
+        Oi.pop(int(np.where(C_O == C_O.min())[0]))
+
         
         #No of Pd atoms in the cluster
         self.NPd = int(len(Pdi))   
@@ -108,6 +115,8 @@ class PdCO():
         Pd_C = self.atoms.get_distances(Ci[0], Pdi, mic = True) #all Pd-C bond length 
         
         Pd_C, Pdi = sort_i_and_d(Pd_C, Pdi) #sorted Pd-C bond length
+        
+    
         
         #The distance of Pd to the first nearest C
         PdC3 = np.zeros(3)
@@ -148,17 +157,35 @@ class PdCO():
         Pd_Pd = pd.DataFrame() #Pd to Pd bond length table 
         PdNN = pd.DataFrame() #Pd NN table      
         Pd1NN= dict() #Pd NN table 
+        Pd_O = dict()
+        Pd_Ce = dict()
         
         
         for i in Pdi:
            PdD =  self.atoms.get_distances(i, Pdi)
            PdD, Pdisort = sort_i_and_d(PdD,Pdi)
+        
            
            Pd_Pd['Pd'+str(i)] =  PdD
            Pd_Pd['i'+str(i)] = Pdisort
            PdNN['Pd'+str(i)] = [sum(np.logical_and(PdD>=NN1[0], PdD<=NN1[1])),
                 sum(np.logical_and(PdD>=NN2[0], PdD<=NN2[1]))]
            Pd1NN['Pd'+str(i)] = np.array(Pdisort)[np.where(np.logical_and(PdD>=NN1[0],PdD<=NN1[1]))[0]]
+           
+           
+           
+           PdOD = self.atoms.get_distances(i, Oi)
+           PdOD, PdOisort = sort_i_and_d(PdOD, Oi)
+           PdnO = len(np.where(np.array(PdOD) < 3.5)[0])
+           Pd_O['Pd'+str(i)] = PdnO
+           
+           PdCeD = self.atoms.get_distances(i, Cei)
+           PdCeD, PdCeisort = sort_i_and_d(PdCeD, Cei)
+           PdnCe = len(np.where(np.array(PdCeD) < 4.2)[0])
+           Pd_Ce['Pd'+str(i)] = PdnCe
+           
+           
+           
            
         PdNN.index = ['NN1','NN2']   
         
@@ -213,6 +240,23 @@ class PdCO():
         self.GCN = gcn_sum/cn_max[self.Nsites -1]
         
         
+                
+        # Find number of O within 4.5 A  to C
+        O_C = self.atoms.get_distances(Ci[0], Oi, mic = True) #all Pd-C bond length 
+        O_C, Oi = sort_i_and_d(O_C, Oi) #sorted Pd-C bond length
+        self.nO = len(np.where(np.array(O_C) < 4.5)[0]) - 1
+        self.nCe = len(np.where(np.array(C_Ce) < 5)[0])
+        Pd_O_CO = []
+        Pd_Ce_CO = []
+        for si in COsites_cols:
+            Pd_O_CO.append(Pd_O[si])
+            Pd_Ce_CO.append(Pd_Ce[si])
+            
+        self.ONN1  = np.dot(np.array(Pd_O_CO), norm_weights)
+        self.CeNN1 = np.dot(np.array(Pd_Ce_CO), norm_weights)
+        # Find number of C within 4.5 A  to C
+        #Pd_O = PdNN.loc[:, COsites_cols] #NN dataframe 
+        
         '''
         Make a row in dataframe as an ID for each structure including filenames and properties etc
         '''
@@ -230,7 +274,11 @@ class PdCO():
                              self.Nsites, #number of sites
                              self.PdC1, #1st Pd-C distance 
                              self.PdC2, #2nd Pd-C distance
-                             self.PdC3] #3rd Pd-C distance
+                             self.PdC3, #3rd Pd-C distance
+                             self.nO,
+                             self.nCe,
+                             self.CeNN1,
+                             self.ONN1] 
         self.PdNN = PdNN
         self.Pd_Pd = Pd_Pd
         self.PdNN_CO = PdNN_CO
@@ -238,12 +286,17 @@ class PdCO():
         self.Pdisort = Pdisort
         self.Pd1NN = Pd1NN
         self.Pd_C_CO = Pd_C_CO
+        self.Pd_O = Pd_O
+        self.Pd_Ce = Pd_Ce
+
+
+
 
 #%% Analyse the structures and save into a csv file
 Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
-          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C']
+          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'nO', 'nCe', 'CeNN1', 'ONN1']
 
 fdata = pd.DataFrame(columns = labels)
 

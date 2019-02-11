@@ -13,6 +13,7 @@ Test on Pd20
 
 import numpy as np
 import pickle
+from ase.visualize import view
 
 try:
 	from mpi4py import MPI
@@ -64,7 +65,7 @@ Clusters = initialize_Clusters_object()
 
 #%%
 #Genetic Hyperparameters
-ngoal = 10 #5, 10, 15, 20
+ngoal = 19 #5, 10, 15, 20
 nodes = 36 #lattice node size
 n = 100 #Size of population
 ngen = 100 #Number of generations

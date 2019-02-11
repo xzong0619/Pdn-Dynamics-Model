@@ -13,7 +13,9 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import Pipeline
 from scipy.stats import norm
 from sklearn.model_selection import RepeatedKFold, cross_validate, LeaveOneOut
-
+from sklearn.cluster import KMeans
+from scipy.spatial.distance import cdist
+from sklearn.mixture import GaussianMixture
 
 import pandas as pd
 import numpy as np
@@ -22,6 +24,7 @@ import pickle
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt 
 import matplotlib
+from matplotlib.patches import Ellipse
 
 
 matplotlib.rcParams['font.size'] = 14
@@ -37,8 +40,8 @@ matplotlib.rcParams['ytick.major.width'] = 2
 fdata = pd.read_csv('descriptor_data.csv')
 
 #possible descriptors
-descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C'] #10 in total
-descriptors_g =  ['CN1', 'Z', 'Nsites',   'Pd1C', 'Pd2C', 'Pd3C'] #6 geometric descriptors
+descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'CeNN1', 'ONN1'] #10 in total
+descriptors_g =  ['NPd', 'CN1', 'Z', 'Nsites',  'CeNN1', 'ONN1'] #6 geometric descriptors
 #descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
@@ -236,7 +239,7 @@ ylabels = []
 bar_vals = []
 space = 0.4
 
-cm = ['r', 'coral', 'pink',  'orange',  'gold', 'y','lightgreen', 'lightblue',  'c', 'mediumpurple', 'brown'][:len(descriptors)]
+cm = ['r', 'coral', 'pink',  'orange',  'gold', 'y','lightgreen', 'lightblue',  'c', 'mediumpurple', 'brown', 'grey', 'orchid'][:len(descriptors)]
 fig = plt.figure(figsize=(12,6))
 
 
@@ -271,7 +274,61 @@ plt.plot(linex, linex*0, c = 'k', lw = 1.5)
 plt.show()
 
 #%% Regression
-def parity_plot_st(yobj,ypred, method):
+'''
+cluster plot functions
+'''
+def plot_kmeans(kmeans, X,  ax=None):
+    labels = kmeans.fit_predict(X)
+
+    # plot the input data
+    ax = ax or plt.gca()
+    ax.axis('equal')
+    #ax.scatter(X[:, 0], X[:, 1], c=labels, s=40, cmap='viridis', zorder=2)
+
+    # plot the representation of the KMeans model
+    centers = kmeans.cluster_centers_
+    radii = [cdist(X[labels == i], [center]).max()
+             for i, center in enumerate(centers)]
+    for c, r in zip(centers, radii):
+        ax.add_patch(plt.Circle(c, r, fc='#CCCCCC', lw=3, alpha=0.5, zorder=1))
+        ax.plot(c[0], c[1], marker='*', color='k', mec='w', markersize=20)
+
+        
+def draw_ellipse(position, covariance, ax=None, **kwargs):
+    """Draw an ellipse with a given position and covariance"""
+    ax = ax or plt.gca()
+
+    #Convert covariance to principal axes
+    if covariance.shape == (2, 2):
+        U, s, Vt = np.linalg.svd(covariance)
+        angle = np.degrees(np.arctan2(U[1, 0], U[0, 0]))
+        width, height = 2 * np.sqrt(s)
+    else:
+        angle = 0
+        width, height = 2 * np.sqrt(covariance)
+    
+    # Draw the Ellipse
+    for nsig in range(1, 4):
+        ax.add_patch(Ellipse(position, nsig * width, nsig * height,
+                             angle, **kwargs))
+
+        
+def plot_gmm(gmm, X, label=True, ax=None):
+    ax = ax or plt.gca()
+    labels = gmm.fit(X).predict(X)
+#    if label:
+#        ax.scatter(X[:, 0], X[:, 1], c=labels, s=40, cmap='viridis', zorder=2)
+#    else:
+#        ax.scatter(X[:, 0], X[:, 1], s=40, zorder=2)
+#    ax.axis('equal')
+#    
+    w_factor = 0.15 / gmm.weights_.max()
+    for pos, covar, w in zip(gmm.means_, gmm.covariances_, gmm.weights_):
+        draw_ellipse(pos, covar, alpha=w * w_factor)
+
+
+
+def parity_plot_st(yobj, ypred, method):
     '''
     Plot the parity plot of y vs ypred
     return R2 score and MSE for the model
@@ -290,6 +347,15 @@ def parity_plot_st(yobj,ypred, method):
                     alpha = 0.5,
                     s  = 60)
     ax.plot([yobj.min(), yobj.max()], [yobj.min(), yobj.max()], 'k--', lw=2)
+    
+    X_cluster = np.transpose(np.vstack((yobj, ypred)))
+    gmm = GaussianMixture(n_components= 1, random_state = 0)
+    plot_gmm(gmm, X_cluster)
+    
+#    kmeans = KMeans(n_clusters = 1, random_state=0)
+#    plot_kmeans(kmeans, X_cluster)
+
+
     ax.set_xlabel('DFT-Calculated ')
     ax.set_ylabel('Model Prediction')
     plt.title(r'{}, RMSE-{:.2}, $r^2$ -{:.2}'.format(method, RMSE, r2))
@@ -318,10 +384,31 @@ def cross_validation(X, y, estimator):
     '''
     Cross-validation
     '''
-    #rkf = RepeatedKFold(n_splits = 10, n_repeats = 10) #change this to leave one out
+    #rkf = RepeatedKFold(n_splits = 3, n_repeats = 10) #change this to leave one out
     loo = LeaveOneOut()
-    scores  = cross_validate(estimator, X, y, cv=loo,
+    scores  = cross_validate(estimator, X, y, cv = loo,
                                 scoring=('neg_mean_squared_error'),
+                                return_train_score=True)
+    # RMSE for repeated 10 fold test data 
+    
+    train_scores = np.sqrt(np.abs(scores['train_score'])) 
+    train_score_mean = np.mean(train_scores)
+    train_score_std = np.std(train_scores)
+    
+    test_scores = np.sqrt(np.abs(scores['test_score'])) 
+    test_score_mean = np.mean(test_scores)
+    test_score_std = np.std(test_scores)
+    
+    return [train_score_mean, train_score_std, test_score_mean, test_score_std]
+
+def cross_validation_r2(X, y, estimator): 
+    '''
+    Cross-validation
+    '''
+    #rkf = RepeatedKFold(n_splits = 3, n_repeats = 10) #change this to leave one out
+    loo = LeaveOneOut()
+    scores  = cross_validate(estimator, X, y, cv = loo,
+                                scoring=('r2'),
                                 return_train_score=True)
     # RMSE for repeated 10 fold test data 
     
@@ -353,10 +440,13 @@ def regression_pipeline(X, y, estimator, method):
     '''
 
     y_predict = estimator.predict(X)
+    if len(y_predict.shape) > 1: 
+        y_predict = y_predict[:,0]
     RMSE, r2 = parity_plot_st(y, y_predict, method)
     scores = cross_validation(X, y, estimator)
+    r2s = cross_validation_r2(X, y, estimator)
     
-    return RMSE, r2, scores
+    return RMSE, r2, scores, r2s
     
 def detect_outliers(y, y_predict, threshold = 0.2):
     '''
@@ -406,7 +496,7 @@ pc2_estimator  = linear_regression(degree)
 pc2_estimator.fit(Xreg, y)
 y_pc2 = pc2_estimator.predict(Xreg)
 
-RMSE_pc2, r2_pc2, scores_pc2 = regression_pipeline(Xreg, y, pc2_estimator, 'PC2')
+RMSE_pc2, r2_pc2, scores_pc2, r2s_pc2 = regression_pipeline(Xreg, y, pc2_estimator, 'PC2')
 sigma_pc2 = error_distribution(y, y_pc2, 'PC2')
 detect_outliers(y, y_pc2)
 intercept_pc2, coefs_pc2 = ploy_coef(pc2_estimator, pc_reg)
@@ -420,7 +510,7 @@ PCR first order
 pc1_estimator  = linear_regression(1)
 pc1_estimator.fit(Xreg, y)
 y_pc1 = pc1_estimator.predict(Xreg)
-RMSE_pc1, r2_pc1, scores_pc1 = regression_pipeline(Xreg, y, pc1_estimator, 'PC1')
+RMSE_pc1, r2_pc1, scores_pc1, r2s_pc1 = regression_pipeline(Xreg, y, pc1_estimator, 'PC1')
 intercept_pc1, coefs_pc1 = ploy_coef(pc1_estimator, pc_reg)
 
 
@@ -432,7 +522,7 @@ intercept_pc1, coefs_pc1 = ploy_coef(pc1_estimator, pc_reg)
 first  = linear_regression(1)
 first.fit(X, y)
 y_first = first.predict(X)
-RMSE_first, r2_first, scores_first = regression_pipeline(X, y, first, 'First Order')
+RMSE_first, r2_first, scores_first, r2s_first = regression_pipeline(X, y, first, 'First Order')
 intercept_first, coefs_first = ploy_coef(first, X.shape[1])
 
 '''
@@ -441,7 +531,7 @@ intercept_first, coefs_first = ploy_coef(first, X.shape[1])
 second  = linear_regression(2)
 second.fit(X, y)
 y_second = second.predict(X)
-RMSE_second, r2_second, scores_second = regression_pipeline(X, y, second, 'Second Order')
+RMSE_second, r2_second, scores_second, r2s_second = regression_pipeline(X, y, second, 'Second Order')
 intercept_second, coefs_second = ploy_coef(second,  X.shape[1])
 
 '''
@@ -452,7 +542,7 @@ from sklearn.cross_decomposition import PLSRegression
 PLS = PLSRegression(n_components = pc_reg, tol=1e-8) #<- N_components tells the model how many sub-components to select
 PLS.fit(X,y) 
 y_PLS = PLS.predict(X)[:,0] #<- the prediction here is a column vector
-RMSE_PLS, r2_PLS, scores_PLS = regression_pipeline(X, y, PLS, 'PLS')
+RMSE_PLS, r2_PLS, scores_PLS, r2s_PLS = regression_pipeline(X, y, PLS, 'PLS')
 
 #%%
 '''
@@ -460,132 +550,95 @@ Use geomertric descriptors only
 '''
 Xg =  np.array(fdata.loc[:,descriptors_g], dtype = float)
 X_std_g = StandardScaler().fit_transform(Xg)
-Xpc_g = pca.fit_transform(X_std_g) 
-pcg_estimator  = linear_regression(2)
-pcg_estimator.fit(Xpc_g, y)
-y_pcg = pcg_estimator.predict(Xpc_g)
-RMSE_pcg, r2_pcg, scores_pcg = regression_pipeline(Xpc_g, y, pcg_estimator, 'PCg')
-detect_outliers(y, y_pcg)
-intercept_pcg, coefs_pcg = ploy_coef(pcg_estimator, Xpc_g.shape[1])
-pickle.dump(pcg_estimator, open('g_estimator','wb'))
+Xpc_g = pca.fit_transform(X_std_g)
+
+'''
+1st order pcg
+'''
+pcg_estimator_first  = linear_regression(2)
+pcg_estimator_first.fit(Xpc_g, y)
+y_pcg_first = pcg_estimator_first.predict(Xpc_g)
+RMSE_pcg_first, r2_pcg_first, scores_pcg_first, r2s_pcg_first = regression_pipeline(Xpc_g, y, pcg_estimator_first, 'PCg')
+detect_outliers(y, y_pcg_first)
+intercept_pcg_first, coefs_pcg_first = ploy_coef(pcg_estimator_first, Xpc_g.shape[1])
+#pickle.dump(pcg_estimator_second, open('g_estimator_second','wb'))
+
+'''
+2nd order pcg
+'''
+pcg_estimator_second  = linear_regression(2)
+pcg_estimator_second.fit(Xpc_g, y)
+y_pcg_second = pcg_estimator_second.predict(Xpc_g)
+RMSE_pcg_second, r2_pcg_second, scores_pcg_second, r2s_pcg_second = regression_pipeline(Xpc_g, y, pcg_estimator_second, 'PCg')
+detect_outliers(y, y_pcg_second)
+intercept_pcg_second, coefs_pcg_second = ploy_coef(pcg_estimator_second, Xpc_g.shape[1])
+#pickle.dump(pcg_estimator_second, open('g_estimator_second','wb'))
 
 #%%
 '''
 Compare different regression models 
 '''
 
-regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'PC Geometric', 'Poly 1st', 'Poly 2nd']
-scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_pcg, scores_first, scores_second])
+'''
+Plot CV RMSE
+'''
+regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'PC G 1st',  'PC G 2nd', 'Poly 1st', 'Poly 2nd']
+scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_pcg_first, scores_pcg_second, scores_first, scores_second])
 means_train = np.array(scores_mx[:,0])
 std_train = np.array(scores_mx[:,1])
 means_test = np.array(scores_mx[:,2])
 std_test = np.array(scores_mx[:,3])
+
+r2s = np.array([r2_PLS, r2_pc1, r2_pc2, r2_pcg_first, r2_pcg_second, r2_first, r2_second])
+
 base_line = 0
 x_pos = np.arange(len(regression_method))
-opacity = 0.8
-bar_width = 0.35
-plt.figure(figsize=(8,6))
+opacity = 0.9
+bar_width = 0.25
+fig, ax1 = plt.subplots(figsize=(8,6))
 rects1 = plt.bar(x_pos, means_train - base_line, bar_width, #yerr=std_train,
-                alpha=opacity, color='lightblue',
+                alpha = opacity, color='lightblue',
                 label='Train')
 rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, #yerr=std_test,  
-                alpha=opacity, color='salmon',
+                alpha = opacity, color='salmon',
                 label='Test')
+rects3 = plt.bar(x_pos+bar_width*2, r2s - base_line, bar_width, #yerr=std_test,  
+                alpha = opacity, color='lightgreen',
+                label='r2')
 #plt.ylim([-1,18])
+
 plt.xticks(x_pos+bar_width/2, regression_method, rotation=40)
 plt.xlabel('Regression Method')
-plt.ylabel('CV RMSE (eV)')
 plt.ylim([0,1])
 plt.legend(loc= 'best', frameon=False)
 
-#%% 
-'''
-Plot important PC vs each other and observe clustering
-'''
-pc1 = Xpc[:,0]
-pc2 = Xpc[:,1]
-pc3 = Xpc[:,2]
+ax1.set_ylabel('CV RMSE (eV)')
+ax2 = ax1.twinx()
+ax2.set_ylabel('r2')
 
+#'''
+#Plot r2
+#'''
+#r2s_mx = np.array([r2s_PLS, r2s_pc1, r2s_pc2, r2s_pcg_first, r2s_pcg_second, r2s_first, r2s_second])
+#means_train = np.array(r2s_mx[:,0])
+#std_train = np.array(r2s_mx[:,1])
+#means_test = np.array(r2s_mx[:,2])
+#std_test = np.array(r2s_mx[:,3])
+#base_line = 0
+#x_pos = np.arange(len(regression_method))
+#opacity = 0.8
+#bar_width = 0.35
+#plt.figure(figsize=(8,6))
+#rects1 = plt.bar(x_pos, means_train - base_line, bar_width, #yerr=std_train,
+#                alpha=opacity, color='lightblue',
+#                label='Train')
+#rects2 = plt.bar(x_pos+bar_width, means_test - base_line, bar_width, #yerr=std_test,  
+#                alpha=opacity, color='salmon',
+#                label='Test')
+##plt.ylim([-1,18])
+#plt.xticks(x_pos+bar_width/2, regression_method, rotation=40)
+#plt.xlabel('Regression Method')
+#plt.ylabel('CV r^2')
+#plt.ylim([0,1])
+#plt.legend(loc= 'best', frameon=False)
 
-# pc1 vs pc2
-plt.figure(figsize=(6, 4))
-for site, col in zip(('top', 'bridge', 'hollow'),
-            ('red', 'green', 'blue')):
-    indices = np.where(np.array(sitetype_list) == site)[0]
-    plt.scatter(pc1[indices],
-                pc2[indices],
-                label=site,
-                facecolor = col, 
-                alpha = 0.5,
-                s  = 60)
-    
-plt.xlabel('PC1')
-plt.ylabel('PC2')
-#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-plt.tight_layout()  
-plt.show() 
-
-plt.figure(figsize=(6,4))
-plt.scatter(pc1, pc2, c = y, s = 80)
-plt.xlabel('PC1')
-plt.ylabel('PC2')
-
-
-from sklearn.cluster import KMeans
-random_state =2
-X_cluster = Xpc[:,0:2]
-cluster_model = KMeans(n_clusters = 4, random_state=random_state)
-cluster_model.fit(X_cluster)
-y_predict = cluster_model.predict(X_cluster)
-centers = cluster_model.cluster_centers_
-
-fig, axes = plt.subplots(1,2,figsize=(8,4))
-axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='jet')
-axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
-for center in centers:
-    x_i = center[0]
-    y_i = center[1]
-    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)
-
-
-# pc1 vs pc3
-plt.figure(figsize=(6, 4))
-for site, col in zip(('top', 'bridge', 'hollow'),
-            ('red', 'green', 'blue')):
-    indices = np.where(np.array(sitetype_list) == site)[0]
-    plt.scatter(pc1[indices],
-                pc3[indices],
-                label=site,
-                facecolor = col, 
-                alpha = 0.5,
-                s  = 60)
-    
-plt.xlabel('PC1')
-plt.ylabel('PC3')
-#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-plt.tight_layout()
-plt.show() 
-
-plt.figure(figsize=(6,4))
-plt.scatter(pc1, pc3,  c = y, s = 80)
-plt.xlabel('PC1')
-plt.ylabel('PC3')
-
-X_cluster = Xpc[:,[0,2]]
-cluster_model = KMeans(n_clusters = 4, random_state=random_state)
-cluster_model.fit(X_cluster)
-y_predict = cluster_model.predict(X_cluster)
-centers = cluster_model.cluster_centers_
-
-fig, axes = plt.subplots(1,2,figsize=(8,4))
-axes[0].scatter(X_cluster[:,0], X_cluster[:,1], c=y_predict, cmap='jet')
-axes[1].scatter(X_cluster[:,0], X_cluster[:,1], c=y)
-for center in centers:
-    x_i = center[0]
-    y_i = center[1]
-    axes[0].plot(x_i, y_i, marker='*', color='k', mec='w', markersize=20)m 
-	
-	
-# Cluster for parity plot
-# Cluster for PC1-PC2
-# Cluster for parameters
