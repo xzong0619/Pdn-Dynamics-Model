@@ -40,8 +40,8 @@ matplotlib.rcParams['ytick.major.width'] = 2
 fdata = pd.read_csv('descriptor_data.csv')
 
 #possible descriptors
-descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'CeNN1', 'ONN1'] #10 in total
-descriptors_g =  ['NPd', 'CN1', 'Z', 'Nsites',  'CeNN1', 'ONN1'] #6 geometric descriptors
+descriptors =  ['NPd', 'CN1', 'CN2','GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'CeCN1', 'OCN1'] #10 in total
+descriptors_g =  ['NPd', 'CN1', 'Z', 'Nsites',  'CeCN1', 'OCN1'] #6 geometric descriptors
 #descriptors = ['NPd', 'CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C'] 
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Nsites']
 #descriptors =  ['CN1', 'Z', 'Charge',  'Pd1C', 'Pd2C', 'Pd3C']
@@ -225,7 +225,7 @@ plt.step(range(nDescriptors), cum_var_exp, where='mid',
 plt.ylabel('Explained variance ratio')
 plt.xlabel('Principal components')
 plt.xticks(np.arange(nDescriptors), 
-            ['PC%i'%(w+1) for w in range(nDescriptors)])
+            ['PC%i'%(w+1) for w in range(nDescriptors)],  rotation=40)
 plt.legend(loc='best')
 plt.tight_layout()
 
@@ -315,7 +315,8 @@ def draw_ellipse(position, covariance, ax=None, **kwargs):
         
 def plot_gmm(gmm, X, label=True, ax=None):
     ax = ax or plt.gca()
-    labels = gmm.fit(X).predict(X)
+    gmm.fit(X).predict(X)
+    #labels = gmm.fit(X).predict(X)
 #    if label:
 #        ax.scatter(X[:, 0], X[:, 1], c=labels, s=40, cmap='viridis', zorder=2)
 #    else:
@@ -352,8 +353,8 @@ def parity_plot_st(yobj, ypred, method):
     gmm = GaussianMixture(n_components= 1, random_state = 0)
     plot_gmm(gmm, X_cluster)
     
-#    kmeans = KMeans(n_clusters = 1, random_state=0)
-#    plot_kmeans(kmeans, X_cluster)
+    kmeans = KMeans(n_clusters = 1, random_state=0)
+    plot_kmeans(kmeans, X_cluster)
 
 
     ax.set_xlabel('DFT-Calculated ')
@@ -551,27 +552,31 @@ Use geomertric descriptors only
 Xg =  np.array(fdata.loc[:,descriptors_g], dtype = float)
 X_std_g = StandardScaler().fit_transform(Xg)
 Xpc_g = pca.fit_transform(X_std_g)
-
+var_exp_pcg = pca.explained_variance_ratio_ #explained variance ratio
+cum_var_exp_pcg = np.cumsum(var_exp) #cumulative variance ratio
+nPCg = 4
+Xreg_g = Xpc_g[:,:nPCg]
 '''
 1st order pcg
 '''
-pcg_estimator_first  = linear_regression(2)
-pcg_estimator_first.fit(Xpc_g, y)
-y_pcg_first = pcg_estimator_first.predict(Xpc_g)
-RMSE_pcg_first, r2_pcg_first, scores_pcg_first, r2s_pcg_first = regression_pipeline(Xpc_g, y, pcg_estimator_first, 'PCg')
+pcg_estimator_first  = linear_regression(1)
+pcg_estimator_first.fit(Xreg_g, y)
+y_pcg_first = pcg_estimator_first.predict(Xreg_g)
+RMSE_pcg_first, r2_pcg_first, scores_pcg_first, r2s_pcg_first = regression_pipeline(Xreg_g, y, pcg_estimator_first, 'PCg1')
 detect_outliers(y, y_pcg_first)
-intercept_pcg_first, coefs_pcg_first = ploy_coef(pcg_estimator_first, Xpc_g.shape[1])
+intercept_pcg_first, coefs_pcg_first = ploy_coef(pcg_estimator_first, Xreg_g.shape[1])
 #pickle.dump(pcg_estimator_second, open('g_estimator_second','wb'))
 
 '''
 2nd order pcg
 '''
 pcg_estimator_second  = linear_regression(2)
-pcg_estimator_second.fit(Xpc_g, y)
-y_pcg_second = pcg_estimator_second.predict(Xpc_g)
-RMSE_pcg_second, r2_pcg_second, scores_pcg_second, r2s_pcg_second = regression_pipeline(Xpc_g, y, pcg_estimator_second, 'PCg')
+pcg_estimator_second.fit(Xreg_g, y)
+y_pcg_second = pcg_estimator_second.predict(Xreg_g)
+RMSE_pcg_second, r2_pcg_second, scores_pcg_second, r2s_pcg_second = regression_pipeline(Xreg_g, y, pcg_estimator_second, 'PCg2')
 detect_outliers(y, y_pcg_second)
-intercept_pcg_second, coefs_pcg_second = ploy_coef(pcg_estimator_second, Xpc_g.shape[1])
+sigma_pcg2 = error_distribution(y, y_pcg_second, 'PCg2')
+intercept_pcg_second, coefs_pcg_second = ploy_coef(pcg_estimator_second, Xreg_g.shape[1])
 #pickle.dump(pcg_estimator_second, open('g_estimator_second','wb'))
 
 #%%
@@ -582,7 +587,7 @@ Compare different regression models
 '''
 Plot CV RMSE
 '''
-regression_method = ['PLS', 'PCR 1st', 'PCR 2nd', 'PC G 1st',  'PC G 2nd', 'Poly 1st', 'Poly 2nd']
+regression_method = ['PLS', 'PCR 1st (nPC = 7)', 'PCR 2nd (nPC = 7)', 'PC G 1st (nPC = 6)',  'PC G 2nd (nPC = 6)', 'Poly 1st', 'Poly 2nd']
 scores_mx = np.array([scores_PLS, scores_pc1, scores_pc2, scores_pcg_first, scores_pcg_second, scores_first, scores_second])
 means_train = np.array(scores_mx[:,0])
 std_train = np.array(scores_mx[:,1])

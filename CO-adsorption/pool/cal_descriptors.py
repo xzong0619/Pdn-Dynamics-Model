@@ -296,7 +296,7 @@ class PdCO():
 Ntot = len(structures)
 
 labels = ['Filename', 'AtomsObject', 'Eads', 'NPd', 'SiteType', 'RealSite', 
-          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'nO', 'nCe', 'CeNN1', 'ONN1']
+          'CN1', 'CN2', 'GCN', 'Z', 'Charge', 'Nsites', 'Pd1C', 'Pd2C', 'Pd3C', 'nO', 'nCe', 'CeCN1', 'OCN1']
 
 fdata = pd.DataFrame(columns = labels)
 

@@ -164,14 +164,16 @@ for site, col in zip(('top', 'bridge', 'hollow'),
     
 plt.xlabel('PC1')
 plt.ylabel('PC2')
-#plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
+plt.legend(bbox_to_anchor = (1.01, 1),loc= 'upper left', frameon=False)
 plt.tight_layout()  
 plt.show() 
+
 
 plt.figure(figsize=(6,4))
 plt.scatter(pc1, pc2, c = y, s = 80)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
+plt.colorbar(shrink = 1.8)
 
 
 random_state =2
@@ -179,13 +181,13 @@ X_cluster = Xpc[:,0:2]
 kmeans = KMeans(n_clusters = 3, random_state=random_state)
 kmeans.fit(X_cluster)
 y_predict = kmeans.predict(X_cluster)
-plt.figure(figsize=(6,4))
+plt.figure(figsize=(5,4))
 plot_kmeans(kmeans, X_cluster)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
 
 gmm = GaussianMixture(n_components=3, random_state=random_state)
-plt.figure(figsize=(6,4))
+plt.figure(figsize=(5,4))
 plot_gmm(gmm, X_cluster)
 plt.xlabel('PC1')
 plt.ylabel('PC2')
@@ -204,20 +206,23 @@ def get_random_num(n, r):
     return rset
     
 
-#range1 = [2, 6]
-#range2  = [-3, -2]
-#
-#rset1 =get_random_num(50, range1)
-#rset2 =get_random_num(50, range2)
-#rset = np.transpose(np.vstack((rset1, rset2)))
-#X_cluster_new = np.vstack((X_cluster, rset))
-#
-#plt.figure(figsize=(6,4))
-#plot_kmeans(kmeans, X_cluster_new)
-#
-#plt.figure(figsize=(6,4))
-#plot_gmm(gmm, X_cluster_new)
+range1 = [-4, 0]
+range2  = [-1, 2]
 
+rset1 =get_random_num(10, range1)
+rset2 =get_random_num(10, range2)
+rset = np.transpose(np.vstack((rset1, rset2)))
+X_cluster_new = np.vstack((X_cluster, rset))
+
+plt.figure(figsize=(5,4))
+plot_kmeans(kmeans, X_cluster_new)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+
+plt.figure(figsize=(5,4))
+plot_gmm(gmm, X_cluster_new)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
 
 
 
@@ -234,44 +239,46 @@ def get_random_num(n, r):
 
 
 # pc1 vs pc3
-#plt.figure(figsize=(6, 4))
-#for site, col in zip(('top', 'bridge', 'hollow'),
-#            ('red', 'green', 'blue')):
-#    indices = np.where(np.array(sitetype_list) == site)[0]
-#    plt.scatter(pc1[indices],
-#                pc3[indices],
-#                label=site,
-#                facecolor = col, 
-#                alpha = 0.5,
-#                s  = 60)
-#    
-#plt.xlabel('PC1')
-#plt.ylabel('PC3')
-##plt.legend(bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
-#plt.tight_layout()  
-#plt.show() 
-#
-#plt.figure(figsize=(6,4))
-#plt.scatter(pc1, pc3, c = y, s = 80)
-#plt.xlabel('PC1')
-#plt.ylabel('PC3')
-#
-#
-#random_state =2
-#X_cluster = Xpc[:,[0,2]]
-#kmeans = KMeans(n_clusters = 3, random_state=random_state)
-#kmeans.fit(X_cluster)
-#y_predict = kmeans.predict(X_cluster)
-#plt.figure(figsize=(6,4))
-#plot_kmeans(kmeans, X_cluster)
-#plt.xlabel('PC1')
-#plt.ylabel('PC3')
-#
-#gmm = GaussianMixture(n_components= 3, random_state=random_state)
-#plt.figure(figsize=(6,4))
-#plot_gmm(gmm, X_cluster)
-#plt.xlabel('PC1')
-#plt.ylabel('PC3')
+plt.figure(figsize=(6, 4))
+for site, col in zip(('top', 'bridge', 'hollow'),
+            ('red', 'green', 'blue')):
+    indices = np.where(np.array(sitetype_list) == site)[0]
+    plt.scatter(pc1[indices],
+                pc3[indices],
+                label=site,
+                facecolor = col, 
+                alpha = 0.5,
+                s  = 60)
+    
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+plt.legend(bbox_to_anchor = (1.01, 1),loc= 'upper left', frameon=False)
+plt.tight_layout()  
+plt.show() 
+
+
+plt.figure(figsize=(6,4))
+plt.scatter(pc1, pc3, c = y, s = 80)
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+plt.colorbar(shrink = 1.8)
+
+
+random_state =2
+X_cluster = Xpc[:,[0,2]]
+kmeans = KMeans(n_clusters = 3, random_state=random_state)
+kmeans.fit(X_cluster)
+y_predict = kmeans.predict(X_cluster)
+plt.figure(figsize=(5,4))
+plot_kmeans(kmeans, X_cluster)
+plt.xlabel('PC1')
+plt.ylabel('PC3')
+
+gmm = GaussianMixture(n_components= 3, random_state=random_state)
+plt.figure(figsize=(5,4))
+plot_gmm(gmm, X_cluster)
+plt.xlabel('PC1')
+plt.ylabel('PC3')
 # Cluster for parity plot
 # Cluster for PC1-PC2
 # Cluster for parameters
