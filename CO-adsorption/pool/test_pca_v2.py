@@ -248,11 +248,12 @@ n = len(descriptors)
 width = (1 - space) / (len(descriptors))
 indeces = np.arange(0, pc_draw) + 0.5  
 
+PC_loadings = []
 # Create a set of bars at each position
 for i, pci in enumerate(eig_vecs[:pc_draw]):
     
     vals = pci/np.sum(np.absolute(pci))
-    
+    PC_loadings.append(vals)
     pos = width*np.arange(n) + i 
     ax.bar(pos, vals, width=width, label=str(i+1), color = cm, alpha = 1) 
         
@@ -271,6 +272,25 @@ plt.legend(patches, descriptors,
            bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
 
 plt.plot(linex, linex*0, c = 'k', lw = 1.5)
+plt.show()
+
+
+#%% PC1, PC2 2D PC loading plot
+plt.figure(figsize=(6, 4))
+for i in range(n):
+    xl = PC_loadings[0][i]
+    yl = PC_loadings[1][i]
+    plt.scatter(xl, yl,  c = cm[i], s = 120)
+    plt.plot(np.array([0, xl]), np.array([0, yl]), '--', c = cm[i], label = descriptors[i])
+plt.xlabel('PC1 Loading')
+plt.ylabel('PC2 Loading')
+
+# Add legend using color patches
+patches = []
+for c in range(n):
+    patches.append(mpatches.Patch(color=cm[c]))
+plt.legend(patches, descriptors, 
+           bbox_to_anchor = (1.02, 1),loc= 'upper left', frameon=False)
 plt.show()
 
 #%% Regression
