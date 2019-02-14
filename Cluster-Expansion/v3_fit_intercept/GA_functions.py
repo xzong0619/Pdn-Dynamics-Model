@@ -23,7 +23,35 @@ from ase.visualize import view
 from ase.data import covalent_radii
 from ase import Atoms, Atom
 from ase.build import surface
-from structure_constants import mother
+from structure_constants import mother, dz
+
+[Gcv_nonzero, J_nonzero, 
+ intercept, MSE_test, MSE_train,
+ pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
+
+#%%
+def initialize_Clusters_object():
+    
+    empty = 'grey'
+    filled = 'r'
+    occ = [empty, filled]
+    
+    '''
+    only draw 1st nearest neighbors?
+    '''
+    NN1 = 0
+    '''
+    Draw mother/conifgurations/clusters?
+    '''
+    draw = [0, 0, 0]
+    
+    
+    Clusters = lf.clusters(occ, NN1, draw)
+    Clusters.get_mother(mother, dz)
+    
+    return Clusters
+
+Clusters = initialize_Clusters_object()
 
 #%%
 def get_rank(COMM = None):
@@ -52,11 +80,29 @@ def save_population(COMM = None, population = None, file_name = None):
 		with open(file_name, 'wb') as f_ptr:
 			pickle.dump(population, f_ptr)
 
+def one_hot_to_index(individual):
+    '''
+    Convert an individual from one hot encoding to a list index
+    '''
+    ind_index = list(np.nonzero(individual)[0])
+    return ind_index
+
+def index_to_one_hot(ind_index, n_nodes = 36):
+    '''
+    Convert an individual from a list index to one hot encoding  
+    '''
+    individual = np.zeros(n_nodes, dtype = int)
+    individual[np.array(ind_index)] = 1
+    individual = list(individual)
+    
+    return individual 
+
+    
 def ase_object(individual):
     '''
     take in the 1/0 vector for index
     '''
-    ind_index = list(np.nonzero(individual)[0])
+    ind_index = one_hot_to_index(individual)
     Pdr = covalent_radii[46]
     Or = covalent_radii[8]
     PdPd = Pdr*2
@@ -119,15 +165,15 @@ def occupancy():
     return occ
     
     
-def individual_config(individual, Clusters):
+def individual_config(individual, Clusters = Clusters ):
     
-    ind_list = list(np.nonzero(individual)[0])
-    Clusters.get_configs([ind_list])
+    ind_index = one_hot_to_index(individual)
+    Clusters.get_configs([ind_index])
     Gsv = Clusters.Gsv
     
     return Gsv
 
-def evaluate_pi(individual, Clusters, Gcv):
+def evaluate_pi(individual, Clusters = Clusters, Gcv =  Gcv_nonzero):
     
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
@@ -135,12 +181,26 @@ def evaluate_pi(individual, Clusters, Gcv):
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
     
     return pi_pred
+
+def predict_E(ind_index, Clusters = Clusters, Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercept):
+    '''
+    Predict Energy of the cluster only, take in ind index
+    '''
+    individual = index_to_one_hot(ind_index)
+    occ = Clusters.occupancy
+    Gsv = individual_config(individual, Clusters)
+    Cal = lf.calculations(occ)
+    pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
+    E_pred = float(np.dot(pi_pred, J) + intercept)
     
-def evaluate(individual, Clusters, Gcv, J, intercept, ngoal):
+    return E_pred
+    
+    
+def evaluate(individual, ngoal,  Clusters = Clusters, Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercept):
     
     occ = Clusters.occupancy
     Gsv = individual_config(individual, Clusters)
-    occ_nodes = list(np.nonzero(individual)[0])
+    occ_nodes = one_hot_to_index(individual)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
     n_node = sum(individual)
@@ -351,7 +411,7 @@ def hall_of_fame(COMM = None, history = None, nbest = None):
 
 
 
-def winner_details(COMM = None, population = None, Clusters = None, Gcv = None):
+def winner_details(COMM = None, population = None, Clusters = Clusters, Gcv =  Gcv_nonzero):
     
     print( '\nWinner Details:')
     i = find_best_individual(COMM, population)

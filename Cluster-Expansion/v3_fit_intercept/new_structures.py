@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 from structure_constants import NPd_list, Ec
+import GA_functions as GA
+from ase.visualize import view
+
 #import GA_functions as GA
 #from ase.io import read, write
 #from ase.visualize import view
@@ -52,9 +55,7 @@ for Pdi in nPd_v:
     new_Pd_min[Pdi] =  np.array(new_Pd[Pdi])[min_indices]
     new_E_min[Pdi] = np.array(new_E[Pdi])[min_indices]
 
-
-
-    
+  
 '''
 Plot 1 Cluster Size vs DFT cluster energy
 '''
@@ -96,7 +97,7 @@ plt.show()
 
 
 '''
-Plot 3 Cluster Size vs DFT cluster energy
+Plot 3 Cluster Size vs DFT cluster energy below energy hull
 '''
 
 nPd = nPd_v[0]
@@ -119,8 +120,57 @@ plt.yticks(np.arange(-25, 5, 5))
 plt.legend()
 plt.show()
 
-#
-## Create atom objects for the qualified individuals 
+
+
+'''
+Plot 4 Cluster Size vs DFT cluster energy selected clusters
+'''
+n_min = 3
+n_total = 0
+nPd = nPd_v[0]
+fig, ax = plt.subplots(figsize= (6,5))
+ax.scatter(NPd_list, Ec, s=20, facecolors='grey', edgecolors='grey', label = 'DFT')
+ax.plot(E_min.keys(), E_min.values(), '--', c = 'grey', label = 'DFT min')
+
+for Pdi in nPd_v:
+    ns = min(len(new_E_min[Pdi]),n_min)
+    n_total = ns + n_total
+    if Pdi == nPd_v[0]:
+        ax.scatter(Pdi * np.ones(ns), new_E_min[Pdi][:ns], s=20, facecolors='g', edgecolors='g', label = 'GA+CE')
+    else:
+        ax.scatter(Pdi * np.ones(ns), new_E_min[Pdi][:ns], s=20, facecolors='g', edgecolors='g')
+
+ax.set_xlabel('Cluster Size N')
+ax.set_ylabel('DFT Cluster Energy (eV)')
+plt.axis([1, 22, -25, 1])
+plt.xticks(np.arange(0, 22, 5))
+plt.yticks(np.arange(-25, 5, 5))
+plt.legend()
+plt.show()
+
+
+# take 3 structure below the minimum energy hull
+all_new_Pd = []
+all_new_E = []
+all_new_atoms = []
+
+for Pdi in nPd_v:
+    ns = min(len(new_E_min[Pdi]),n_min)
+    all_new_Pd = all_new_Pd + new_Pd[Pdi][:ns]
+    all_new_E = all_new_E + new_E[Pdi][:ns]
+    
+for s in all_new_Pd:
+    all_new_atoms.append(GA.ase_object(s))
+
+#view(all_new_atoms[0])
+#Pd_ind_fitness = dict()
+
+
+
+
+
+
+## Create atom objects for the qualified individuals into POV files
 #ns = 2 # frome each group select 2 
 #new_structure_pool = []
 #new_atoms = []

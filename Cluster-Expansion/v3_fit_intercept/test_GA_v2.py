@@ -37,40 +37,17 @@ from GA_functions import get_time
 
 import GA_functions as GA
 import lattice_functions as lf
-from structure_constants import mother, dz
 
-#%%
-def initialize_Clusters_object():
-    
-    empty = 'grey'
-    filled = 'r'
-    occ = [empty, filled]
-    
-    '''
-    only draw 1st nearest neighbors?
-    '''
-    NN1 = 0
-    '''
-    Draw mother/conifgurations/clusters?
-    '''
-    draw = [0, 0, 0]
-    
-    
-    Clusters = lf.clusters(occ, NN1, draw)
-    Clusters.get_mother(mother, dz)
-    
-    return Clusters
 
-Clusters = initialize_Clusters_object()
 
 #%%
 #Genetic Hyperparameters
-ngoal = 19 #5, 10, 15, 20
+ngoal = 21 #5, 10, 15, 20
 nodes = 36 #lattice node size
 n = 100 #Size of population
-ngen = 100 #Number of generations
+ngen = 2 #Number of generations
 cxpb = 0.8 #The probability of mating two individuals
-mutpb = 0.05 #The probability of mutating an individual
+mutpb = 0.1 #The probability of mutating an individual
 k = n
 tournsize = 10
 
@@ -94,8 +71,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("mutate", tools.mutFlipBit, indpb = mutpb)
 toolbox.register("select", tools.selTournament, k = k, tournsize = tournsize)
-toolbox.register("evaluate", GA.evaluate, 
-                 Clusters = Clusters, Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercept, ngoal= ngoal)
+toolbox.register("evaluate", GA.evaluate, ngoal= ngoal)
 
 population = GA.make_initial_population(COMM, toolbox, n)
 population = GA.evaluate_population(COMM, toolbox, population)
@@ -105,11 +81,11 @@ history = []
 #%%
 ind1 = toolbox.individual()
 fit1 = toolbox.evaluate(ind1)
-pi1 = GA.evaluate_pi(ind1, Clusters = Clusters, Gcv =  Gcv_nonzero) 
+pi1 = GA.evaluate_pi(ind1) 
 
 ind2 = toolbox.individual()
 fit2 = toolbox.evaluate(ind2)
-pi2 = GA.evaluate_pi(ind2, Clusters = Clusters, Gcv =  Gcv_nonzero) 
+pi2 = GA.evaluate_pi(ind2) 
 #%%
 sim_mat = np.zeros(shape = (n, n))
 for generation in range(ngen):
@@ -126,9 +102,9 @@ for generation in range(ngen):
 #%%
 n_hof  = 20
 ihof,E_hof  = GA.hall_of_fame(COMM, history, 20)
-(best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof, Clusters, Gcv_nonzero)
+(best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof)
 lf.drawing(best_config[0])
-best_G = GA.individual_config(best_ind, Clusters)
+best_G = GA.individual_config(best_ind)
 GA.ase_object(best_ind)
 ind_list = list(np.nonzero(best_ind)[0])
 pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))
