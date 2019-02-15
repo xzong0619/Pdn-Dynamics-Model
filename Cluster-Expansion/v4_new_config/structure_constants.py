@@ -172,11 +172,11 @@ Ec = [0.0,
  -23.36,
  -23.08]
 
-#%%
-from ase import Atoms
-from ase.visualize import view
-lattice = Atoms('He17', positions=l1d)
-view(lattice)
+##%%
+#from ase import Atoms
+#from ase.visualize import view
+#lattice = Atoms('He17', positions=l1d)
+#view(lattice)
 ##%% CO adsorption regression
 #'''
 #CO adsorbed structure index

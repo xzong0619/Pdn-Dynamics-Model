@@ -4,6 +4,7 @@ Created on Thu Aug  2 15:52:08 2018
 
 @author: wangyf
 """
+
 from structure_constants import mother, dz, config, Ec
 import lattice_functions as lf
 import numpy as np
