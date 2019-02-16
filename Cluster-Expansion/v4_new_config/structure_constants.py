@@ -55,6 +55,15 @@ l4d = lf.add_z(l4, 4 * dz)
 
 mother = np.concatenate((l1d, l2d, l3d, l4d), axis=0)
 
+
+node_layer_v = np.around(mother[:,2]/dz, decimals = 0).astype(int)
+node_layer_dict = dict()
+n_layer = np.amax(node_layer_v)
+
+for layer_i in range(n_layer):
+    node_layer_dict[layer_i] = list(np.where(node_layer_v == layer_i +1)[0])   
+    
+    
 '''
 Configuragtiions
 '''

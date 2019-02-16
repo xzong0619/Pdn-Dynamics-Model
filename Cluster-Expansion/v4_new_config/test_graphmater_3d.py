@@ -12,11 +12,19 @@ from pprint import pprint
 import numpy as np
 import lattice_functions as lf
 import pickle
-from structure_constants import mother, dz, config, Ec
+from structure_constants import mother, dz, config, Ec, node_layer_dict
+import json
 
 [Gm, Gsv, Gcv1, Gcv2, Gcv3] = pickle.load(open("clusters.p", "rb"))
 
+layer = 1
+node_index = []
+for i in range(layer):
+    node_index = node_index + node_layer_dict[i]
 
+mother = mother[np.array(node_index)]
+
+#%%
 def initialize_Clusters_object():
     
     empty = 'grey'
@@ -46,15 +54,15 @@ empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
-G1 =  Gsv[1]
-plt.figure()
-lf.drawing(G1)
+G1 =  Clusters.Gm
+#plt.figure()
+#lf.drawing(G1)
 
-Clusters.get_clusters(mother, [[0]]) #one in layer 3 and one in layer 4
+Clusters.get_clusters(mother, [[0,1,2]]) #one in layer 3 and one in layer 4
 Gcv = Clusters.Gcv
 G2 = Gcv[0]
-plt.figure()
-lf.drawing(G2)
+#plt.figure()
+#lf.drawing(G2)
 
 #%%
 if len(G2) > 1:
@@ -67,7 +75,23 @@ else:
     GMn = iso.GraphMatcher(G1, G2, node_match= iso.categorical_edge_match(['z'],[1]) )
     x = [y for y in GMn.subgraph_isomorphisms_iter()]
 
-niso = len(x)
 
+niso = len(x)
+iso_indices = [list(xi.keys()) for xi in x]
+iso_indices = [list(yi) for yi  in list(set(xi) for xi in iso_indices)]
+
+iso_indices = [list(xi) for xi in np.unique(iso_indices, axis = 0)]
+
+
+#%%
+#Take all configurations with points fall on the left panel
+#check if x of all the point > 0
+iso_indices_pos = []
+for iso_i in iso_indices:
+    if np.any(mother[np.array(iso_i)][:,0] >= 0):
+        iso_indices_pos.append([int(xi) for xi in iso_i])
+
+with open('iso.json', 'w') as outfile:
+    json.dump(iso_indices_pos, outfile)
 #Cal = lf.calculations(occ)
 #delta = Cal.get_delta(G1,G2)
