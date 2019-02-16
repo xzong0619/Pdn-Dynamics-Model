@@ -59,6 +59,20 @@ def add_z(v, z):
     vd = np.concatenate((v, np.array([z*np.ones(len(v))]).T), axis =1) 
 
     return vd
+
+
+def get_layers(mother, dz, config):
+
+    '''
+    takes in mother coordinates and one configurations and 
+    returns how the number of layers there are
+    '''
+    config_layers = np.around(mother[np.array(config)][:,2]/dz, decimals = 0).astype(int)
+    n_layers = np.amax(config_layers)
+    
+    return n_layers
+
+    
     
 #%%
 '''
