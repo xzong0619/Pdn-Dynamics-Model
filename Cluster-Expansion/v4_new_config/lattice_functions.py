@@ -290,18 +290,22 @@ class calculations():
         if there are more than 2 nodes in a cluster
         '''
         if len(Gs) > 1:            
-            '''
-            find subgraphs using edge distance match
-            '''
-            GMl = iso.GraphMatcher(Gl, Gs, edge_match=iso.numerical_edge_match(['length'],[1.0]))
-            '''
-            find subgraphs using node layer match
-            '''
-            GMz= iso.GraphMatcher(Gl, Gs, edge_match= iso.categorical_edge_match(['z'],[1.0])  )
-            '''
-            list down total number of subgraphs niso GMz||GMl
-            '''
-            x = [y for y in GMz.subgraph_isomorphisms_iter() if y in GMl.subgraph_isomorphisms_iter()]
+#            '''
+#            find subgraphs using edge distance match
+#            '''
+#            GMl = iso.GraphMatcher(Gl, Gs, edge_match=iso.numerical_edge_match(['length'],[1.0]))
+#            '''
+#            find subgraphs using node layer match
+#            '''
+#            GMz= iso.GraphMatcher(Gl, Gs, edge_match= iso.categorical_edge_match(['z'],[1.0])  )
+#            '''
+#            list down total number of subgraphs niso GMz||GMl
+#            '''
+#            x = [y for y in GMz.subgraph_isomorphisms_iter() if y in GMl.subgraph_isomorphisms_iter()]
+            
+            GMn = iso.GraphMatcher(Gl, Gs, node_match= iso.categorical_edge_match(['z'],[1]), 
+                               edge_match= iso.numerical_edge_match(['length'],[1.0]))
+            x = [y for y in GMn.subgraph_isomorphisms_iter()]
             
         else:
             '''

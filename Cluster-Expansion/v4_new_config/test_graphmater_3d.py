@@ -39,7 +39,7 @@ def initialize_Clusters_object(sub_mother):
     
     return Clusters
 
-def get_iso_config(config_list, i_config, drawing_flag = False):    
+def get_iso_config(config_list, i_config, saveas_json = False, drawing_flag = False):    
     '''
     Take each configuration (the configuration list and its index)
     check isomorphoric subgraphs
@@ -56,7 +56,7 @@ def get_iso_config(config_list, i_config, drawing_flag = False):
     sub_mother = mother[np.array(node_index)]
 
     
-    Clusters = initialize_Clusters_object()
+    Clusters = initialize_Clusters_object(sub_mother)
 
     empty = 'grey'
     filled = 'r'
@@ -105,38 +105,52 @@ def get_iso_config(config_list, i_config, drawing_flag = False):
         cond1 = np.any(mother[np.array(iso_i)][:,0] > 0)
         cond2 = np.all(mother[np.array(iso_i)][:,0] == 0)
         if cond1 or cond2:
-            iso_indices_pos.append([int(xi) for xi in iso_i])
+            iso_indices_pos.append(sorted([int(xi) for xi in iso_i]))
+
     niso = len(iso_indices_pos)
     # save to a json file
-    output_dict = {'configuration': config_i,
-                   'index': int(i_config),
-                   'n_nodes': int(n_nodes),
-                   'n_layers': int(n_layers),
-                   'n_iso': int(niso),
-                   'iso_graph_list': iso_indices_pos}
-    
-    with open('iso_config_' + str(i_config) +'.json', 'w') as outfile:
-        json.dump(output_dict, outfile)
+    if saveas_json:
+        output_dict = {'configuration': config_i,
+                       'index': int(i_config),
+                       'n_nodes': int(n_nodes),
+                       'n_layers': int(n_layers),
+                       'n_iso': int(niso),
+                       'iso_graph_list': iso_indices_pos}
         
-    return iso_indices_pos
+        with open('iso_config_' + str(i_config) +'.json', 'w') as outfile:
+            json.dump(output_dict, outfile)
+    else:
+          E_iso_i = list(Ec[i_config] * np.ones(niso))
+          return E_iso_i, iso_indices_pos
 
 #%% Main part of the function
-#for i in range(len(config)):
-#    get_iso_config(config, i, drawing_flag =  False)  
-    
-iso_indices_pos = get_iso_config(config, i, drawing_flag =  False)  
-Clusters = initialize_Clusters_object(mother)
+E_iso = []
+config_iso = []
+for i in range(len(config)):
+    E_iso_i, iso_indices_pos = get_iso_config(config, i, saveas_json = False, drawing_flag =  False) 
+    E_iso = E_iso + E_iso_i
+    config_iso = config_iso + iso_indices_pos
 
-empty = 'grey'
-filled = 'r'
-occ = [empty, filled]
+#%%    
+ES_dict = {'E_iso': E_iso, 'config_iso': config_iso}
+with open('ES_iso.json', 'w') as outfile:
+    json.dump(ES_dict, outfile)
 
-# Generate the configuration graph
-Clusters.get_clusters(mother, iso_indices_pos) #one in layer 3 and one in layer 4
-Gcv = Clusters.Gcv
-#G2 = Gcv[1]
-
-for G2 in Gcv:
-    plt.figure()
-    lf.drawing(G2)
-# flip the sign to see if the graph mathces in pairs        
+#%%    
+#iso_indices_pos = get_iso_config(config, 3, drawing_flag =  False)  
+#Clusters = initialize_Clusters_object(mother)
+#struct_list = [mother[np.array(xi)] for xi in iso_indices_pos]
+#
+#empty = 'grey'
+#filled = 'r'
+#occ = [empty, filled]
+#
+## Generate the configuration graph
+#Clusters.get_clusters(mother, iso_indices_pos) #one in layer 3 and one in layer 4
+#Gcv = Clusters.Gcv
+##G2 = Gcv[1]
+#
+#for G2 in Gcv:
+#    plt.figure()
+#    lf.drawing(G2)
+#    flip the sign to see if the graph mathces in pairs        

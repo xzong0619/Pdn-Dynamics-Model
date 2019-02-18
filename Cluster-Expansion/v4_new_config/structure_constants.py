@@ -126,8 +126,6 @@ Configuration Energy
 Use pandas and copy clipboard in Excel to import data
 Ec =list(pd.read_clipboard(header = None)['0'])
 '''
-NPd_list =  []
-for configi in config: NPd_list.append(len(configi))
 
 
 

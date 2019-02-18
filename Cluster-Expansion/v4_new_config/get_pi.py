@@ -4,7 +4,7 @@ Created on Fri Aug 17 14:36:10 2018
 
 @author: wangyf
 """
-from structure_constants import mother, config, Ec
+from structure_constants import mother
 import lattice_functions as lf
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ empty = 'grey'
 filled = 'r'
 occ = [empty, filled]
 
-[Gm, Gsv, Gcv1, Gcv2, Gcv3] = pickle.load(open("clusters.p", "rb"))
+[Gm, Gsv, Gcv1, Gcv2, Gcv3, Gcv4] = pickle.load(open("clusters.p", "rb"))
 
 
 #%% Stattistical analysis
@@ -30,5 +30,6 @@ pi =  Cal.get_pi_matrix(Gsv ,Gcv)
 
 #%%
 
-np.save('pi3', pi, allow_pickle = True)
-#pi = np.load('pi3.npy')
+np.save('pi4', pi, allow_pickle = True)
+#pi4 = np.load('pi4.npy')
+

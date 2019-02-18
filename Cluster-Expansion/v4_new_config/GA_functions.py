@@ -98,7 +98,7 @@ def index_to_one_hot(ind_index, n_nodes = 36):
     return individual 
 
     
-def ase_object(individual):
+def ase_object(individual, view_flag = False):
     '''
     take in the 1/0 vector for index
     '''
@@ -151,8 +151,8 @@ def ase_object(individual):
     nPd = len(Pdnodes)
     for i in range(nPd):
         support.append(Atom('Pd', position = Pdm[i]))
-    #view(support) 
     
+    if view_flag: view(support) 
     
     return support
                 

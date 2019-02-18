@@ -12,21 +12,33 @@ from sklearn.metrics import mean_squared_error
 import sklearn.cross_validation as cv
 
 import numpy as np
-from structure_constants import Ec, NPd_list
 import pickle 
+import json
 
 import matplotlib.pyplot as plt 
 import matplotlib
 
-[Gm, Gsv, Gcv1, Gcv2, Gcv3] = pickle.load(open("clusters.p", "rb"))
+fit_int_flag = False
+
+with open('ES_iso.json') as f:
+    ES_data = json.load(f)
+    
+Ec = ES_data['E_iso']
+config = ES_data['config_iso']
+
+[Gm, Gsv, Gcv1, Gcv2, Gcv3, Gcv4] = pickle.load(open("clusters.p", "rb"))
 Gcv = Gcv1+Gcv2+Gcv3
 
-x = np.load('pi3.npy')
+x = np.load('pi4.npy')
 X = x
-NPd_list = np.array(NPd_list)
-#X = np.ones((x.shape[0], x.shape[1]+1)) #the first column of pi matrix is set a 1, to be the intercept
-#X[:,1:] = x     
+
+if not fit_int_flag:
+    X = np.ones((x.shape[0], x.shape[1]+1)) #the first column of pi matrix is set a 1, to be the intercept
+    X[:,1:] = x     
    
+# the number of Pd atoms in each structure
+NPd_list = np.array([len(x) for x in config])
+
 #%%
 
 y = np.array(Ec)
@@ -44,12 +56,12 @@ NPd_train = np.array(NPd_train)
                                  
 rkf = RepeatedKFold(n_splits = 10, n_repeats = 10, random_state=0)
 
-lasso_cv  = LassoCV(cv = rkf, max_iter = 10000, tol = 0.0001, fit_intercept=True, random_state=0)
+lasso_cv  = LassoCV(cv = rkf, max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag, random_state=5)
 lasso_cv.fit(X_train, y_train)
 alpha = lasso_cv.alpha_
 alphas = lasso_cv.alphas_
 
-alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=True)
+alphas, coef_path, _ = lasso_path(X_train, y_train, alphas = lasso_cv.alphas_, fit_intercept=fit_int_flag)
 #cv_scores = cv.cross_val_score(lasso_cv,X_train, y_train)
 
 
@@ -71,12 +83,20 @@ n_coef = len(J_index)
 J_nonzero = coefs[J_index] 
 pi_nonzero = X[:, J_index]
 n_nonzero = [] # number of nonzeor coefficients in the trajectory
-
-Gcv_nonzero = []
-for i in J_index:
-    Gcv_nonzero.append(Gcv[i]) 
 for i in range(coef_path.shape[1]):
     n_nonzero.append(len(np.nonzero(coef_path[:,i])[0]))
+
+Gcv_nonzero = []
+
+if not fit_int_flag: 
+    intercept = J_nonzero[0]
+    J_nonzero = J_nonzero[1:]
+    for i in J_index[1:]:
+        Gcv_nonzero.append(Gcv[i]) 
+
+else:       
+    for i in J_index:
+        Gcv_nonzero.append(Gcv[i]) 
 #%%
 '''
 Save Gcv_nonzero and n_nonzero for further use
