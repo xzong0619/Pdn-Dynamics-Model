@@ -110,6 +110,6 @@ def GA_structures(ngoal, n_hof = 20, view_flag = False):
     pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))
 
 
-GA_structures(10)
+GA_structures(8)
 
 #for n_goal_i in range(20,21): GA_structures(n_goal_i)
