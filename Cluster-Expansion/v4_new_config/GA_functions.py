@@ -340,19 +340,17 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
             fiv.append(fitnesses[:,fi])
            
         ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6], fiv[-7]))
-        i = ind[0]
+        best_i = ind[0]
         
         print( '\tIndividual with best fitness:')
-        print( '\tFitness = {} '.format(population[i].fitness.values))
+        print( '\tFitness = {} '.format(population[best_i].fitness.values))
         #print( '\tCV RMSE = {} eV'.format(np.sqrt(population[i].fitness.values[0])))
-    return i 
+    return best_i
 
 
 def find_best_individuals(COMM = None, population = None, nbest = 1):
     
     rank = get_rank(COMM)
-    
-    
     if rank == 0:
         fitnesses = get_fitnesses(population)
         fiv = []
@@ -361,19 +359,18 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
            
         ind = np.lexsort((fiv[-1], fiv[-2], fiv[-3], fiv[-4], fiv[-5], fiv[-6] , fiv[-7]))
         best_index = np.array([ind[0]])
-        i = 0 #Index of indiviuals
+        counter = 0 #Index of indiviuals
         count = 1 #count of qualifing individuals
     
         while count < nbest:
             best_pre = population[best_index[-1]]
-            best_next = population[ind[i]]
+            best_next = population[ind[counter]]
             if not best_pre.fitness.values == best_next.fitness.values:
-                best_index = np.append(best_index, ind[i])
+                best_index = np.append(best_index, ind[counter])
                 count = count + 1
                 
-            i = i + 1
-
-        
+            counter = counter + 1
+       
     return best_index
             
     

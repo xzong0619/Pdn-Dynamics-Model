@@ -25,6 +25,9 @@ with open('ES_iso.json') as f:
     
 Ec = ES_data['E_iso']
 config = ES_data['config_iso']
+# the number of Pd atoms in each structure
+NPd_list = np.array([len(x) for x in config])
+
 
 [Gm, Gsv, Gcv1, Gcv2, Gcv3, Gcv4] = pickle.load(open("clusters.p", "rb"))
 Gcv = Gcv1+Gcv2+Gcv3
@@ -36,8 +39,6 @@ if not fit_int_flag:
     X = np.ones((x.shape[0], x.shape[1]+1)) #the first column of pi matrix is set a 1, to be the intercept
     X[:,1:] = x     
    
-# the number of Pd atoms in each structure
-NPd_list = np.array([len(x) for x in config])
 
 #%%
 
