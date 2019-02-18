@@ -111,4 +111,4 @@ def GA_structures(ngoal, n_hof = 20, view_flag = False):
 
 
 
-for i in range(5,21): GA_structures(i)
+for n_goal_i in range(5,21): GA_structures(n_goal_i)
