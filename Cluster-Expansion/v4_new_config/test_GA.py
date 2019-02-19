@@ -41,7 +41,7 @@ import lattice_functions as lf
 
 
 #%%
-def GA_structures(ngoal, n_hof = 20, view_flag = False):
+def GA_structures(ngoal, n_hof = 20):
     
     #Genetic Hyperparameters
     
@@ -103,13 +103,12 @@ def GA_structures(ngoal, n_hof = 20, view_flag = False):
     
     ihof,E_hof  = GA.hall_of_fame(COMM, history, 20)
     (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof)
-    lf.drawing(best_config[0])
-    best_G = GA.individual_config(best_ind)
-    GA.ase_object(best_ind, view_flag  = view_flag)
-    ind_list = list(np.nonzero(best_ind)[0])
     pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))
+    
+    return best_ind
 
 
-GA_structures(8)
-
+best_ind  = GA_structures(6)
+best_G = GA.individual_config(best_ind)
+GA.ase_object(best_ind, view_flag  = True)
 #for n_goal_i in range(20,21): GA_structures(n_goal_i)

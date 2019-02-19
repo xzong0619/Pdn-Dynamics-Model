@@ -216,7 +216,7 @@ def evaluate(individual, ngoal,  Clusters = Clusters, Gcv =  Gcv_nonzero, J = J_
     fitness7 = float(np.dot(pi_pred, J) + intercept)
     
     if ngoal <= 10:
-        return fitness1,  fitness2, fitness3, fitness4, fitness5, fitness7, fitness6
+        return fitness1,  fitness2, fitness3, fitness6, fitness7, fitness4, fitness5
     if ngoal > 10 and ngoal <= 15:
         return fitness1,  fitness2, fitness3, fitness4, fitness7, fitness5, fitness6
     if ngoal > 15:

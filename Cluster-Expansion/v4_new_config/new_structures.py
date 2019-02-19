@@ -4,7 +4,7 @@ Created on Mon Feb  4 08:05:11 2019
 
 @author: wangyf
 """
-
+import os 
 import pickle
 import matplotlib.pyplot as plt 
 import matplotlib
@@ -12,10 +12,9 @@ import numpy as np
 import json
 import GA_functions as GA
 from ase.visualize import view
+from ase.io import read, write
 
-#import GA_functions as GA
-#from ase.io import read, write
-#from ase.visualize import view
+
 
 font = {'size'   : 20}
 
@@ -136,7 +135,7 @@ plt.show()
 '''
 Plot 4 Cluster Size vs DFT cluster energy selected clusters
 '''
-n_min = 3
+n_min = 4
 n_total = 0
 nPd = nPd_v[0]
 fig, ax = plt.subplots(figsize= (6,5))
@@ -176,34 +175,51 @@ for s in all_new_Pd:
 #view(all_new_atoms[0])
 #Pd_ind_fitness = dict()
 
+#%%
+new_Pd_dict = dict()
+new_E_dict = dict()
+new_atoms_dict = dict()
+new_count_dict = dict()
+
+for Pdi in nPd_v:
+    ns = min(len(new_E_min[Pdi]),n_min)
+    new_count_dict[Pdi] = ns
+    new_Pd_dict[Pdi] = new_Pd[Pdi][:ns]
+    new_E_dict[Pdi] = new_E[Pdi][:ns]
+    new_atoms_dict[Pdi] = [GA.ase_object(s) for s in new_Pd[Pdi][:ns]]
+    
+#%% Save the atom object
+def save_CONTCAR(Pdi, index, atoms):
+
+    Base_path = os.getcwd()
+    filename = 'Pd'+str(Pdi) +'-' + str(index) + '-CONTCAR'
+    output_dir = os.path.join(Base_path, 'outputs_CONTCAR')
+    if not os.path.exists(output_dir): os.makedirs(output_dir)    
+    write(os.path.join(output_dir, filename), atoms)
 
 
+def save_POV(Pdi, index, atoms):
 
+    pov_args = {
+    	'transparent': True, #Makes background transparent. I don't think I've had luck with this option though
+        'canvas_width': 1800., #Size of the width. Height will automatically be calculated. This value greatly impacts POV-Ray processing times
+        'display': False, #Whether you want to see the image rendering while POV-Ray is running. I've found it annoying
+        'rotation': '0x, 0y,0z', #Position of camera. If you want different angles, the format is 'ax, by, cz' where a, b, and c are angles in degrees
+        'celllinewidth': 0.02, #Thickness of cell lines
+        'show_unit_cell': 0 #Whether to show unit cell. 1 and 2 enable it (don't quite remember the difference)
+        #You can also color atoms by using the color argument. It should be specified by an list of length N_atoms of tuples of length 3 (for R, B, G)
+        #e.g. To color H atoms white and O atoms red in H2O, it'll be:
+        #colors: [(0, 0, 0), (0, 0, 0), (1, 0, 0)]
+        }
 
+    #Write to POV-Ray file
+    Base_path = os.getcwd()
+    filename = 'Pd'+str(Pdi) +'-' + str(index) + '.POV'
+    output_dir = os.path.join(Base_path, 'outputs_POV')
+    if not os.path.exists(output_dir): os.makedirs(output_dir)    
+    write(os.path.join(output_dir, filename), atoms, **pov_args)
 
-## Create atom objects for the qualified individuals into POV files
-#ns = 2 # frome each group select 2 
-#new_structure_pool = []
-#new_atoms = []
-#for Pdi in nPd_v:
-#    for si in range(ns):
-#        new_structure_pool.append(new_Pd_min[Pdi][si])
-#        new_atoms.append(GA.ase_object(new_Pd_min[Pdi][si]))
-#
-#
-#pov_args = {
-#	'transparent': True, #Makes background transparent. I don't think I've had luck with this option though
-#    'canvas_width': 3600., #Size of the width. Height will automatically be calculated. This value greatly impacts POV-Ray processing times
-#    'display': False, #Whether you want to see the image rendering while POV-Ray is running. I've found it annoying
-#    'rotation': '0x, 0y,0z', #Position of camera. If you want different angles, the format is 'ax, by, cz' where a, b, and c are angles in degrees
-#    'celllinewidth': 0.02, #Thickness of cell lines
-#    'show_unit_cell': 0 #Whether to show unit cell. 1 and 2 enable it (don't quite remember the difference)
-#    #You can also color atoms by using the color argument. It should be specified by an list of length N_atoms of tuples of length 3 (for R, B, G)
-#    #e.g. To color H atoms white and O atoms red in H2O, it'll be:
-#    #colors: [(0, 0, 0), (0, 0, 0), (1, 0, 0)]
-#    }
-##%%
-##Write to POV-Ray file
-#for k, atomi in enumerate(new_atoms):
-#    write('structure' + str(k)+'.POV', atomi, **pov_args)
-
+for Pdi in nPd_v:
+    for index in range(new_count_dict[Pdi]):
+        save_CONTCAR(Pdi, index+1, new_atoms_dict[Pdi][index])
+        save_POV(Pdi, index+1, new_atoms_dict[Pdi][index])
