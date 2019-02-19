@@ -30,14 +30,10 @@ from deap import creator
 from deap import tools
 
 from GA_functions import get_time
-[Gcv_nonzero, J_nonzero, 
- intercept, MSE_test, MSE_train,
- pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
 
 
 import GA_functions as GA
 import lattice_functions as lf
-
 
 
 #%%
@@ -47,7 +43,7 @@ def GA_structures(ngoal, n_hof = 20):
     
     nodes = 36 #lattice node size
     n = 100 #Size of population
-    ngen = 100 #Number of generations
+    ngen = 10 #Number of generations
     cxpb = 0.8 #The probability of mating two individuals
     mutpb = 0.05 #The probability of mutating an individual
     k = n
@@ -80,7 +76,7 @@ def GA_structures(ngoal, n_hof = 20):
     history = []
     
     
-    
+#   Would like to test on two individuals     
 #    ind1 = toolbox.individual()
 #    fit1 = toolbox.evaluate(ind1)
 #    pi1 = GA.evaluate_pi(ind1) 
@@ -106,8 +102,8 @@ def GA_structures(ngoal, n_hof = 20):
     
     return best_ind
 
-
-best_ind  = GA_structures(20)
-best_G = GA.individual_config(best_ind)
-GA.ase_object(best_ind, view_flag  = True)
-#for n_goal_i in range(20,21): GA_structures(n_goal_i)
+#
+#best_ind  = GA_structures(9)
+#best_G = GA.individual_config(best_ind)
+#GA.ase_object(best_ind, view_flag  = True)
+for n_goal_i in range(5,21): GA_structures(n_goal_i)

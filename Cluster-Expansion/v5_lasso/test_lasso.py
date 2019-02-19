@@ -128,9 +128,11 @@ else:
         Gcv_nonzero.append(Gcv[i]) 
 #%%
 '''
-Save Gcv_nonzero and n_nonzero for further use
+Save Gcv_nonzero and J_nonzero to pickle for further use
 ''' 
-pickle.dump([Gcv_nonzero, J_nonzero, intercept, RMSE_test, RMSE_train, pi_nonzero], open('lasso.p','wb'))
+pickle.dump([Gcv_nonzero, J_nonzero, intercept, 
+             RMSE_test, RMSE_train, pi_nonzero], open('lasso.p','wb'))
+    
     
 #%% Plot the regression results
     

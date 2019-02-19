@@ -8,6 +8,7 @@ Created on Mon Oct  1 16:14:01 2018
 import random
 import numpy as np 
 import pickle
+import json
 try:
     from mpi4py import MPI
 except:
@@ -25,35 +26,18 @@ from ase import Atoms, Atom
 from ase.build import surface
 from structure_constants import mother, dz
 
-[Gcv_nonzero, J_nonzero, 
- intercept, MSE_test, MSE_train,
- pi_nonzero,y] =  pickle.load(open("lasso.p", "rb"))
+# Load all structures
+with open('ES_iso.json') as f:
+    ES_data = json.load(f)
+    
+Ec = ES_data['E_iso']
+config = ES_data['config_iso']
+
+# Load Lasso results
+[Gcv_nonzero, J_nonzero, intercept, MSE_test, MSE_train, pi_nonzero] =  pickle.load(open("lasso.p", "rb"))
 
 #%%
-def initialize_Clusters_object():
-    
-    empty = 'grey'
-    filled = 'r'
-    occ = [empty, filled]
-    
-    '''
-    only draw 1st nearest neighbors?
-    '''
-    NN1 = 0
-    '''
-    Draw mother/conifgurations/clusters?
-    '''
-    draw = [0, 0, 0]
-    
-    
-    Clusters = lf.clusters(occ, NN1, draw)
-    Clusters.get_mother(mother, dz)
-    
-    return Clusters
 
-
-
-#%%
 def get_rank(COMM = None):
     if COMM is None:
         return 0
@@ -97,6 +81,37 @@ def index_to_one_hot(ind_index, n_nodes = 36):
     
     return individual 
 
+def config_pool():
+    '''
+    Generate the pool of configurations 
+    included in one hot encoding format
+    '''
+    config_list = [index_to_one_hot(x) for x in config]
+    
+    return config_list
+
+def initialize_Clusters_object():
+    '''
+    Create an empty cluster object
+    '''
+    empty = 'grey'
+    filled = 'r'
+    occ = [empty, filled]
+    
+    '''
+    only draw 1st nearest neighbors?
+    '''
+    NN1 = 0
+    '''
+    Draw mother/conifgurations/clusters?
+    '''
+    draw = [0, 0, 0]
+    
+    
+    Clusters = lf.clusters(occ, NN1, draw)
+    Clusters.get_mother(mother, dz)
+    
+    return Clusters
     
 def ase_object(individual, view_flag = False):
     '''
@@ -198,7 +213,7 @@ def predict_E(ind_index, Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercep
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
     E_pred = float(np.dot(pi_pred, J) + intercept)
     
-    return pi_pred
+    return E_pred
     
     
 def evaluate(individual, ngoal,  Gcv =  Gcv_nonzero, J = J_nonzero, intercept = intercept):
@@ -338,6 +353,9 @@ def print_generation_number(COMM = None, generation = None):
         print( '{}  Core {}  Generation {}'.format(get_time(), rank, generation))
 
 def find_best_individual(COMM = None, population = None, nbest = 1):
+    '''
+    find the best individual in a population
+    '''
     rank = get_rank(COMM)
     if rank == 0:
         fitnesses = get_fitnesses(population)
@@ -355,9 +373,20 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
 
 
 def find_best_individuals(COMM = None, population = None, nbest = 1):
-    
+    '''
+    find top nbest individuals in a given population
+    '''
     rank = get_rank(COMM)
     if rank == 0:
+        
+        # Take out the repeated individuals in the population
+        config_list =  config_pool()
+        population_flags = [x in config_list for x in population]
+        population_new = []
+        for i, flag_i in enumerate(population_flags):
+            if not flag_i: population_new.append(population[i])
+        population = population_new
+        
         fitnesses = get_fitnesses(population)
         fiv = []
         for fi in range(fitnesses.shape[1]):
@@ -374,7 +403,7 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
             if not best_pre.fitness.values == best_next.fitness.values:
                 best_index = np.append(best_index, ind[counter])
                 count = count + 1
-                
+            # Increase the counter by 1
             counter = counter + 1
        
     return best_index
