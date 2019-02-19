@@ -178,7 +178,7 @@ def evaluate_pi(individual, Gcv =  Gcv_nonzero):
     
     Clusters = initialize_Clusters_object()
     occ = Clusters.occupancy
-    Gsv = individual_config(individual, Clusters)
+    Gsv = individual_config(individual)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
     
@@ -205,7 +205,7 @@ def evaluate(individual, ngoal,  Gcv =  Gcv_nonzero, J = J_nonzero, intercept = 
    
     Clusters = initialize_Clusters_object()
     occ = Clusters.occupancy
-    Gsv = individual_config(individual, Clusters)
+    Gsv = individual_config(individual)
     occ_nodes = one_hot_to_index(individual)
     Cal = lf.calculations(occ)
     pi_pred =  Cal.get_pi_matrix(Gsv ,Gcv)
@@ -422,7 +422,7 @@ def winner_details(COMM = None, population = None,  Gcv =  Gcv_nonzero):
     best_ind = population[i]
     best_fitness = best_ind.fitness.values
     best_pi = evaluate_pi(best_ind, Gcv)
-    best_config = individual_config(best_ind, Clusters)
+    best_config = individual_config(best_ind)
     
     return(best_ind, best_fitness, best_pi, best_config)
     

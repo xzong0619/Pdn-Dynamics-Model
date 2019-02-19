@@ -99,7 +99,6 @@ def GA_structures(ngoal, n_hof = 20):
         GA.find_best_individual(COMM, population)
         history = GA.write_history(population, history)
         
-        
     
     ihof,E_hof  = GA.hall_of_fame(COMM, history, 20)
     (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof)
@@ -108,7 +107,7 @@ def GA_structures(ngoal, n_hof = 20):
     return best_ind
 
 
-best_ind  = GA_structures(6)
+best_ind  = GA_structures(20)
 best_G = GA.individual_config(best_ind)
 GA.ase_object(best_ind, view_flag  = True)
 #for n_goal_i in range(20,21): GA_structures(n_goal_i)
