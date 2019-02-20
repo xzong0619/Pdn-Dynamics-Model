@@ -29,10 +29,10 @@ from deap import base
 from deap import creator
 from deap import tools
 
-from GA_functions import get_time
+from GA_functions_no_mpi import get_time
 
 
-import GA_functions as GA
+import GA_functions_no_mpi as GA
 import lattice_functions as lf
 
 
