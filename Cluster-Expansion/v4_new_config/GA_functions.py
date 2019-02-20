@@ -264,7 +264,9 @@ def evaluate_population(COMM = None, toolbox = None, population = None):
     if COMM is None:
         fitnesses_list = [fitnesses_mpi]
     else:
+        print('\t{} Core {} Before gather.'.format(get_time(), rank))
         fitnesses_list = MPI.COMM_WORLD.gather(fitnesses_mpi, root = 0)
+        print('\t{} Core {} After gather.'.format(get_time(), rank))
     if rank == 0:
         print('\t{}  Core {}  Assigning fitness to population.'.format(get_time(), rank))
         for fitnesses_dict in fitnesses_list:
