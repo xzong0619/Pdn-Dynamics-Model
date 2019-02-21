@@ -37,10 +37,10 @@ import lattice_functions as lf
 
 
 #%%
+    #ngoal = 6
 def GA_structures(ngoal, n_hof = 20):
-    
-    #Genetic Hyperparameters
-    
+        #Genetic Hyperparameters
+        
     nodes = 36 #lattice node size
     n = 100 #Size of population
     ngen = 10 #Number of generations
@@ -76,14 +76,14 @@ def GA_structures(ngoal, n_hof = 20):
     history = []
     
     
-#   Would like to test on two individuals     
-#    ind1 = toolbox.individual()
-#    fit1 = toolbox.evaluate(ind1)
-#    pi1 = GA.evaluate_pi(ind1) 
-#    
-#    ind2 = toolbox.individual()
-#    fit2 = toolbox.evaluate(ind2)
-#    pi2 = GA.evaluate_pi(ind2) 
+    #   Would like to test on two individuals     
+    #    ind1 = toolbox.individual()
+    #    fit1 = toolbox.evaluate(ind1)
+    #    pi1 = GA.evaluate_pi(ind1) 
+    #    
+    #    ind2 = toolbox.individual()
+    #    fit2 = toolbox.evaluate(ind2)
+    #    pi2 = GA.evaluate_pi(ind2) 
     
     for generation in range(ngen):
         GA.print_generation_number(COMM, generation)
@@ -99,11 +99,11 @@ def GA_structures(ngoal, n_hof = 20):
     ihof,E_hof  = GA.hall_of_fame(COMM, history, 20)
     (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof)
     pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))
-    
+
     return best_ind
 
 #
-#best_ind  = GA_structures(9)
-#best_G = GA.individual_config(best_ind)
-#GA.ase_object(best_ind, view_flag  = True)
-for n_goal_i in range(5,21): GA_structures(n_goal_i)
+best_ind  = GA_structures(9)
+best_G = GA.individual_config(best_ind)
+GA.ase_object(best_ind, view_flag  = True)
+#for n_goal_i in range(5,21): GA_structures(n_goal_i)

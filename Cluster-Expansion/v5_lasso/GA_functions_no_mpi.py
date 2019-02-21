@@ -279,12 +279,13 @@ def evaluate_population(COMM = None, toolbox = None, population = None):
 #        jobs_mpi = COMM.scatter(jobs_split, root = 0)
 
     #Evaluate fitness
+    fitnesses_list = []
     fitnesses_mpi = {}
     for i, individual_mpi in zip(jobs_mpi, population_mpi):
         fitnesses_mpi[i] = toolbox.evaluate(individual_mpi)
     print('\t{}  Core {}  Finished evaluating individuals'.format(get_time(), rank))
-    if COMM is None:
-        fitnesses_list = [fitnesses_mpi]
+    #if COMM is None:
+    fitnesses_list = [fitnesses_mpi]
 #    else:
 #        fitnesses_list = MPI.COMM_WORLD.gather(fitnesses_mpi, root = 0)
 #    if rank == 0:
@@ -294,6 +295,7 @@ def evaluate_population(COMM = None, toolbox = None, population = None):
             population[i].fitness.values = fitness
 #    else:
 #        population = None
+        
     return population
 
 def generate_offspring(COMM = None, toolbox = None, population = None, cxpb = None):
@@ -353,6 +355,18 @@ def print_generation_number(COMM = None, generation = None):
 #    if rank == 0:
     print( '{}  Core {}  Generation {}'.format(get_time(), rank, generation))
 
+def get_fitnesses(population = None):
+    '''
+    normalize the fitness values
+    '''
+    fitness_tuple = np.array([individual.fitness.values for individual in population])
+    
+    #fitness_max = np.max(fitness_tuple, axis = 0)
+    #normalized_fit = fitness_tuple/fitness_max
+    #normalized_fit[:,-1] = 1-normalized_fit[:,-1]
+    
+    return fitness_tuple
+
 def find_best_individual(COMM = None, population = None, nbest = 1):
     '''
     find the best individual in a population
@@ -410,17 +424,7 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
     return best_index
             
     
-def get_fitnesses(population = None):
-    '''
-    normalize the fitness values
-    '''
-    fitness_tuple = np.array([individual.fitness.values for individual in population])
-    
-    #fitness_max = np.max(fitness_tuple, axis = 0)
-    #normalized_fit = fitness_tuple/fitness_max
-    #normalized_fit[:,-1] = 1-normalized_fit[:,-1]
-    
-    return fitness_tuple
+
 
 def write_history(population, history):
     for pi in population:
@@ -441,7 +445,6 @@ def hall_of_fame(COMM = None, history = None, nbest = None):
         print( '\tIndividual {} with best fitness:  Fitness = {}'.format(i, hof[i].fitness.values))
     
     return hof, E_hof 
-
 
 
 def winner_details(COMM = None, population = None,  Gcv =  Gcv_nonzero):
