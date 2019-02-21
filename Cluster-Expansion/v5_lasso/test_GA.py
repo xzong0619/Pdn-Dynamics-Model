@@ -25,9 +25,6 @@ else:
 	rank = COMM.rank
     
 
-from deap import base
-from deap import creator
-from deap import tools
 
 from GA_functions_no_mpi import get_time
 
@@ -119,14 +116,10 @@ def GA_structures(ngoal, n_hof = 20):
     k = n
     tournsize = 10
     
-    score_weights = (-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
-    
+    tools, base, creator = GA.import_deap()
     print('{}  Core {}  Reading files'.format(get_time(), rank))
     
-    #Create the fitness object
-    creator.create("FitnessMin", base.Fitness, weights = score_weights)
-    #Create an individual
-    creator.create("Individual", list, fitness = creator.FitnessMin)
+
     
     #Create the toolbox
     toolbox = base.Toolbox()
@@ -170,4 +163,4 @@ def GA_structures(ngoal, n_hof = 20):
     (best_ind, best_fitness, best_pi, best_config) = GA.winner_details(COMM, ihof)
     pickle.dump([ihof, E_hof], open('pd_'+str(ngoal) + '.p','wb'))    
 
-for n_goal_i in range(7,20): GA_structures(n_goal_i)
+for n_goal_i in range(4,5): GA_structures(n_goal_i)

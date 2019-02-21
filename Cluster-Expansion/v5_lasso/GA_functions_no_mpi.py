@@ -38,6 +38,22 @@ config = ES_data['config_iso']
 
 #%%
 
+def import_deap():
+    '''
+    import deap object and create individuals 
+    '''
+    from deap import tools
+    from deap import base
+    from deap import creator
+    score_weights = (-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0) #tuple for min-1.0, max+1.0
+    #Create the fitness object
+    creator.create("FitnessMin", base.Fitness, weights = score_weights)
+    #Create an individual
+    creator.create("Individual", list, fitness = creator.FitnessMin)
+    
+    return tools, base, creator
+
+
 def get_rank(COMM = None):
     if COMM is None:
         return 0
