@@ -394,13 +394,6 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
     #rank = get_rank(COMM)
 #    if rank == 0:
         
-    # Take out the repeated individuals in the population
-    config_list =  config_pool()
-    population_flags = [x in config_list for x in population]
-    population_new = []
-    for i, flag_i in enumerate(population_flags):
-        if not flag_i: population_new.append(population[i])
-    population = population_new
     
     fitnesses = get_fitnesses(population)
     fiv = []
@@ -433,6 +426,14 @@ def write_history(population, history):
     return history
     
 def hall_of_fame(COMM = None, history = None, nbest = None):
+    
+    # Take out the repeated individuals in the population
+    config_list =  config_pool()
+    population_flags = [x in config_list for x in history]
+    population_new = []
+    for i, flag_i in enumerate(population_flags):
+        if not flag_i: population_new.append(history[i])
+    history = population_new
     
     print( '\nHall of Fame top {}:'.format(nbest))
     ihof = find_best_individuals(COMM, history, nbest)
