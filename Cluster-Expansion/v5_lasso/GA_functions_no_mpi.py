@@ -403,7 +403,7 @@ def find_best_individual(COMM = None, population = None, nbest = 1):
     return best_i
 
 
-def find_best_individuals(COMM = None, population = None, nbest = 1):
+def find_best_individuals(COMM = None,  population = None, nbest = 1):
     '''
     find top nbest individuals in a given population
     '''
@@ -420,8 +420,9 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
     best_index = np.array([ind[0]])
     counter = 0 #Index of indiviuals
     count = 1 #count of qualifing individuals
+    
 
-    while count < nbest:
+    while count < nbest and counter < len(population):
         best_pre = population[best_index[-1]]
         best_next = population[ind[counter]]
         if not best_pre.fitness.values == best_next.fitness.values:
@@ -431,8 +432,6 @@ def find_best_individuals(COMM = None, population = None, nbest = 1):
         counter = counter + 1
        
     return best_index
-            
-    
 
 
 def write_history(population, history):
@@ -441,7 +440,7 @@ def write_history(population, history):
     
     return history
     
-def hall_of_fame(COMM = None, history = None, nbest = None):
+def hall_of_fame(COMM = None, history = None, nbest = None, output = True):
     
     # Take out the repeated individuals in the population
     config_list =  config_pool()
@@ -451,16 +450,18 @@ def hall_of_fame(COMM = None, history = None, nbest = None):
         if not flag_i: population_new.append(history[i])
     history = population_new
     
-    print( '\nHall of Fame top {}:'.format(nbest))
+    
     ihof = find_best_individuals(COMM, history, nbest)
     hof = []
     E_hof = []
     for ih in ihof:
         hof.append(history[ih])
-        E_hof.append(min(history[ih].fitness.values))
-    for i in range(nbest):
-        print( '\tIndividual {} with best fitness:  Fitness = {}'.format(i, hof[i].fitness.values))
-    
+        E_hof.append(min(history[ih].fitness.values)) #Take out the energy value
+    if output: 
+        print( '\nHall of Fame top {}:'.format(nbest))
+        for i in range(nbest):
+            print( '\tIndividual {} with best fitness:  Fitness = {}'.format(i, hof[i].fitness.values))
+        
     return hof, E_hof 
 
 
