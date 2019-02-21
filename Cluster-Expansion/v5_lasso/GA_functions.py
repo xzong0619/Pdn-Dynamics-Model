@@ -241,7 +241,7 @@ def evaluate(individual, ngoal,  Gcv =  Gcv_nonzero, J = J_nonzero, intercept = 
     if ngoal > 10 and ngoal <= 15:
         return fitness1,  fitness2, fitness3, fitness4, fitness7, fitness5, fitness6
     if ngoal > 15:
-        return fitness1,  fitness7, fitness2, fitness3, fitness4, fitness5, fitness6
+        return fitness1,  fitness2, fitness7, fitness3, fitness4, fitness5, fitness6
 
 
 def make_initial_population(COMM = None, toolbox = None, n = None):

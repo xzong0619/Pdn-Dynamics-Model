@@ -43,7 +43,7 @@ def GA_structures(ngoal, n_hof = 20):
         
     nodes = 36 #lattice node size
     n = 100 #Size of population
-    ngen = 10 #Number of generations
+    ngen = 100 #Number of generations
     cxpb = 0.8 #The probability of mating two individuals
     mutpb = 0.05 #The probability of mutating an individual
     k = n
@@ -103,7 +103,7 @@ def GA_structures(ngoal, n_hof = 20):
     return best_ind
 
 #
-best_ind  = GA_structures(9)
-best_G = GA.individual_config(best_ind)
-GA.ase_object(best_ind, view_flag  = True)
-#for n_goal_i in range(5,21): GA_structures(n_goal_i)
+#best_ind  = GA_structures(21)
+#best_G = GA.individual_config(best_ind)
+#GA.ase_object(best_ind, view_flag  = True)
+for n_goal_i in range(6,20): GA_structures(n_goal_i)
