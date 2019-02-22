@@ -215,5 +215,40 @@ def plot_lasso():
     plt.show()
     
 
+#%% Ridge regression
+from sklearn.linear_model import RidgeCV
 
-    
+# Compute paths
+
+n_alphas = 2
+alphas = np.logspace(-5, 0, n_alphas)
+
+coef_path_ridge = []
+for a in alphas:
+    ridge_cv = RidgeCV(alpha=a, cv = rkf, max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag, random_state=5)
+    ridge_cv.fit(X_train, y_train)
+    coef_path_ridge.append(ridge_cv.coef_)
+    cvm = ridge_cv.cv_values_ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
