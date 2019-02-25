@@ -236,7 +236,7 @@ from sklearn.linear_model import RidgeCV, Ridge
 from sklearn.linear_model import ElasticNetCV, enet_path
       
 
-enet_cv  = ElasticNetCV(cv = rkf, l1_ratio=0.5,  max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag, random_state=5)
+enet_cv  = ElasticNetCV(cv = rkf, l1_ratio=0.98,  max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag, random_state=5)
 enet_cv.fit(X_train, y_train)
 
 # the optimal alpha
