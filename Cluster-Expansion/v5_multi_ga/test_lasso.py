@@ -143,7 +143,7 @@ def predict_y(x, intercept, J_nonzero):
     # the results should be the same as y = lasso_cv.predict(X)
     return y
     
-def plot_lasso():
+def plot_path(alphas, RMSE_path, n_nonzero_v, model, model_name):
     
     '''
     #plot alphas vs RMSE along the path
@@ -162,7 +162,7 @@ def plot_lasso():
     plt.ylabel("log10(RMSE (eV))")    
     plt.tight_layout()
     matplotlib.rc('font', **font)
-    fig.savefig('lasso_a_vs_cv.png')
+    fig.savefig(model_name + '_a_vs_cv.png')
     plt.show()   
        
     
@@ -181,14 +181,14 @@ def plot_lasso():
     plt.ylabel("Number of Nonzero Coefficients ")    
     plt.tight_layout()
     matplotlib.rc('font', **font)
-    fig.savefig('lasso_a_vs_n.png')
+    fig.savefig(model_name + '_a_vs_n.png')
     plt.show() 
     
     
     '''
     #plot parity plot
     '''
-    y_predict_all = lasso_cv.predict(X)
+    y_predict_all = model.predict(X)
     #y_predict_all = predict_y(pi_nonzero, intercept, J_nonzero)
     
     plt.figure(figsize=(6,4))
@@ -211,34 +211,90 @@ def plot_lasso():
 
     matplotlib.rc('font', **font)
     plt.tight_layout()
-    fig.savefig('lasso_parity.png')
+    fig.savefig(model_name + '_parity.png')
     plt.show()
     
-
+plot_path(alphas, RMSE_path, n_nonzero_v, lasso_cv, 'lasso')
 #%% Ridge regression
 from sklearn.linear_model import RidgeCV, Ridge
 
 # Compute paths
 
-n_alphas = 2
-alphas = np.logspace(-5, 0, n_alphas)
-
-coef_path_ridge = []
-for a in alphas:
-    ridge_cv = Ridge(alpha=a, fit_intercept=fit_int_flag)
-    ridge_cv.fit(X_train, y_train)
-    coef_path_ridge.append(ridge_cv.coef_)
-    cvm = ridge_cv.cv_values_ 
+#n_alphas = 2
+#alphas = np.logspace(-5, 0, n_alphas)
+#
+#coef_path_ridge = []
+#for a in alphas:
+#    ridge_cv = Ridge(alpha=a, fit_intercept=fit_int_flag)
+#    ridge_cv.fit(X_train, y_train)
+#    coef_path_ridge.append(ridge_cv.coef_)
+#    cvm = ridge_cv.cv_values_ 
 
 
 
 #%% Elastic net
+from sklearn.linear_model import ElasticNetCV, enet_path
+      
+
+enet_cv  = ElasticNetCV(cv = rkf, l1_ratio=0.5,  max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag, random_state=5)
+enet_cv.fit(X_train, y_train)
+
+# the optimal alpha
+enet_alpha = enet_cv.alpha_
+# the alpha path
+enet_alphas = enet_cv.alphas_
+
+enet_alphas, enet_coef_path, _ = enet_path(X_train, y_train, l1_ratio=enet_cv.l1_ratio, alphas = enet_cv.alphas_, fit_intercept=fit_int_flag)
+
+# Coefficients for each term
+enet_coefs = enet_cv.coef_
+# The original intercepts 
+enet_intercept = enet_cv.intercept_
+
+# Access the errors 
+y_predict_test = enet_cv.predict(X_test)
+y_predict_train = enet_cv.predict(X_train)
+
+enet_RMSE_test = np.sqrt(sum(((y_test - y_predict_test)/NPd_test)**2)/len(y_test))
+enet_RMSE_train = np.sqrt(sum(((y_train - y_predict_train)/NPd_train)**2)/len(y_test))
+
+enet_RMSE_path = np.sqrt(np.mean(enet_cv.mse_path_, axis = 1))
+
+
+#%% Select the significant cluster interactions 
+# The tolerance for zero coefficients
+Tol = 1e-7
+# The indices for non-zero coefficients/significant cluster interactions 
+J_index = np.where(abs(enet_coefs)>=Tol)[0]
+# The number of non-zero coefficients/significant cluster interactions  
+n_nonzero = len(J_index)
+# The values of non-zero coefficients/significant cluster interactions  
+J_nonzero = enet_coefs[J_index] 
+pi_nonzero = X[:, J_index]
+
+# The number of nonzero coefficients in the trajectory
+n_nonzero_v = []
+for i in range(coef_path.shape[1]):
+    n_nonzero_v.append(len(np.nonzero(enet_coef_path[:,i])[0]))
+
+# Pick the significant clusters
+Gcv_nonzero = []
+
+# Adjust for the manual intercept fitting
+if not fit_int_flag:
     
-    
+    intercept = J_nonzero[0]
+    n_nonzero = n_nonzero - 1 
+    J_nonzero = J_nonzero[1:]
+    pi_nonzero = pi_nonzero[:,1:]
+    for i in J_index[1:]:
+        # take out the first one and adjust the indices by -1 
+        Gcv_nonzero.append(Gcv[i-1]) 
+else:       
+    for i in J_index:
+        Gcv_nonzero.append(Gcv[i]) 
 
-
-
-
+plot_path(enet_alphas, enet_RMSE_path, n_nonzero_v, enet_cv, 'elasticnet')
 
 
 
