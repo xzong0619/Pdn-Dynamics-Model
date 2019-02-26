@@ -336,7 +336,7 @@ def l1_enet(ratio):
     enet_RMSE_test_atom = np.sqrt(mean_squared_error(y_test/NPd_test, y_predict_test/NPd_test))
     enet_RMSE_train_atom = np.sqrt(mean_squared_error(y_train/NPd_train, y_predict_train/NPd_train))
 
-    return enet_alpha, n_nonzero, enet_RMSE_test, enet_RMSE_train, enet_RMSE_test_atom, enet_RMSE_train_atom
+    return enet_cv, enet_alpha, n_nonzero, enet_RMSE_test, enet_RMSE_train, enet_RMSE_test_atom, enet_RMSE_train_atom
 
 # The vector of l1 ratio
 l1s = [.1, .5, .7, .9, .95, .99, 1]
@@ -351,7 +351,9 @@ enet_RMSE_train_atom = []
 
 for i, l1i in enumerate(l1s):
     print('{} % done'.format(100*(i+1)/len(l1s)))
-    ai, n, RMSE_test, RMSE_train, RMSE_test_atom, RMSE_train_atom = l1_enet(l1i)
+    enet_cv, ai, n, RMSE_test, RMSE_train, RMSE_test_atom, RMSE_train_atom = l1_enet(l1i)
+    
+    enet.append(enet_cv)
     enet_alphas.append(ai)
     enet_n.append(n)
     
@@ -389,7 +391,45 @@ ax2.tick_params('y', colors='r')
 fig.tight_layout()
 fig.savefig('elastic_net.png')
 
+#%% Select the significant cluster interactions 
+enet_coef_095 = enet[l1s.index(0.95)].coef_
+# The tolerance for zero coefficients
+Tol = 1e-7
+# The indices for non-zero coefficients/significant cluster interactions 
+J_index = np.where(abs(enet_coef_095)>=Tol)[0]
+# The number of non-zero coefficients/significant cluster interactions  
+n_nonzero = len(J_index)
+# The values of non-zero coefficients/significant cluster interactions  
+J_nonzero = enet_coef_095[J_index] 
+pi_nonzero = X[:, J_index]
 
+# Pick the significant clusters
+Gcv_nonzero = []
+
+# Adjust for the manual intercept fitting
+if not fit_int_flag:
+    
+    intercept = J_nonzero[0]
+    n_nonzero = n_nonzero - 1 
+    J_nonzero = J_nonzero[1:]
+    pi_nonzero = pi_nonzero[:,1:]
+    for i in J_index[1:]:
+        # take out the first one and adjust the indices by -1 
+        Gcv_nonzero.append(Gcv[i-1]) 
+else:       
+    for i in J_index:
+        Gcv_nonzero.append(Gcv[i]) 
+# You can plot the cluster radius 
+#
+#xi = np.arange(len(coefs))
+#fig, ax = plt.subplots()
+#plt.bar(xi, coefs)
+#linex = np.arange(xi.min()-1, xi.max()+2)
+#plt.plot(linex, linex*0, c = 'k')
+#plt.xticks(xi, terms, rotation=45 )
+#plt.ylabel("Regression Coefficient Value (eV)")
+#plt.xlabel("Regression Coefficient")  
+#plt.show()
 
 
 
