@@ -56,7 +56,7 @@ def plot_ridge_path(alpha, alphas, RMSE_path, model_name):
     plt.plot(-np.log10(alphas), np.mean(RMSE_path, axis = 1), 
              label='Average across the folds', linewidth=2)  
     plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
-                label='alpha: CV estimate') 
+                label='Optimal alpha') 
     
     plt.legend(frameon=False,loc='best')
     plt.xlabel(r'$-log10(\lambda)$')
@@ -87,7 +87,7 @@ def plot_path(alpha, alphas, RMSE_path, coef_path, model, model_name):
     plt.plot(-np.log10(alphas), np.mean(np.sqrt(RMSE_path), axis = 1), 
              label='Average across the folds', linewidth=2)  
     plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
-                label='alpha: CV estimate') 
+                label='Optimal alpha') 
     
     plt.legend(frameon=False,loc='best')
     plt.xlabel(r'$-log10(\lambda)$')
@@ -107,7 +107,7 @@ def plot_path(alpha, alphas, RMSE_path, coef_path, model, model_name):
     plt.plot(-np.log10(alphas),n_nonzero_v,
              label='Average across the folds', linewidth=2)     
     plt.axvline(-np.log10(alpha), linestyle='--' , color='r', linewidth=3,
-                label='alpha: CV estimate') 
+                label='Optimal alpha') 
     plt.legend(frameon=False, loc='best')
     plt.xlabel(r'$-log10(\lambda)$')
     plt.ylabel("Number of Nonzero Coefficients ")    
@@ -290,7 +290,7 @@ ridge_RMSE_path = cal_RMSE_path(alphas_grid, Ridge)
 ridge_alpha =  alphas_grid[np.argmin(np.mean(ridge_RMSE_path, axis =1))]
 plot_ridge_path(ridge_alpha, alphas_grid, ridge_RMSE_path, 'ridge')
 
-ridge = Ridge(alpha = ridge_alpha,  fit_intercept=fit_int_flag)
+ridge = Ridge(alpha = ridge_alpha,  max_iter = 1e7, tol = 0.0001, fit_intercept=fit_int_flag)
 ridge.fit(X_train, y_train)
 
 # Access the errors 
@@ -309,7 +309,7 @@ ridge_RMSE_train_atom = np.sqrt(mean_squared_error(y_train/NPd_train, y_predict_
 l1 ratio = 1 - lasso, l1 
 l1 ratio = 0 - ridge, l2
 '''
-from sklearn.linear_model import ElasticNetCV
+from sklearn.linear_model import ElasticNetCV, enet_path, ElasticNet
       
 def l1_enet(ratio):
     
@@ -360,7 +360,13 @@ for i, l1i in enumerate(l1s):
     
     enet_RMSE_test_atom.append(RMSE_test_atom)
     enet_RMSE_train_atom.append(RMSE_train_atom)
-
+'''
+#Use alpha grid prepare for enet_path when l1_ratio  = 0.95
+'''
+#%%enet_path to get alphas and coef_path
+enet_alphas_095, enet_coef_path_095, _ = enet_path(X_train, y_train, alphas = alphas_grid, fit_intercept=fit_int_flag)
+enet_RMSE_path_095 = cal_RMSE_path(alphas_grid, ElasticNet)    
+plot_path(enet_alphas[l1s.index(0.95)], enet_alphas_095, enet_RMSE_path_095, enet_coef_path_095, lasso_cv, 'elasticnet095')
 
 #%% Plot elastic net results
 # expand the vector, put the result of ridge to the first
@@ -369,14 +375,14 @@ enet_n_v  = np.array([X.shape[1]] + enet_n)
 enet_RMSE_test_v = np.array([ridge_RMSE_test] + enet_RMSE_test)
 plt.figure(figsize=(6,4))
 fig, ax1 = plt.subplots()
-ax1.plot(l1_ratio_v, enet_RMSE_test_v, 'b-')
+ax1.plot(l1_ratio_v, enet_RMSE_test_v, 'bo-')
 ax1.set_xlabel('L1 Ratio')
 # Make the y-axis label, ticks and tick labels match the line color.
 ax1.set_ylabel('RMSE/cluster(ev)', color='b')
 ax1.tick_params('y', colors='b')
 
 ax2 = ax1.twinx()
-ax2.plot(l1_ratio_v, enet_n_v, 'r')
+ax2.plot(l1_ratio_v, enet_n_v, 'ro-')
 ax2.set_ylabel('Number of Nonzero Coefficients', color='r')
 ax2.tick_params('y', colors='r')
 
