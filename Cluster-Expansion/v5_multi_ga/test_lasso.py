@@ -364,7 +364,7 @@ for i, l1i in enumerate(l1s):
 #Use alpha grid prepare for enet_path when l1_ratio  = 0.95
 '''
 #%%enet_path to get alphas and coef_path
-enet_alphas_095, enet_coef_path_095, _ = enet_path(X_train, y_train, alphas = alphas_grid, fit_intercept=fit_int_flag)
+enet_alphas_095, enet_coef_path_095, _ = enet_path(X_train, y_train, l1_ratio=0.95, alphas = alphas_grid, fit_intercept=fit_int_flag)
 enet_RMSE_path_095 = cal_RMSE_path(alphas_grid, ElasticNet)    
 plot_path(enet_alphas[l1s.index(0.95)], enet_alphas_095, enet_RMSE_path_095, enet_coef_path_095, lasso_cv, 'elasticnet095')
 
