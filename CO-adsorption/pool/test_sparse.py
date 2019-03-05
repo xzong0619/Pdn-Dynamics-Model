@@ -48,3 +48,6 @@ for i in [4,5,6,7]:
     X[:,i] = V2 + np.random.randn(n) 
 for i in [8,9]:
     X[:,i] = V3 + np.random.randn(n) 
+    
+    
+    
