@@ -33,7 +33,7 @@ plot_PCi <- function(iPC, lambda_range) {
     
     pc <- spca(pitprops, K=iPC, type="Gram", sparse="penalty", trace=TRUE, 
                para = c(pre_lambdas, lambda1[i])) 
-   
+    
     pc_pev[i] <- pc$pev[iPC]
   }
   
@@ -62,8 +62,3 @@ plot_PCi(5,1.1)
 
 # PC 6
 plot_PCi(6,1.1)
-
-
-
-
-
