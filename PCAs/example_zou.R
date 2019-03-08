@@ -14,3 +14,4 @@ out2
 names(out2) 
 ## to get the loadings 
 out2$loadings
+print.spca(out2)
