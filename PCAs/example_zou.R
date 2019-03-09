@@ -15,3 +15,6 @@ names(out2)
 ## to get the loadings 
 out2$loadings
 print.spca(out2)
+
+# Compare SPCA and prcomp, not possible, cannnot use cor matrix instead of data matrix
+out3<-spca(pitprops,K=6,type="Gram",sparse="penalty",trace=TRUE,para=rep(0, times = 13)) 

@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.decomposition import SparsePCA
 from sklearn.decomposition import PCA 
-from sklearn.preprocessing import StandardScaler 
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+ 
 '''
 Create the dataset
 '''
@@ -10,7 +12,7 @@ Create the dataset
 np.random.seed(seed=0)
 
 # Number of data points
-n = 100
+n = 1000
 
 # Number of parameters
 p = 10
@@ -75,3 +77,7 @@ print(flag4)
 
 flag5 = np.allclose(eig_vecs, spca_c)
 print(flag5)
+
+#%% Save the Xstd to a csv file
+X_std_df = pd.DataFrame(X_std, columns=['x'+str(i) for i in range(1,p+1)])
+X_std_df.to_csv('synthetic_data.csv', index=False, index_label=False)
